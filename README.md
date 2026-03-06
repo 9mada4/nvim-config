@@ -28,6 +28,33 @@ nvim
 ## 4. Set Font
 - Terminal.app で，`設定 > プロファイル > フォント` から `FiraCode Nerd Font Mono` へ変更
 
-|                 設定画面                 |               フォント選択画面               |
-| :----------------------------------: | :----------------------------------: |
-| ![[Pasted image 20260303200304.png]] | ![[Pasted image 20260303200431.png]] |
+## 5. IME auto OFF when returning to Terminal (optional)
+
+### Install
+```zsh
+brew install --cask hammerspoon
+```
+
+### Configure
+```zsh
+mkdir -p ~/.hammerspoon
+nvim ~/.hammerspoon/init.lua
+```
+Paste this -> `:wq`
+```zsh
+local terminals = {
+  Terminal = true,
+  iTerm2 = true,
+  WezTerm = true,
+}
+
+hs.application.watcher.new(function(appName, eventType)
+  if eventType == hs.application.watcher.deactivated then
+    if terminals[appName] then
+      hs.keycodes.setMethod("ABC")
+    end
+  end
+end):start()
+```
+### Reload config
+`Hammerspoon menu` -> `Reload Config`
