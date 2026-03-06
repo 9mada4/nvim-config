@@ -16,3 +16,10 @@ vim.keymap.set("n", "<leader>fb", "<cmd>Telescope buffers<CR>")
 
 -- Space fh : Vimヘルプ検索
 vim.keymap.set("n", "<leader>fh", "<cmd>Telescope help_tags<CR>")
+
+-- =========================
+-- LazyGit
+-- =========================
+
+-- Space gg : lazygit UI を開く
+vim.keymap.set("n", "<leader>gg", "<cmd>LazyGit<CR>", { desc = "Open LazyGit" })
