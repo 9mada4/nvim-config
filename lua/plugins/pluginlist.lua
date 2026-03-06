@@ -11,4 +11,7 @@ return {
   require("plugins.editor.comment"),
 
   require("plugins.coding.treesitter"),
+  require("plugins.coding.mason"),
+  require("plugins.coding.lsp"),
+  require("plugins.coding.cmp"),
 }
