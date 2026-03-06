@@ -28,7 +28,7 @@ nvim
 ## 4. Set Font
 - Terminal.app で，`設定 > プロファイル > フォント` から `FiraCode Nerd Font Mono` へ変更
 
-## 5. IME auto OFF when returning to Terminal (optional)
+## 5. Force IME OFF when returning to Terminal.app (optional)
 
 ### Install
 ```zsh
@@ -40,21 +40,29 @@ brew install --cask hammerspoon
 mkdir -p ~/.hammerspoon
 nvim ~/.hammerspoon/init.lua
 ```
-Paste this -> `:wq`
+- Paste this -> `:wq`
 ```zsh
-local terminals = {
-  Terminal = true,
-  iTerm2 = true,
-  WezTerm = true,
-}
+-- ~/.hammerspoon/init.lua
 
-hs.application.watcher.new(function(appName, eventType)
-  if eventType == hs.application.watcher.deactivated then
-    if terminals[appName] then
-      hs.keycodes.setMethod("ABC")
+local terminalWatcher = hs.application.watcher.new(function(appName, eventType, appObject)
+    -- アプリが「アクティブ（最前面）」になったとき
+    if eventType == hs.application.watcher.activated then
+        -- 名前ではなくBundle IDで判定（言語設定に左右されない）
+        if appObject:bundleID() == "com.apple.Terminal" then
+            -- IMEを「ABC（英数）」に切り替え
+            -- hs.keycodes.setLayout("ABC") が一般的ですが、うまくいかない場合は以下を試してください
+            hs.keycodes.currentSourceID("com.apple.keylayout.ABC")
+        end
     end
-  end
-end):start()
+end)
+
+terminalWatcher:start()
 ```
+### Preferences
+- Check this
+  - ☑ Launch Hammerspoon at login
+  - ☑ Check for updates
+- `Enable Accessibility`
+
 ### Reload config
-`Hammerspoon menu` -> `Reload Config`
+- `Hammerspoon menu` -> `Reload Config`
