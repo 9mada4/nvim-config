@@ -29,7 +29,7 @@ nvim
 brew install --cask font-fira-code-nerd-font
 ```
 
-- Terminal.app で，`設定 > プロファイル > フォント` から変更
+- Terminal.app で，`設定 > プロファイル > フォント` から `FiraCode Nerd Font Mono` へ変更
 
 |                 設定画面                 |               フォント選択画面               |
 | :----------------------------------: | :----------------------------------: |
