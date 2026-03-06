@@ -66,3 +66,6 @@ terminalWatcher:start()
 
 ### Reload config
 - `Hammerspoon menu` -> `Reload Config`
+
+## How to update
+Finder > `⌘ + Shift + .` > drag `~/.config/nvim/lua` to upload file this repo
