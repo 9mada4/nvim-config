@@ -69,3 +69,4 @@ terminalWatcher:start()
 
 ## How to update
 Finder > `⌘ + Shift + .` > drag `~/.config/nvim/lua` to upload file this repo
+
