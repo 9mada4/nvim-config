@@ -1,9 +1,12 @@
 # Neovim setup
 
-## 1. Install Neovim
+## 1. Install Neovim (include `Font`, `lazygit`)
 ```zsh
 brew install nvim
+brew install --cask font-fira-code-nerd-font
+brew install lazygit
 ```
+- Nerd Fontをいれる (参考: https://formulae.brew.sh/cask/font-fira-code-nerd-font )
 
 ## 2. Clone config
 1.
@@ -23,12 +26,6 @@ mv nvim-config-main ~/.config/nvim
 nvim
 
 ## 4. Set Font
-
-- Nerd Fontをいれる (参考: https://formulae.brew.sh/cask/font-fira-code-nerd-font )
-```bash
-brew install --cask font-fira-code-nerd-font
-```
-
 - Terminal.app で，`設定 > プロファイル > フォント` から `FiraCode Nerd Font Mono` へ変更
 
 |                 設定画面                 |               フォント選択画面               |
