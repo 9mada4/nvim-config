@@ -22,6 +22,21 @@ return {
     opts = {},
   },
 
+  -- ブラウザで Markdown プレビュー
+  {
+    "iamcco/markdown-preview.nvim",
+    ft = { "markdown" },
+    cmd = {
+      "MarkdownPreview",
+      "MarkdownPreviewStop",
+      "MarkdownPreviewToggle",
+    },
+    build = "cd app && npm install",
+    init = function()
+      vim.g.mkdp_filetypes = { "markdown" }
+    end,
+  },
+
   -- 箇条書きを自動継続
   {
     "gaoDean/autolist.nvim",
