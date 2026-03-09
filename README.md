@@ -5,6 +5,7 @@
 brew install nvim
 brew install --cask font-fira-code-nerd-font
 brew install lazygit
+brew install gh
 ```
 - Nerd Fontをいれる (参考: https://formulae.brew.sh/cask/font-fira-code-nerd-font )
 
