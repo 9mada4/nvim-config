@@ -82,7 +82,13 @@ terminalWatcher:start()
 
 
 ## 6. Safe `pull --rebase`
-1. add this to LazyGit config here `~/Library/Application Support/jesseduffield/lazygit/config.yml`
+1. add this to LazyGit config here 
+`~/Library/Application Support/jesseduffield/lazygit/config.yml`
+- do this
+```
+nvim ~/Library/Application Support/jesseduffield/lazygit/config.yml
+```
+- paste this
 ```
 customCommands:
   - key: "R"
@@ -90,8 +96,13 @@ customCommands:
     description: "Pull with rebase"
     command: "git pull --rebase"
     stream: true
+  - key: "G"
+    context: "files"
+    description: "Generate commit message and open editor"
+    subprocess: true
+    command: 'MSG="$(./scripts/generate-commit-msg.sh)" && git commit -e -m "$MSG"'
 ```
-2. Then press R in LazyGit.
+2. Then use this `R`, `G` 
 
 ## How to update
 Finder > `⌘ + Shift + .` > drag `~/.config/nvim/lua` to upload file this repo
