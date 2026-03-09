@@ -8,6 +8,7 @@ return {
     require("plugins.editor.comment"),
     require("plugins.editor.gitsigns"),
     require("plugins.editor.lazygit"),
+    require("plugins.editor.markdown"),
     require("plugins.editor.noice"),
     require("plugins.editor.octo"),
     require("plugins.editor.telescope"),
