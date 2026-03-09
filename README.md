@@ -79,8 +79,6 @@ terminalWatcher:start()
 ### Reload config
 - `Hammerspoon menu` -> `Reload Config`
 
-## How to update
-Finder > `⌘ + Shift + .` > drag `~/.config/nvim/lua` to upload file this repo
 
 ## 6. Safe `pull --rebase`
 1. add this to LazyGit config here `~/Library/Application Support/jesseduffield/lazygit/config.yml`
@@ -93,3 +91,35 @@ customCommands:
     stream: true
 ```
 2. Then press R in LazyGit.
+
+## How to update
+Finder > `⌘ + Shift + .` > drag `~/.config/nvim/lua` to upload file this repo
+
+## If you require SSH
+1. make `~/.ssh/config`
+```
+nvim ~/.ssh/config
+```
+
+2. paste this
+You should change YOURKEY_ID
+```
+Host github.com
+  HostName github.com
+  User git
+  IdentityFile ~/.ssh/YOURKEY_ID
+  IdentitiesOnly yes
+  AddKeysToAgent yes
+  UseKeychain yes
+```
+
+3. set YOURKEY_ID to Keychain
+```
+ssh-add --apple-use-keychain ~/.ssh/YOURKEY_ID
+```
+
+4. check
+```
+ssh-add -l
+ssh -T git@github.com
+```
