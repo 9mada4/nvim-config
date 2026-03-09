@@ -9,11 +9,13 @@ brew install lazygit
 - Nerd Fontをいれる (参考: https://formulae.brew.sh/cask/font-fira-code-nerd-font )
 
 ## 2. Clone config
-1.
+1. Clone
 ```zsh
 git clone git@github.com:9mada4/nvim-config.git ~/.config/nvim
 ```
-or
+
+**or**
+
 1. unzip nvim-config-main.zip 
 ```zsh
 cd ~/Downloads
@@ -21,6 +23,14 @@ mkdir -p ~/.config
 mv nvim-config-main ~/.config/nvim
 ```
 2. `ls ~/.config` -> nvim ok
+
+**or**
+
+1. pull
+```
+cd ~/.config/nvim
+git pull
+```
 
 ## 3. Open Neovim
 nvim
