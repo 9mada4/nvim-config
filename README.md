@@ -81,12 +81,12 @@ terminalWatcher:start()
 - `Hammerspoon menu` -> `Reload Config`
 
 
-## 6. Safe `pull --rebase`
+## 6. Custom LazyGit
 1. add this to LazyGit config here 
-`~/Library/Application Support/jesseduffield/lazygit/config.yml`
+`~/Library/Application\ Support/lazygit/config.yml`
 - do this
 ```
-nvim ~/Library/Application Support/jesseduffield/lazygit/config.yml
+nvim ~/Library/Application Support/lazygit/config.yml
 ```
 - paste this
 ```
