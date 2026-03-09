@@ -1,0 +1,38 @@
+Project tree
+Generated: 2026-03-09 15:13:31
+
+.
+├── lua
+│   ├── config
+│   │   ├── keymaps.lua
+│   │   └── options.lua
+│   └── plugins
+│       ├── coding
+│       │   ├── cmp.lua
+│       │   ├── lsp.lua
+│       │   ├── mason.lua
+│       │   └── treesitter.lua
+│       ├── editor
+│       │   ├── autopairs.lua
+│       │   ├── comment.lua
+│       │   ├── gitsigns.lua
+│       │   ├── lazygit.lua
+│       │   ├── markdown.lua
+│       │   ├── octo.lua
+│       │   └── telescope.lua
+│       ├── ui
+│       │   ├── lualine.lua
+│       │   ├── nvim-tree.lua
+│       │   ├── tokyonight.lua
+│       │   └── which-key.lua
+│       └── pluginlist.lua
+├── scripts
+│   └── save-tree.sh
+├── .gitignore
+├── .luarc.json
+├── init.lua
+├── Neovim 備忘録.md
+├── README.md
+└── STRUCTURE.txt
+
+8 directories, 25 files
