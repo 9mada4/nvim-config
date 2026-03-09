@@ -53,7 +53,7 @@ mkdir -p ~/.hammerspoon
 nvim ~/.hammerspoon/init.lua
 ```
 - Paste this -> `:wq`
-```zsh
+```lua
 -- ~/.hammerspoon/init.lua
 
 local terminalWatcher = hs.application.watcher.new(function(appName, eventType, appObject)
@@ -70,6 +70,7 @@ end)
 
 terminalWatcher:start()
 ```
+
 ### Preferences
 - Check this
   - ☑ Launch Hammerspoon at login
@@ -97,7 +98,7 @@ Finder > `⌘ + Shift + .` > drag `~/.config/nvim/lua` to upload file this repo
 
 ## If you require SSH
 1. make `~/.ssh/config`
-```
+``` zsh
 nvim ~/.ssh/config
 ```
 
@@ -114,12 +115,21 @@ Host github.com
 ```
 
 3. set YOURKEY_ID to Keychain
-```
+``` zsh
 ssh-add --apple-use-keychain ~/.ssh/YOURKEY_ID
 ```
 
 4. check
-```
+``` zsh
 ssh-add -l
 ssh -T git@github.com
 ```
+
+## Folder structure
+
+Run this:
+
+``` zsh
+./scripts/save-tree.sh
+```
+
