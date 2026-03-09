@@ -27,7 +27,7 @@ return {
             width = "block",
             left_pad = 2,
             right_pad = 2,
-            border = "thin",
+            border = "none",
             language_name = true,
             language_icon = true,
 	    language_border = "",
@@ -36,8 +36,6 @@ return {
 
         vim.api.nvim_set_hl(0, "RenderMarkdownCode", { bg = "#40383E" })
         vim.api.nvim_set_hl(0, "RenderMarkdownCodeInline", { bg = "#40383E" })
-        vim.api.nvim_set_hl(0, "RenderMarkdownH1Bg", { bg = "#2a2f44" })
-        vim.api.nvim_set_hl(0, "RenderMarkdownH2Bg", { bg = "#252a3c" })
     end,
   },
 
