@@ -5,9 +5,12 @@
 # Neovim設定フォルダの構造を tree で可視化し，
 # STRUCTURE.txt に自動保存するためのスクリプト
 #
+# コマンド=======
 # 使い方:
 #   ./scripts/save-tree.sh
 #   ./scripts/save-tree.sh ~/.config/nvim
+# 権限が必要なとき:
+#   chmod +x ~/.config/nvim/scripts/save-tree.sh
 #
 # 第1引数を省略した場合は，現在のディレクトリを対象にする
 # =========================================
