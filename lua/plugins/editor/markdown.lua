@@ -20,22 +20,31 @@ return {
       "echasnovski/mini.nvim",
     },
     config = function()
-        require("render-markdown").setup({
-          code = {
-            enabled = true,
-            sign = false,
-            width = "block",
-            left_pad = 2,
-            right_pad = 2,
-            border = "none",
-            language_name = true,
-            language_icon = true,
-	    language_border = "",
-          },
-        })
+      require("render-markdown").setup({
+        code = {
+          enabled = true,
+          sign = false,
+          width = "block",
+          left_pad = 0,
+          right_pad = 0,
+          min_width = 0,
+          border = "none",
+          language_name = true,
+          language_icon = true,
+          language_border = "",
+        },
+        heading = {
+          enabled = true,
+          sign = false,
+          width = "block",
+          left_pad = 0,
+          right_pad = 0,
+          min_width = 0,
+        },
+      })
 
-        vim.api.nvim_set_hl(0, "RenderMarkdownCode", { bg = "#40383E" })
-        vim.api.nvim_set_hl(0, "RenderMarkdownCodeInline", { bg = "#40383E" })
+      vim.api.nvim_set_hl(0, "RenderMarkdownCode", { bg = "#40383E" })
+      vim.api.nvim_set_hl(0, "RenderMarkdownCodeInline", { bg = "#40383E" })
     end,
   },
 
