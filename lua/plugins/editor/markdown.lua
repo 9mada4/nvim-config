@@ -19,7 +19,25 @@ return {
       "nvim-treesitter/nvim-treesitter",
       "echasnovski/mini.nvim",
     },
-    opts = {},
+    config = function()
+        require("render-markdown").setup({
+          code = {
+            enabled = true,
+            sign = false,
+            width = "block",
+            left_pad = 2,
+            right_pad = 2,
+            border = "thin",
+            language_name = true,
+            language_icon = true,
+          },
+        })
+
+        vim.api.nvim_set_hl(0, "RenderMarkdownCode", { bg = "#23364a" })
+        vim.api.nvim_set_hl(0, "RenderMarkdownCodeInline", { bg = "#23364a" })
+        vim.api.nvim_set_hl(0, "RenderMarkdownH1Bg", { bg = "#2a2f44" })
+        vim.api.nvim_set_hl(0, "RenderMarkdownH2Bg", { bg = "#252a3c" })
+    end,
   },
 
   -- ブラウザで Markdown プレビュー
