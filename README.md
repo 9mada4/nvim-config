@@ -1,5 +1,5 @@
 # Neovim setup
-
+https://youtu.be/80zZQLe0NNg?si=i35CENhmjsgItoPy
 ## 1. Install Neovim (include `Font`, `lazygit`)
 ```zsh
 brew install nvim
