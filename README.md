@@ -100,8 +100,7 @@ customCommands:
     context: "files"
     description: "Generate commit message and open editor"
     subprocess: true
-    command: 'MSG="$(./scripts/generate-commit-msg.sh)" && git commit -e -m "$MSG"'
-```
+    command: 'MSG="$($HOME/.config/nvim/scripts/generate-commit-msg.sh)" && git commit -e -m "$MSG"'```
 2. Then use this `R`, `G` 
 
 ## How to update
