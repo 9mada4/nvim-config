@@ -1,6 +1,10 @@
 -- Insertモードで jj → Normalへ戻る
 vim.keymap.set("i", "jj", "<Esc>", { noremap = true, silent = true })
 
+-- Visual modeで，K/J により選択中の行を上下に移動して再選択する
+vim.keymap.set("v", "K", ":m '<-2<CR>gv=gv")
+vim.keymap.set("v", "J", ":m '>+1<CR>gv=gv")
+
 -- =========================
 -- Telescope
 -- =========================
