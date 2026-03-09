@@ -5,6 +5,13 @@ vim.keymap.set("i", "jj", "<Esc>", { noremap = true, silent = true })
 vim.keymap.set("v", "K", ":m '<-2<CR>gv=gv")
 vim.keymap.set("v", "J", ":m '>+1<CR>gv=gv")
 
+-- 最後に検索した語を使って，確認しながら置換する
+-- 例: /status で検索したあと <leader>sr
+vim.keymap.set("n", "<leader>sr", [[:%s//gc<Left><Left><Left>]], {
+  noremap = true,
+  desc = "Replace last search with confirm",
+})
+
 -- =========================
 -- Telescope
 -- =========================
