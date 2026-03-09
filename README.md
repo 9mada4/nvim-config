@@ -82,3 +82,14 @@ terminalWatcher:start()
 ## How to update
 Finder > `⌘ + Shift + .` > drag `~/.config/nvim/lua` to upload file this repo
 
+## 6. Safe `pull --rebase`
+1. add this to LazyGit config here `~/Library/Application Support/jesseduffield/lazygit/config.yml`
+```
+customCommands:
+  - key: "R"
+    context: "global"
+    description: "Pull with rebase"
+    command: "git pull --rebase"
+    stream: true
+```
+2. Then press R in LazyGit.
