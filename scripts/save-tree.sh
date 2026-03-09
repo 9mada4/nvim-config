@@ -7,7 +7,6 @@
 #
 # コマンド=======
 # 使い方:
-#   ./scripts/save-tree.sh
 #   ./scripts/save-tree.sh ~/.config/nvim
 # 権限が必要なとき:
 #   chmod +x ~/.config/nvim/scripts/save-tree.sh
