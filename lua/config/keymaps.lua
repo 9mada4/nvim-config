@@ -12,6 +12,9 @@ vim.keymap.set("n", "<leader>sr", [[:%s//gc<Left><Left><Left>]], {
   desc = "Replace last search with confirm",
 })
 
+-- Markdownプレビューをブラウザで表示
+vim.keymap.set("n", "<leader>mg", "<cmd>Glow<CR>", { desc = "Markdown preview" })
+
 -- =========================
 -- Telescope
 -- =========================
