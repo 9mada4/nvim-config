@@ -30,25 +30,16 @@ return {
           },
         },
         code = {
-          enabled = true,
-          sign = false,
-          width = "block",
-          disable_background = true,
-          left_pad = 0,
-          right_pad = 0,
-          min_width = 0,
-          border = "none",
-          language_name = true,
-          language_icon = true,
-          language_border = "",
-          inline = false,
+          enabled = false,
         },
         heading = {
           enabled = false,
         },
       })
 
-      vim.api.nvim_set_hl(0, "RenderMarkdownCode", { bg = "#40383E" })
+      vim.api.nvim_set_hl(0, "MarkdownCodeBlockBg", { bg = "#40383E" })
+      vim.api.nvim_set_hl(0, "@markup.raw.block.markdown", { link = "MarkdownCodeBlockBg" })
+      vim.api.nvim_set_hl(0, "@markup.raw.block", { link = "MarkdownCodeBlockBg" })
     end,
   },
 
