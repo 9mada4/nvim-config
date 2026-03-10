@@ -24,6 +24,9 @@ return {
           enabled = false,
         },
         win_options = {
+          conceallevel = {
+            rendered = 0,
+          },
           concealcursor = {
             rendered = vim.o.concealcursor,
           },
@@ -36,7 +39,7 @@ return {
         },
       })
 
-      vim.api.nvim_set_hl(0, "MarkdownCodeBlockBg", { bg = "#40383E" })
+      vim.api.nvim_set_hl(0, "MarkdownCodeBlockBg", { fg = "fg", bg = "#40383E" })
       vim.api.nvim_set_hl(0, "@markup.raw.block.markdown", { link = "MarkdownCodeBlockBg" })
       vim.api.nvim_set_hl(0, "@markup.raw.block", { link = "MarkdownCodeBlockBg" })
     end,
