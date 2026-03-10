@@ -1,10 +1,9 @@
 # Neovim setup
-## 2
-### 3
-#### 4
-##### 5
-###### 6
-
+- [ ] コードブロック背景
+- [ ] ショートカットメモ表示機能 mdを作ってnoiceで表示
+- [ ] 写真表示機能
+    - [ ] ファイルを表示
+    - [ ] ブラウザプレビュー
 https://youtu.be/80zZQLe0NNg?si=i35CENhmjsgItoPy
 zz, zb, zt
 ## 1. Install Neovim (include `Font`, `lazygit`)
@@ -89,11 +88,11 @@ terminalWatcher:start()
 1. add this to LazyGit config here 
 `~/Library/Application\ Support/lazygit/config.yml`
 - do this
-```
+```zsh
 nvim ~/Library/Application Support/lazygit/config.yml
 ```
 - paste this
-```
+```txt
 customCommands:
   - key: "R"
     context: "global"
@@ -118,7 +117,7 @@ nvim ~/.ssh/config
 ```
 2. paste this
 You should change YOURKEY_ID
-```
+```text
 Host github.com
   HostName github.com
   User git
