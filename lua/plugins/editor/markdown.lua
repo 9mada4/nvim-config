@@ -33,6 +33,7 @@ return {
           enabled = true,
           sign = false,
           width = "block",
+          disable_background = true,
           left_pad = 0,
           right_pad = 0,
           min_width = 0,
