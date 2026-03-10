@@ -1,12 +1,20 @@
 # Neovim setup
+## 2
+### 3
+#### 4
+##### 5
+###### 6
+
 https://youtu.be/80zZQLe0NNg?si=i35CENhmjsgItoPy
 zz, zb, zt
 ## 1. Install Neovim (include `Font`, `lazygit`)
+
 ```zsh
 brew install nvim
 brew install --cask font-fira-code-nerd-font
 brew install lazygit
 brew install gh
+brew install pngpaste
 ```
 - Nerd Fontをいれる (参考: https://formulae.brew.sh/cask/font-fira-code-nerd-font )
 
@@ -15,7 +23,6 @@ brew install gh
 ```zsh
 git clone git@github.com:9mada4/nvim-config.git ~/.config/nvim
 ```
-
 **or**
 
 1. unzip nvim-config-main.zip 
@@ -33,7 +40,6 @@ mv nvim-config-main ~/.config/nvim
 cd ~/.config/nvim
 git pull
 ```
-
 ## 3. Open Neovim
 nvim
 
@@ -46,7 +52,6 @@ nvim
 ```zsh
 brew install --cask hammerspoon
 ```
-
 ### Configure
 ```zsh
 mkdir -p ~/.hammerspoon
@@ -70,7 +75,6 @@ end)
 
 terminalWatcher:start()
 ```
-
 ### Preferences
 - Check this
   - ☑ Launch Hammerspoon at login
@@ -112,7 +116,6 @@ Finder > `⌘ + Shift + .` > drag `~/.config/nvim/lua` to upload file this repo
 ``` zsh
 nvim ~/.ssh/config
 ```
-
 2. paste this
 You should change YOURKEY_ID
 ```
@@ -124,18 +127,15 @@ Host github.com
   AddKeysToAgent yes
   UseKeychain yes
 ```
-
 3. set YOURKEY_ID to Keychain
 ``` zsh
 ssh-add --apple-use-keychain ~/.ssh/YOURKEY_ID
 ```
-
 4. check
 ``` zsh
 ssh-add -l
 ssh -T git@github.com
 ```
-
 ## Folder structure
 
 Run this:
@@ -143,4 +143,3 @@ Run this:
 ``` zsh
 ./scripts/save-tree.sh
 ```
-
