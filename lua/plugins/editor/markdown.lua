@@ -21,6 +21,14 @@ return {
     },
     config = function()
       require("render-markdown").setup({
+        anti_conceal = {
+          enabled = false,
+        },
+        win_options = {
+          concealcursor = {
+            rendered = vim.o.concealcursor,
+          },
+        },
         code = {
           enabled = true,
           sign = false,
@@ -32,19 +40,14 @@ return {
           language_name = true,
           language_icon = true,
           language_border = "",
+          inline = false,
         },
         heading = {
-          enabled = true,
-          sign = false,
-          width = "block",
-          left_pad = 0,
-          right_pad = 0,
-          min_width = 0,
+          enabled = false,
         },
       })
 
       vim.api.nvim_set_hl(0, "RenderMarkdownCode", { bg = "#40383E" })
-      vim.api.nvim_set_hl(0, "RenderMarkdownCodeInline", { bg = "#40383E" })
     end,
   },
 
