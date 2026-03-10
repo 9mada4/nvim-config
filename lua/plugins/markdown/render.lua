@@ -22,6 +22,62 @@ return {
       preview = {
         icon_provider = "mini",
       },
+      markdown = {
+        headings = {
+          enable = true,
+          style = "label",
+          heading_1 = {
+              style = "label",
+              padding_left = "  ",
+              padding_right = "  ",
+          },
+          heading_2 = {
+              style = "label",
+              padding_left = "  ",
+              padding_right = "  ",
+          },
+          heading_3 = {
+              style = "label",
+              padding_left = "  ",
+              padding_right = "  ",
+          },
+          heading_4 = {
+              style = "label",
+              padding_left = "  ",
+              padding_right = "  ",
+          },
+          heading_5 = {
+              style = "label",
+              padding_left = "  ",
+              padding_right = "  ",
+          },
+          heading_6 = {
+              style = "label",
+              padding_left = "  ",
+              padding_right = "  ",
+          },
+        },
+
+        -- Code Block
+        code_blocks = {
+          enable = true,
+          style = "block",
+
+          border_hl = "MarkviewCode",
+          info_hl = "MarkviewCodeInfo",
+
+          label_direction = "right",
+          min_width = 60,
+          pad_amount = 2,
+          pad_char = " ",
+          sign = false,
+
+          default = {
+              block_hl = "MarkviewCode",
+              pad_hl = "MarkviewCode",
+          }
+        }
+      },
     },
   },
 
