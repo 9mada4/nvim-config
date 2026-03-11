@@ -1,47 +1,48 @@
 Project tree
-Generated: 2026-03-11 02:25:30
+Generated: 2026-03-11 15:40:35
 
 .
 ├── lua
-│   ├── config
-│   │   ├── keymaps.lua
-│   │   └── options.lua
-│   └── plugins
-│       ├── coding
-│       │   ├── cmp.lua
-│       │   ├── lsp.lua
-│       │   ├── mason.lua
-│       │   └── treesitter.lua
-│       ├── editor
-│       │   ├── autopairs.lua
-│       │   ├── comment.lua
-│       │   ├── gitsigns.lua
-│       │   ├── img-clip.lua
-│       │   ├── lazygit.lua
-│       │   ├── noice.lua
-│       │   ├── octo.lua
-│       │   └── telescope.lua
-│       ├── markdown
-│       │   ├── editing.lua
-│       │   ├── focus.lua
-│       │   ├── preview.lua
-│       │   └── render.lua
-│       ├── ui
-│       │   ├── ccc.lua
-│       │   ├── lualine.lua
-│       │   ├── nvim-tree.lua
-│       │   ├── tokyonight.lua
-│       │   └── which-key.lua
-│       └── pluginlist.lua
+│   ├── config
+│   │   ├── keymaps.lua
+│   │   ├── options.lua
+│   │   └── os.lua
+│   └── plugins
+│       ├── coding
+│       │   ├── cmp.lua
+│       │   ├── lsp.lua
+│       │   ├── mason.lua
+│       │   └── treesitter.lua
+│       ├── editor
+│       │   ├── autopairs.lua
+│       │   ├── comment.lua
+│       │   ├── gitsigns.lua
+│       │   ├── img-clip.lua
+│       │   ├── lazygit.lua
+│       │   ├── noice.lua
+│       │   ├── octo.lua
+│       │   └── telescope.lua
+│       ├── markdown
+│       │   ├── editing.lua
+│       │   ├── focus.lua
+│       │   ├── preview.lua
+│       │   └── render.lua
+│       ├── ui
+│       │   ├── ccc.lua
+│       │   ├── lualine.lua
+│       │   ├── nvim-tree.lua
+│       │   ├── tokyonight.lua
+│       │   └── which-key.lua
+│       └── pluginlist.lua
 ├── scripts
-│   ├── generate-commit-msg.sh
-│   └── save-tree.sh
+│   ├── generate-commit-msg.sh
+│   ├── save-tree.lua
+│   └── save-tree.sh
 ├── .gitignore
 ├── .luarc.json
 ├── .nvimlog
-├── init.lua
 ├── Neovim 備忘録.md
 ├── README.md
-└── STRUCTURE.txt
-
-9 directories, 33 files
+├── STRUCTURE.txt
+├── init.lua
+└── shortcuts.md
