@@ -1,6 +1,6 @@
 # Neovim setup
 - [ ] コードブロック背景
-- [ ] ショートカットメモ表示機能 mdを作ってnoiceで表示
+- [x] ショートカットメモ表示機能 mdを作ってnoiceで表示
 - [ ] 写真表示機能
     - [ ] ファイルを表示
     - [ ] ブラウザプレビュー
@@ -89,14 +89,15 @@ terminalWatcher:start()
 
 
 ## 6. Custom LazyGit
-1. add this to LazyGit config here 
-`~/Library/Application\ Support/lazygit/config.yml`
-- do this
-```zsh
-nvim ~/Library/Application Support/lazygit/config.yml
-```
-- paste this
-```txt
+1. open LazyGit config
+
+- macOS/Linux: `~/.config/lazygit/config.yml` (or `~/Library/Application Support/lazygit/config.yml` on some macOS setups)
+- Windows: `%APPDATA%\\lazygit\\config.yml`
+
+2. add custom commands (choose your shell variant)
+
+`POSIX shell (zsh/bash/sh)`:
+```yaml
 customCommands:
   - key: "R"
     context: "global"
@@ -111,7 +112,27 @@ customCommands:
       MSG="$(nvim --clean --headless +"lua dofile(vim.fn.stdpath('config') .. '/scripts/generate-commit-msg.lua')" +qa)"
       git commit -e -m "$MSG"
 ```
-2. Then use this `R`, `G` 
+
+`PowerShell (Windows)`:
+```yaml
+customCommands:
+  - key: "R"
+    context: "global"
+    description: "Pull with rebase"
+    command: "git pull --rebase"
+    stream: true
+  - key: "G"
+    context: "files"
+    description: "Generate commit message and open editor"
+    subprocess: true
+    command: |
+      $MSG = nvim --clean --headless "+lua dofile(vim.fn.stdpath('config') .. '/scripts/generate-commit-msg.lua')" +qa
+      git commit -e -m $MSG
+```
+
+3. usage
+- `<leader>gg` opens LazyGit in Neovim
+- In LazyGit, press `R` or `G` after applying the matching customCommands block above
 
 ## How to update
 Finder > `⌘ + Shift + .` > drag `$NVIM_CONFIG_DIR/lua` to upload file this repo
