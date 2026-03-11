@@ -111,7 +111,7 @@ customCommands:
     command: |
       MSG="$(nvim --clean --headless +'lua dofile(vim.fn.stdpath("config") .. "/scripts/generate-commit-msg.lua")' +qa 2>&1)"
       [ -n "$MSG" ] || { echo "failed to generate commit message"; exit 1; }
-      GIT_EDITOR="nvim -n" git commit -e -m "$MSG"
+      git commit -e -m "$MSG"
 ```
 
 `PowerShell (Windows)`:
@@ -129,7 +129,6 @@ customCommands:
     command: |
       $MSG = (nvim --clean --headless "+lua dofile(vim.fn.stdpath('config') .. '/scripts/generate-commit-msg.lua')" +qa 2>&1 | Out-String).Trim()
       if ([string]::IsNullOrWhiteSpace($MSG)) { Write-Host "failed to generate commit message"; exit 1 }
-      $env:GIT_EDITOR = "nvim -n"
       git commit -e -m "$MSG"
 ```
 
