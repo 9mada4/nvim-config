@@ -1,7 +1,7 @@
 -- save-tree.lua
 -- Cross-platform replacement for scripts/save-tree.sh
 -- Usage:
---   nvim --headless -l scripts/save-tree.lua
+--   nvim --clean --headless +"lua dofile(vim.fn.stdpath('config') .. '/scripts/save-tree.lua')" +qa
 
 local uv = vim.uv or vim.loop
 

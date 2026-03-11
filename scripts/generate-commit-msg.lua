@@ -1,7 +1,7 @@
 -- generate-commit-msg.lua
 -- Cross-platform replacement for scripts/generate-commit-msg.sh
 -- Usage:
---   nvim --clean --headless -l scripts/generate-commit-msg.lua
+--   nvim --clean --headless +"lua dofile(vim.fn.stdpath('config') .. '/scripts/generate-commit-msg.lua')" +qa
 
 local function systemlist(cmd)
   local out = vim.fn.systemlist(cmd)
