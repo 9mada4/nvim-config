@@ -21,6 +21,39 @@ vim.keymap.set("n", "<leader>mg", function()
   vim.cmd("Glow")
 end, { desc = "Markdown preview" })
 
+-- Git diff をポップアップ表示
+vim.keymap.set("n", "<leader>gd", function()
+  local file = vim.fn.expand("%")
+  if file == "" then
+    vim.notify("No file is open", vim.log.levels.WARN)
+    return
+  end
+
+  local buf = vim.api.nvim_create_buf(false, true)
+
+  local width = math.floor(vim.o.columns * 0.9)
+  local height = math.floor(vim.o.lines * 0.8)
+  local row = math.floor((vim.o.lines - height) / 2)
+  local col = math.floor((vim.o.columns - width) / 2)
+
+  local win = vim.api.nvim_open_win(buf, true, {
+    relative = "editor",
+    width = width,
+    height = height,
+    row = row,
+    col = col,
+    style = "minimal",
+    border = "rounded",
+  })
+
+  vim.fn.termopen({ "git", "diff", "--", file })
+
+  vim.bo[buf].bufhidden = "wipe"
+  vim.keymap.set("n", "q", "<cmd>close<CR>", { buffer = buf, silent = true })
+  vim.keymap.set("n", "<Esc>", "<cmd>close<CR>", { buffer = buf, silent = true })
+  vim.keymap.set("n", "<C-[>", "<cmd>close<CR>", { buffer = buf, silent = true })
+end, { desc = "Git diff popup" })
+
 -- =========================
 -- Telescope
 -- =========================
