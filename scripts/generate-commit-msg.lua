@@ -1,7 +1,7 @@
 -- generate-commit-msg.lua
 -- Cross-platform replacement for scripts/generate-commit-msg.sh
 -- Usage:
---   nvim --headless -l scripts/generate-commit-msg.lua
+--   nvim --clean --headless -l scripts/generate-commit-msg.lua
 
 local function systemlist(cmd)
   local out = vim.fn.systemlist(cmd)
@@ -54,13 +54,13 @@ else
     files = vim.fn.systemlist({ "git", "diff", "--name-only" })
   else
     print("変更がありません")
-    os.exit(1)
+    os.exit(0)
   end
 end
 
 if is_empty(changes) or is_empty(files) then
   print("変更がありません")
-  os.exit(1)
+  os.exit(0)
 end
 
 local count = 0
