@@ -1,9 +1,9 @@
 # Neovim setup
 - [ ] コードブロック背景
 - [x] ショートカットメモ表示機能 mdを作ってnoiceで表示
-- [ ] 写真表示機能
-    - [ ] ファイルを表示
-    - [ ] ブラウザプレビュー
+- [x] 写真表示機能
+    - [x] ファイルを表示
+    - [x] ブラウザプレビュー
 https://youtu.be/80zZQLe0NNg?si=i35CENhmjsgItoPy
 zz, zb, zt
 ## 1. Install Neovim (include `Font`, `lazygit`)

@@ -9,15 +9,16 @@
    Insert             Visual
  i  a  o  O        v   V    Ctrl+v
  左 右 下 上           行    矩形
-[Edit]   u  undo     Ctrl+r  redo    gcc  ｺﾒﾝﾄｱｳﾄ
-                    Cursorから
-       Vmode 行全体 終わりまで  単語
- Copy   vy     yy       Y       vwy
- 編集   vc     cc       C       vwc
- カット vd     dd       D       vwd
+[Edit]  Spc + mp  写真ペースト       u    undo
+            + mi  環境で開く      Ctrl+r  redo
+            + mb  ブラウザで開く    gcc   ｺﾒﾝﾄｱｳﾄ
+
+       Vmode 行全体 単語 Cursorから終わりまで   
+ Copy   vy     yy   vwy    Y       
+ 編集   vc     cc   vwc    C       
+ カット vd     dd   vwd    D       
 [Search]   N ← /word → n    Spc sr  単語置換
-[Git]
- p  pull   Spc gg  Open LazyGit   G  auto comit msg  
- P  push   Spc gd  git diff       R  pull --rebase   
+[Git] p  pull   Spc gg  Open LazyGit   G  auto comit msg  
+      P  push   Spc gd  git diff       R  pull --rebase   
 [VimCmd]    :q  quit    :q!  force
             :w  save    :e   open
