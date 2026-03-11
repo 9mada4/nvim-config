@@ -12,8 +12,10 @@ vim.opt.ignorecase = true
 vim.opt.smartcase = true
 vim.opt.incsearch = true
 
--- Macとクリップボード共有
-vim.opt.clipboard = "unnamedplus"
+-- クリップボード連携（利用可能な環境のみ）
+if vim.fn.has("clipboard") == 1 then
+  vim.opt.clipboard = "unnamedplus"
+end
 
 -- 24bitカラー
 vim.opt.termguicolors = true
