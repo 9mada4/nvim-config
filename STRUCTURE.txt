@@ -1,5 +1,5 @@
 Project tree
-Generated: 2026-03-11 15:59:43
+Generated: 2026-03-11 16:39:51
 
 .
 ├── lua
@@ -35,12 +35,13 @@ Generated: 2026-03-11 15:59:43
 │       │   └── which-key.lua
 │       └── pluginlist.lua
 ├── scripts
-│   ├── generate-commit-msg.sh
-│   ├── save-tree.lua
-│   └── save-tree.sh
+│   ├── legacy
+│   │   ├── generate-commit-msg.sh
+│   │   └── save-tree.sh
+│   ├── generate-commit-msg.lua
+│   └── save-tree.lua
 ├── .gitignore
 ├── .luarc.json
-├── .nvimlog
 ├── Neovim 備忘録.md
 ├── README.md
 ├── STRUCTURE.txt
