@@ -2,6 +2,8 @@ return {
   {
     "neovim/nvim-lspconfig",
     config = function()
+      local has_npm = vim.fn.executable("npm") == 1
+
       -- diagnostics の表示設定
       vim.diagnostic.config({
         virtual_text = true,   -- 行末にエラー内容を表示
@@ -16,6 +18,11 @@ return {
       })
 
       -- LSP servers
+      if has_npm then
+        vim.lsp.enable("html")
+      else
+        vim.lsp.enable("superhtml")
+      end
       vim.lsp.enable("lua_ls")
       vim.lsp.enable("marksman")
       vim.lsp.enable("pyright")
