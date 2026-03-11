@@ -21,7 +21,7 @@ vim.keymap.set("n", "<leader>mg", function()
   vim.cmd("Glow")
 end, { desc = "Markdown preview" })
 
--- Git diff をポップアップ表示
+-- Git diff をポップアップ表示 Spc gd
 vim.keymap.set("n", "<leader>gd", function()
   local file = vim.fn.expand("%")
   if file == "" then
@@ -53,6 +53,28 @@ vim.keymap.set("n", "<leader>gd", function()
   vim.keymap.set("n", "<Esc>", "<cmd>close<CR>", { buffer = buf, silent = true })
   vim.keymap.set("n", "<C-[>", "<cmd>close<CR>", { buffer = buf, silent = true })
 end, { desc = "Git diff popup" })
+
+-- ショートカットをポップアップ Spc + ?
+vim.keymap.set("n", "<leader>?", function()
+  local sep = package.config:sub(1, 1)
+  local path = vim.fn.stdpath("config") .. sep .. "shortcuts.md"
+
+  if vim.fn.filereadable(path) ~= 1 then
+    vim.notify("memo file not found: " .. path, vim.log.levels.WARN, {
+      title = "Memo",
+    })
+    return
+  end
+
+  local lines = vim.fn.readfile(path)
+  local content = table.concat(lines, "\n")
+
+  vim.notify(content, vim.log.levels.INFO, {
+    title = "Shortcut Memo",
+    timeout = 10000,
+  })
+end, { desc = "Show memo popup" })
+
 
 -- =========================
 -- Telescope
