@@ -16,8 +16,8 @@
  編集   vc     cc       C       vwc
  カット vd     dd       D       vwd
 [Search]   N ← /word → n    Spc sr  単語置換
-[Git]       Spc gg   Open LazyGit
- p  pull    Spc gd   git diff      G  auto comit msg
- P  push                           R  pull --rebase
+[Git]
+ p  pull   Spc gg  Open LazyGit   G  auto comit msg  
+ P  push   Spc gd  git diff       R  pull --rebase   
 [VimCmd]    :q  quit    :q!  force
             :w  save    :e   open
