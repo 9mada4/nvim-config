@@ -107,7 +107,9 @@ customCommands:
     context: "files"
     description: "Generate commit message and open editor"
     subprocess: true
-    command: 'MSG="$($(nvim --headless --clean +''lua io.write(vim.fn.stdpath("config"))'' +qa)/scripts/generate-commit-msg.sh)" && git commit -e -m "$MSG"'
+    command: |
+      MSG="$(nvim --clean --headless +"lua dofile(vim.fn.stdpath('config') .. '/scripts/generate-commit-msg.lua')" +qa)"
+      git commit -e -m "$MSG"
 ```
 2. Then use this `R`, `G` 
 
@@ -144,5 +146,5 @@ ssh -T git@github.com
 Run this:
 
 ``` zsh
-nvim --headless -l scripts/save-tree.lua
+nvim --clean --headless +"lua dofile(vim.fn.stdpath('config') .. '/scripts/save-tree.lua')" +qa
 ```
