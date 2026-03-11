@@ -103,13 +103,14 @@ customCommands:
     context: "global"
     description: "Pull with rebase"
     command: "git pull --rebase"
-    stream: true
+    output: log
   - key: "G"
     context: "files"
     description: "Generate commit message and open editor"
-    subprocess: true
+    output: terminal
     command: |
-      MSG="$(nvim --clean --headless +"lua dofile(vim.fn.stdpath('config') .. '/scripts/generate-commit-msg.lua')" +qa)"
+      MSG="$(nvim --clean --headless +"lua dofile(vim.fn.stdpath('config') .. '/scripts/generate-commit-msg.lua')" +qa 2>&1)"
+      [ -n "$MSG" ] || { echo "failed to generate commit message"; exit 1; }
       git commit -e -m "$MSG"
 ```
 
@@ -120,14 +121,15 @@ customCommands:
     context: "global"
     description: "Pull with rebase"
     command: "git pull --rebase"
-    stream: true
+    output: log
   - key: "G"
     context: "files"
     description: "Generate commit message and open editor"
-    subprocess: true
+    output: terminal
     command: |
-      $MSG = nvim --clean --headless "+lua dofile(vim.fn.stdpath('config') .. '/scripts/generate-commit-msg.lua')" +qa
-      git commit -e -m $MSG
+      $MSG = (nvim --clean --headless "+lua dofile(vim.fn.stdpath('config') .. '/scripts/generate-commit-msg.lua')" +qa 2>&1 | Out-String).Trim()
+      if ([string]::IsNullOrWhiteSpace($MSG)) { Write-Host "failed to generate commit message"; exit 1 }
+      git commit -e -m "$MSG"
 ```
 
 3. usage
