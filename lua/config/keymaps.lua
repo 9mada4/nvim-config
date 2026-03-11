@@ -75,6 +75,12 @@ vim.keymap.set("n", "<leader>?", function()
   })
 end, { desc = "Show memo popup" })
 
+-- Terminal.appでショートカットが使えるようにする
+vim.keymap.set("t", "<C-[>", [[<C-\><C-n>]], { desc = "Exit terminal mode" })
+vim.keymap.set("t", "<C-h>", [[<C-\><C-n><C-w>h]], { desc = "Terminal move left" })
+vim.keymap.set("t", "<C-j>", [[<C-\><C-n><C-w>j]], { desc = "Terminal move down" })
+vim.keymap.set("t", "<C-k>", [[<C-\><C-n><C-w>k]], { desc = "Terminal move up" })
+vim.keymap.set("t", "<C-l>", [[<C-\><C-n><C-w>l]], { desc = "Terminal move right" })
 
 -- =========================
 -- Telescope
