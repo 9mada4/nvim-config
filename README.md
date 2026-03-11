@@ -1,5 +1,4 @@
 # Neovim setup
-- [ ] コードブロック背景
 - [x] ショートカットメモ表示機能 mdを作ってnoiceで表示
 - [x] 写真表示機能
     - [x] ファイルを表示
@@ -14,6 +13,7 @@ brew install --cask font-fira-code-nerd-font
 brew install lazygit
 brew install gh
 brew install pngpaste
+brew install glow
 ```
 - Nerd Fontをいれる (参考: https://formulae.brew.sh/cask/font-fira-code-nerd-font )
 
