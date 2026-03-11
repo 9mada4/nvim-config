@@ -18,25 +18,29 @@ brew install pngpaste
 - Nerd Fontをいれる (参考: https://formulae.brew.sh/cask/font-fira-code-nerd-font )
 
 ## 2. Clone config
+```zsh
+NVIM_CONFIG_DIR="$(nvim --headless --clean +'lua io.write(vim.fn.stdpath(\"config\"))' +qa)"
+```
+
 1. Clone
 ```zsh
-git clone git@github.com:9mada4/nvim-config.git ~/.config/nvim
+git clone git@github.com:9mada4/nvim-config.git "$NVIM_CONFIG_DIR"
 ```
 **or**
 
 1. unzip nvim-config-main.zip 
 ```zsh
 cd ~/Downloads
-mkdir -p ~/.config
-mv nvim-config-main ~/.config/nvim
+mkdir -p "$(dirname "$NVIM_CONFIG_DIR")"
+mv nvim-config-main "$NVIM_CONFIG_DIR"
 ```
-2. `ls ~/.config` -> nvim ok
+2. `ls "$(dirname "$NVIM_CONFIG_DIR")"` -> nvim ok
 
 **or**
 
 1. pull
 ```
-cd ~/.config/nvim
+cd "$NVIM_CONFIG_DIR"
 git pull
 ```
 ## 3. Open Neovim
@@ -103,12 +107,12 @@ customCommands:
     context: "files"
     description: "Generate commit message and open editor"
     subprocess: true
-    command: 'MSG="$($HOME/.config/nvim/scripts/generate-commit-msg.sh)" && git commit -e -m "$MSG"'
+    command: 'MSG="$($(nvim --headless --clean +''lua io.write(vim.fn.stdpath("config"))'' +qa)/scripts/generate-commit-msg.sh)" && git commit -e -m "$MSG"'
 ```
 2. Then use this `R`, `G` 
 
 ## How to update
-Finder > `⌘ + Shift + .` > drag `~/.config/nvim/lua` to upload file this repo
+Finder > `⌘ + Shift + .` > drag `$NVIM_CONFIG_DIR/lua` to upload file this repo
 
 ## If you require SSH
 1. make `~/.ssh/config`
