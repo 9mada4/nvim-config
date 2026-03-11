@@ -144,5 +144,5 @@ ssh -T git@github.com
 Run this:
 
 ``` zsh
-./scripts/save-tree.sh
+nvim --headless -l scripts/save-tree.lua
 ```
