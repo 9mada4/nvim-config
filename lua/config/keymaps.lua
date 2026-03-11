@@ -21,6 +21,92 @@ vim.keymap.set("n", "<leader>mg", function()
   vim.cmd("Glow")
 end, { desc = "Markdown preview" })
 
+local image_extensions = {
+  png = true,
+  jpg = true,
+  jpeg = true,
+  gif = true,
+  webp = true,
+  bmp = true,
+  tif = true,
+  tiff = true,
+  svg = true,
+  heic = true,
+}
+
+local function is_image_file(path)
+  local ext = vim.fn.fnamemodify(path, ":e"):lower()
+  return image_extensions[ext] == true
+end
+
+local function encode_uri_path(path)
+  local encoded = path:gsub("%%", "%%25")
+  encoded = encoded:gsub(" ", "%%20")
+  encoded = encoded:gsub("#", "%%23")
+  encoded = encoded:gsub("%?", "%%3F")
+  return encoded
+end
+
+local function resolve_image_path()
+  local current = vim.fn.expand("%:p")
+  if current ~= "" and vim.fn.filereadable(current) == 1 and is_image_file(current) then
+    return current
+  end
+
+  local under_cursor = vim.fn.expand("<cfile>")
+  if under_cursor == "" then
+    return nil
+  end
+
+  local base = vim.fn.expand("%:p:h")
+  local absolute = vim.fn.fnamemodify(base .. "/" .. under_cursor, ":p")
+  if vim.fn.filereadable(absolute) == 1 and is_image_file(absolute) then
+    return absolute
+  end
+
+  return nil
+end
+
+-- 画像ファイルを既定のアプリで表示
+vim.keymap.set("n", "<leader>mi", function()
+  local path = resolve_image_path()
+  if not path then
+    vim.notify("Image file not found (current file or <cfile>)", vim.log.levels.WARN)
+    return
+  end
+  vim.ui.open(path)
+end, { desc = "Image: open file" })
+
+-- 画像ファイルをブラウザでプレビュー
+vim.keymap.set("n", "<leader>mb", function()
+  local path = resolve_image_path()
+  if not path then
+    vim.notify("Image file not found (current file or <cfile>)", vim.log.levels.WARN)
+    return
+  end
+
+  local html = ([[<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Image Preview</title>
+  <style>
+    html, body { margin: 0; background: #111; }
+    body { min-height: 100vh; display: grid; place-items: center; }
+    img { max-width: 100vw; max-height: 100vh; object-fit: contain; }
+  </style>
+</head>
+<body>
+  <img src="file://%s" alt="preview">
+</body>
+</html>
+]]):format(encode_uri_path(path))
+
+  local preview_file = vim.fn.tempname() .. ".html"
+  vim.fn.writefile(vim.split(html, "\n"), preview_file)
+  vim.ui.open(preview_file)
+end, { desc = "Image: browser preview" })
+
 -- Git diff をポップアップ表示 Spc gd
 vim.keymap.set("n", "<leader>gd", function()
   local file = vim.fn.expand("%")
