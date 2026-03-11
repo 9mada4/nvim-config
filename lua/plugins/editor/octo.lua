@@ -1,6 +1,7 @@
 return {
   {
     "pwntester/octo.nvim",
+    enabled = vim.fn.executable("gh") == 1,
     cmd = "Octo",
     dependencies = {
       "nvim-lua/plenary.nvim",

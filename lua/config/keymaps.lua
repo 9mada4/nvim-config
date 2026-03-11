@@ -13,7 +13,13 @@ vim.keymap.set("n", "<leader>sr", [[:%s//gc<Left><Left><Left>]], {
 })
 
 -- Markdownプレビューをブラウザで表示
-vim.keymap.set("n", "<leader>mg", "<cmd>Glow<CR>", { desc = "Markdown preview" })
+vim.keymap.set("n", "<leader>mg", function()
+  if vim.fn.executable("glow") ~= 1 then
+    vim.notify("'glow' is not installed or not on PATH", vim.log.levels.WARN)
+    return
+  end
+  vim.cmd("Glow")
+end, { desc = "Markdown preview" })
 
 -- =========================
 -- Telescope
@@ -36,4 +42,10 @@ vim.keymap.set("n", "<leader>fh", "<cmd>Telescope help_tags<CR>")
 -- =========================
 
 -- Space gg : lazygit UI を開く
-vim.keymap.set("n", "<leader>gg", "<cmd>LazyGit<CR>", { desc = "Open LazyGit" })
+vim.keymap.set("n", "<leader>gg", function()
+  if vim.fn.executable("lazygit") ~= 1 then
+    vim.notify("'lazygit' is not installed or not on PATH", vim.log.levels.WARN)
+    return
+  end
+  vim.cmd("LazyGit")
+end, { desc = "Open LazyGit" })

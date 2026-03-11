@@ -3,6 +3,10 @@ vim.g.mapleader = " "
 -- lazy.nvim bootstrap
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
 if not vim.loop.fs_stat(lazypath) then
+  if vim.fn.executable("git") ~= 1 then
+    vim.notify("lazy.nvim bootstrap requires 'git' on PATH", vim.log.levels.ERROR)
+    return
+  end
   vim.fn.system({
     "git",
     "clone",
