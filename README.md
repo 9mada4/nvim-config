@@ -17,6 +17,7 @@ brew install lazygit
 brew install gh
 brew install pngpaste
 brew install glow
+brew install ripgrep
 ```
 - Nerd Fontをいれる (参考: https://formulae.brew.sh/cask/font-fira-code-nerd-font )
 
