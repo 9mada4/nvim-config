@@ -67,6 +67,37 @@ local terminalWatcher = hs.application.watcher.new(function(appName, eventType, 
 end)
 
 terminalWatcher:start()
+
+-- jj → Esc (Google日本語入力のときだけ)
+local lastJTime = 0
+local jjInterval = 0.25
+local deleteDown = hs.eventtap.event.newKeyEvent({}, "delete", true)
+local deleteUp   = hs.eventtap.event.newKeyEvent({}, "delete", false)
+local escDown = hs.eventtap.event.newKeyEvent({}, "escape", true)
+local escUp   = hs.eventtap.event.newKeyEvent({}, "escape", false)
+local jjEscape = hs.eventtap.new({hs.eventtap.event.types.keyDown}, function(e)
+    -- Google日本語入力でないなら何もしない
+    if hs.keycodes.currentSourceID() ~= "com.google.inputmethod.Japanese.base" then
+        return false
+    end
+    local key = hs.keycodes.map[e:getKeyCode()]
+    if key == "j" then
+        local now = hs.timer.secondsSinceEpoch()
+        if now - lastJTime < jjInterval then
+            lastJTime = 0
+            deleteDown:post()
+            deleteUp:post()
+            escDown:post()
+            escUp:post()
+            hs.keycodes.currentSourceID("com.apple.keylayout.ABC")
+            return true
+        end
+        lastJTime = now
+    end
+    return false
+end)
+
+jjEscape:start()
 ```
 ### Preferences
 - Check this
