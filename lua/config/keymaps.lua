@@ -142,7 +142,7 @@ end, { desc = "Git diff popup" })
 
 -- ショートカットをポップアップ Spc + ?
 vim.keymap.set("n", "<leader>?", function()
-  local sep = package.config:sub(1, 1)
+  local sep = package.config:sub(1, 1)                        
   local path = vim.fn.stdpath("config") .. sep .. "shortcuts.md"
 
   if vim.fn.filereadable(path) ~= 1 then
@@ -161,13 +161,6 @@ vim.keymap.set("n", "<leader>?", function()
   })
 end, { desc = "Show memo popup" })
 
--- Terminal.appでショートカットが使えるようにする
--- vim.keymap.set("t", "<C-[>", [[<C-\><C-n>]], { desc = "Exit terminal mode" })
--- vim.keymap.set("t", "<C-h>", [[<C-\><C-n><C-w>h]], { desc = "Terminal move left" })
--- vim.keymap.set("t", "<C-j>", [[<C-\><C-n><C-w>j]], { desc = "Terminal move down" })
--- vim.keymap.set("t", "<C-k>", [[<C-\><C-n><C-w>k]], { desc = "Terminal move up" })
--- vim.keymap.set("t", "<C-l>", [[<C-\><C-n><C-w>l]], { desc = "Terminal move right" })
---
 -- =========================
 -- Telescope
 -- =========================
