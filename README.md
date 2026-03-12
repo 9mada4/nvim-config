@@ -1,4 +1,5 @@
 # Neovim setup
+## todo
 - [x] ショートカットメモ表示機能 mdを作ってnoiceで表示
 - [x] 写真表示機能
     - [x] ファイルを表示
@@ -6,7 +7,9 @@
 https://youtu.be/80zZQLe0NNg?si=i35CENhmjsgItoPy
 zz, zb, zt
 ## 1. Install Neovim (include `Font`, `lazygit`)
-
+### Windows
+工事中
+### macOS
 ```zsh
 brew install nvim
 brew install --cask font-fira-code-nerd-font
@@ -17,32 +20,19 @@ brew install glow
 ```
 - Nerd Fontをいれる (参考: https://formulae.brew.sh/cask/font-fira-code-nerd-font )
 
-## 2. Clone config
-```zsh
-NVIM_CONFIG_DIR="$(nvim --headless --clean +'lua io.write(vim.fn.stdpath(\"config\"))' +qa)"
+## 2. Clone(pull) config
+```
+NVIM_CONFIG_DIR="$(nvim --headless --clean +'lua io.write(vim.fn.stdpath("config"))' +qa)"
+
+mkdir -p "$NVIM_CONFIG_DIR"
+
+if [ ! -d "$NVIM_CONFIG_DIR/.git" ]; then
+  git clone https://github.com/9mada4/nvim-config.git "$NVIM_CONFIG_DIR"
+else
+  git -C "$NVIM_CONFIG_DIR" pull
+fi
 ```
 
-1. Clone
-```zsh
-git clone git@github.com:9mada4/nvim-config.git "$NVIM_CONFIG_DIR"
-```
-**or**
-
-1. unzip nvim-config-main.zip 
-```zsh
-cd ~/Downloads
-mkdir -p "$(dirname "$NVIM_CONFIG_DIR")"
-mv nvim-config-main "$NVIM_CONFIG_DIR"
-```
-2. `ls "$(dirname "$NVIM_CONFIG_DIR")"` -> nvim ok
-
-**or**
-
-1. pull
-```
-cd "$NVIM_CONFIG_DIR"
-git pull
-```
 ## 3. Open Neovim
 nvim
 
