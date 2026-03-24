@@ -1,9 +1,7 @@
 # Neovim setup
 ## todo
-- [x] ショートカットメモ表示機能 mdを作ってnoiceで表示
-- [x] 写真表示機能
-    - [x] ファイルを表示
-    - [x] ブラウザプレビュー
+- [ ] Windowsセットアップ手順追記
+
 https://youtu.be/80zZQLe0NNg?si=i35CENhmjsgItoPy
 zz, zb, zt
 ## 1. Install Neovim (include `Font`, `lazygit`)
