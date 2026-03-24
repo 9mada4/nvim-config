@@ -13,22 +13,46 @@ Windows 11（PowerShell）での初回導入を想定した前提ツール（詳
 - 必須
   - Neovim: 本設定を起動する本体
     - 確認: `nvim --version`
+    ```
+    winget install -e --id Neovim.Neovim
+    ```
   - Git: config clone / lazy.nvim bootstrap に必要
     - 確認: `git --version`
+    ```
+    winget install -e --id Git.Git
+    ```
 - 推奨
   - Nerd Font (e.g. FiraCode Nerd Font): アイコン崩れ防止
     - 確認: ターミナルのフォント選択肢に表示されること
+    ```
+    winget install -e --id DEVCOM.JetBrainsMonoNerdFont
+    ```
   - ripgrep: `<leader>fg` (Telescope live_grep) に必要
     - 確認: `rg --version`
+    ```
+    winget install BurntSushi.ripgrep.MSVC
+    ```
 - 任意
   - lazygit: `<leader>gg` を使う場合
     - 確認: `lazygit --version`
+    ```
+    winget install -e --id JesseDuffield.lazygit
+    ```
   - glow: Markdownプレビュー `<leader>mg` を使う場合
     - 確認: `glow --version`
+    ```
+    winget install -e --id charmbracelet.glow    # markdownプレビュー用
+    ```
   - gh: GitHub CLI を使う場合
     - 確認: `gh --version`
+    ```
+    winget install -e --id GitHub.cli    # octo.nvim用
+    ```
   - Node.js / npm: 一部機能で利用
     - 確認: `node --version`, `npm --version`
+    ```
+    winget install -e --id JesseDuffield.lazygit
+    ```
 ### macOS
 ```zsh
 brew install nvim
