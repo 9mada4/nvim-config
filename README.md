@@ -9,6 +9,28 @@ zz, zb, zt
 ## 1. Install Neovim (include `Font`, `lazygit`)
 ### Windows
 工事中
+
+Windows 11（PowerShell）での初回導入を想定した前提ツール（詳細インストール手順は省略）:
+
+- 必須
+  - Neovim: 本設定を起動する本体
+    - 確認: `nvim --version`
+  - Git: config clone / lazy.nvim bootstrap に必要
+    - 確認: `git --version`
+- 推奨
+  - Nerd Font (e.g. FiraCode Nerd Font): アイコン崩れ防止
+    - 確認: ターミナルのフォント選択肢に表示されること
+  - ripgrep: `<leader>fg` (Telescope live_grep) に必要
+    - 確認: `rg --version`
+- 任意
+  - lazygit: `<leader>gg` を使う場合
+    - 確認: `lazygit --version`
+  - glow: Markdownプレビュー `<leader>mg` を使う場合
+    - 確認: `glow --version`
+  - gh: GitHub CLI を使う場合
+    - 確認: `gh --version`
+  - Node.js / npm: 一部機能で利用
+    - 確認: `node --version`, `npm --version`
 ### macOS
 ```zsh
 brew install nvim
@@ -34,13 +56,28 @@ else
 fi
 ```
 
+`Windows 11 (PowerShell)`:
+```powershell
+$NVIM_CONFIG_DIR = nvim --headless --clean "+lua io.write(vim.fn.stdpath('config'))" +qa
+
+New-Item -ItemType Directory -Force -Path $NVIM_CONFIG_DIR | Out-Null
+
+if (-not (Test-Path (Join-Path $NVIM_CONFIG_DIR ".git"))) {
+  git clone https://github.com/9mada4/nvim-config.git $NVIM_CONFIG_DIR
+} else {
+  git -C $NVIM_CONFIG_DIR pull
+}
+```
+
 ## 3. Open Neovim
 nvim
 
 ## 4. Set Font
+- Note: この手順は macOS Terminal.app 向けです。Windows では使用中ターミナル側で Nerd Font を設定してください。
 - Terminal.app で，`設定 > プロファイル > フォント` から `FiraCode Nerd Font Mono` へ変更
 
 ## 5. Force IME OFF when returning to Terminal.app (optional)
+- Note: この手順は macOS + Hammerspoon 向けです。Windows ではスキップ可能です。
 
 ### Install
 ```zsh
@@ -110,7 +147,7 @@ jjEscape:start()
 - `Hammerspoon menu` -> `Reload Config`
 
 
-## 6. Custom LazyGit
+## 6. Custom LazyGit (optional: LazyGit 利用者向け)
 1. open LazyGit config
 
 - macOS/Linux: `~/.config/lazygit/config.yml` (or `~/Library/Application Support/lazygit/config.yml` on some macOS setups)
@@ -157,6 +194,13 @@ customCommands:
 3. usage
 - `<leader>gg` opens LazyGit in Neovim
 - In LazyGit, press `R` or `G` after applying the matching customCommands block above
+
+## 7. First setup checklist
+- `nvim --version` / `git --version` が通る
+- Step 2 実行後に `nvim` で起動できる
+- 初回起動で lazy.nvim / plugins の自動セットアップが完了する
+- `:checkhealth` を実行し，致命的エラーがない
+- （任意）`rg --version`, `lazygit --version`, `glow --version` が必要に応じて通る
 
 ## How to update
 Finder > `⌘ + Shift + .` > drag `$NVIM_CONFIG_DIR/lua` to upload file this repo
