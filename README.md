@@ -65,7 +65,11 @@ brew install ripgrep
 ```
 - Nerd Fontをいれる (参考: https://formulae.brew.sh/cask/font-fira-code-nerd-font )
 
-## 2. Clone(pull) config
+## 2. Set Font
+- Note: この手順は macOS Terminal.app 向けです。Windows では使用中ターミナル側で Nerd Font を設定してください。
+- Terminal.app で，`設定 > プロファイル > フォント` から `FiraCode Nerd Font Mono` へ変更
+
+## 3. Clone(pull) config
 ```
 NVIM_CONFIG_DIR="$(nvim --headless --clean +'lua io.write(vim.fn.stdpath("config"))' +qa)"
 
@@ -91,12 +95,8 @@ if (-not (Test-Path (Join-Path $NVIM_CONFIG_DIR ".git"))) {
 }
 ```
 
-## 3. Open Neovim
+## 4. Open Neovim
 nvim
-
-## 4. Set Font
-- Note: この手順は macOS Terminal.app 向けです。Windows では使用中ターミナル側で Nerd Font を設定してください。
-- Terminal.app で，`設定 > プロファイル > フォント` から `FiraCode Nerd Font Mono` へ変更
 
 ## 5. Force IME OFF when returning to Terminal.app (optional)
 - Note: この手順は macOS + Hammerspoon 向けです。Windows ではスキップ可能です。
@@ -219,7 +219,7 @@ customCommands:
 
 ## 7. First setup checklist
 - `nvim --version` / `git --version` が通る
-- Step 2 実行後に `nvim` で起動できる
+- Step 3 実行後に `nvim` で起動できる
 - 初回起動で lazy.nvim / plugins の自動セットアップが完了する
 - `:checkhealth` を実行し，致命的エラーがない
 - （任意）`rg --version`, `lazygit --version`, `glow --version` が必要に応じて通る
