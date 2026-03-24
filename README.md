@@ -66,8 +66,14 @@ brew install ripgrep
 - Nerd Fontをいれる (参考: https://formulae.brew.sh/cask/font-fira-code-nerd-font )
 
 ## 2. Set Font
-- Note: この手順は macOS Terminal.app 向けです。Windows では使用中ターミナル側で Nerd Font を設定してください。
-- Terminal.app で，`設定 > プロファイル > フォント` から `FiraCode Nerd Font Mono` へ変更
+- macOS (Terminal.app)
+  - `設定 > プロファイル > フォント` から `FiraCode Nerd Font Mono` へ変更
+- Windows (Windows Terminal)
+  1. Windows Terminal を開く
+  2. `設定` (`Ctrl + ,`) を開く
+  3. 対象プロファイル（例: PowerShell）を選択
+  4. `外観` > `フォント フェイス` を `JetBrainsMono Nerd Font`（または導入済みの Nerd Font）に変更
+  5. `保存` を押して新しいタブを開き直す
 
 ## 3. Clone(pull) config
 ```
