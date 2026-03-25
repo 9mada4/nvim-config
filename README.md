@@ -90,9 +90,13 @@ fi
 ```
 
 `Windows 11 (PowerShell)`:
+- 設定ディレクトリの設定->確認
 ```powershell
 $NVIM_CONFIG_DIR = nvim --headless --clean "+lua io.write(vim.fn.stdpath('config'))" +qa
+$NVIM_CONFIG_DIR
+```
 
+```powershell
 New-Item -ItemType Directory -Force -Path $NVIM_CONFIG_DIR | Out-Null
 
 if (-not (Test-Path (Join-Path $NVIM_CONFIG_DIR ".git"))) {
