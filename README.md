@@ -137,6 +137,38 @@ nvim
 `:Lazy`->`shift+s`(S)で読み込み
 
 ## 5. IME setting (optional)
+### Windows terminal Neovim: built-in minimal IME OFF
+
+- This repo can use a bundled helper binary at `tools/win-x64/imectl.exe`.
+- Current behavior is intentionally minimal: on Windows only, `InsertLeave` runs `imectl.exe off` and turns IME OFF.
+- No Python host, `pynvim`, remote plugin, WSL, or Git Bash is required.
+- If `tools/win-x64/imectl.exe` does not exist, the Lua side skips the hook silently.
+
+Build output path:
+
+```text
+tools/win-x64/imectl.exe
+```
+
+Source:
+
+```text
+tools/src/imectl.c
+```
+
+Example build with Visual Studio Developer PowerShell:
+
+```powershell
+cl /nologo /O2 /W4 tools\src\imectl.c /link /out:tools\win-x64\imectl.exe imm32.lib
+```
+
+Quick check:
+
+```powershell
+tools\win-x64\imectl.exe off
+```
+
+### Alternative approach: external IME switcher plugin
 1. Install the OS-specific binary and make sure it is on `PATH`.
 https://github.com/keaising/im-select.nvim
 
