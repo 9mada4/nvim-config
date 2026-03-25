@@ -14,6 +14,11 @@
 ## todo
 - [x] Windowsセットアップ手順追記
 - [ ] IME自動切り替え実装
+  - [x] luaから.ps1ファイルを呼び出せるようにしたらいけそう。
+  - [ ] 通知をオフ
+  - [ ] ｊｊが入力されたらback２回にescを送信したら、.ps1も呼び出されていけそう。
+  - [ ] macOSもターミナル上でキー送信で対応か？
+
 https://youtu.be/80zZQLe0NNg?si=i35CENhmjsgItoPy <br>
 zz, zb, zt
 ## 1. Install Neovim (include `Font`, `lazygit`)
