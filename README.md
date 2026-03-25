@@ -111,7 +111,11 @@ Get-ChildItem -Force $NVIM_CONFIG_DIR
 ```
 
 ## 4. Open Neovim
+```shell
+cd $NVIM_CONFIG_DIR
 nvim
+```
+`:Lazy`->`shift+s`(S)で読み込み
 
 ## 5. Force IME OFF when returning to Terminal.app (optional)
 - Note: この手順は macOS + Hammerspoon 向けです。Windows ではスキップ可能です。
