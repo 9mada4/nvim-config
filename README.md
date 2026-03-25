@@ -138,6 +138,7 @@ nvim
 
 ## 5. IME setting (optional)
 1. Install the OS-specific binary and make sure it is on `PATH`.
+https://github.com/keaising/im-select.nvim
 
 - macOS: install `macism`
   - check:
