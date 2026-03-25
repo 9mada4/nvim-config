@@ -135,60 +135,6 @@ nvim
 `:Lazy`->`shift+s`(S)で読み込み
 
 ## 5. IME setting (optional)
-### Windows terminal Neovim: built-in minimal IME OFF
-
-- This repo can use a bundled helper binary at `tools/win-x64/imectl.exe`.
-- Current behavior is intentionally minimal: on Windows only, `InsertLeave` runs `imectl.exe off` and turns IME OFF.
-- No Python host, `pynvim`, remote plugin, WSL, or Git Bash is required.
-- If `tools/win-x64/imectl.exe` does not exist, the Lua side skips the hook silently.
-
-Build output path:
-
-```text
-tools/win-x64/imectl.exe
-```
-
-Source:
-
-```text
-tools/src/imectl.c
-```
-
-<details>
-<summary>未導入なら Visual Studio Build Tools を入れる</summary>
-
-通常は不要です。`tools/win-x64/imectl.exe` がすでにあるなら、そのまま使えます。
-
-Install:
-
-```powershell
-winget install -e --id Microsoft.VisualStudio.2022.BuildTools
-```
-
-ビルドは `Developer PowerShell for VS` か `x64 Native Tools Command Prompt for VS` で実行します。
-
-手順
-「Visual Studio Installer」を開く
-「Build Tools 2022」→「変更」
-これにチェック： `C++によるデスクトップ開発`
-<img width="1303" height="424" alt="image" src="https://github.com/user-attachments/assets/b2521d64-4414-439e-9831-ce9ed6b98395" />
-
----
-
-</details>
-
-```cmd
-cd %USERPROFILE%\AppData\Local\nvim
-cl /nologo /O2 /W4 tools\src\imectl.c /link /out:tools\win-x64\imectl.exe imm32.lib
-```
-
-Quick check:
-
-```powershell
-tools\win-x64\imectl.exe off
-```
-
-### Alternative approach: external IME switcher plugin
 1. Install the OS-specific binary and make sure it is on `PATH`.
 https://github.com/keaising/im-select.nvim
 
