@@ -21,3 +21,4 @@ require("lazy").setup(require("plugins.pluginlist"))
 
 require("config.options")
 require("config.keymaps")
+require("config.ime")
