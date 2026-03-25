@@ -177,9 +177,8 @@ winget install -e --id Microsoft.VisualStudio.2022.BuildTools
 
 </details>
 
-Example build with Visual Studio Developer PowerShell:
-
-```powershell
+```cmd
+cd %USERPROFILE%\AppData\Local\nvim
 cl /nologo /O2 /W4 tools\src\imectl.c /link /out:tools\win-x64\imectl.exe imm32.lib
 ```
 
