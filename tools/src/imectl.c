@@ -5,6 +5,7 @@
 #include <string.h>
 
 #pragma comment(lib, "imm32.lib")
+#pragma comment(lib, "user32.lib")
 
 static void print_usage(const char *prog)
 {
