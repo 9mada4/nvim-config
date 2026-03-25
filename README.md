@@ -12,14 +12,12 @@
 - [If you require SSH](#if-you-require-ssh)
 - [Folder structure](#folder-structure)
 ## todo
-- [ ] Windowsセットアップ手順追記
-
-https://youtu.be/80zZQLe0NNg?si=i35CENhmjsgItoPy
+- [x] Windowsセットアップ手順追記
+- [ ] IME自動切り替え実装
+https://youtu.be/80zZQLe0NNg?si=i35CENhmjsgItoPy <br>
 zz, zb, zt
 ## 1. Install Neovim (include `Font`, `lazygit`)
 ### Windows
-工事中
-
 Windows 11（PowerShell）での初回導入を想定した前提ツール（詳細インストール手順は省略）:
 
 - 必須
