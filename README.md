@@ -106,6 +106,9 @@ if (-not (Test-Path (Join-Path $NVIM_CONFIG_DIR ".git"))) {
 }
 ```
 - 確認
+```
+Get-ChildItem -Force $NVIM_CONFIG_DIR
+```
 
 ## 4. Open Neovim
 nvim
