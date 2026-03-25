@@ -18,34 +18,37 @@ static HWND get_target_window(void)
 
 static int get_open_status(HWND hwnd, BOOL *is_open)
 {
-    HWND ime = ImmGetDefaultIMEWnd(hwnd);
-    if (ime == NULL) {
-        fprintf(stderr, "imectl: IME window not found\n");
+    HIMC himc = ImmGetContext(hwnd);
+    if (himc == NULL) {
+        fprintf(stderr, "imectl: IME context not found\n");
         return 1;
     }
 
-    LRESULT status = SendMessageW(ime, WM_IME_CONTROL, IMC_GETOPENSTATUS, 0);
-    *is_open = status != 0;
+    *is_open = ImmGetOpenStatus(himc);
+    ImmReleaseContext(hwnd, himc);
     return 0;
 }
 
 static int set_open_status(HWND hwnd, BOOL is_open)
 {
-    HWND ime = ImmGetDefaultIMEWnd(hwnd);
+    HIMC himc = ImmGetContext(hwnd);
     BOOL current = FALSE;
 
-    if (ime == NULL) {
-        fprintf(stderr, "imectl: IME window not found\n");
+    if (himc == NULL) {
+        fprintf(stderr, "imectl: IME context not found\n");
         return 1;
     }
 
-    SendMessageW(ime, WM_IME_CONTROL, IMC_SETOPENSTATUS, (LPARAM)is_open);
-
-    if (get_open_status(hwnd, &current) != 0) {
+    if (!ImmSetOpenStatus(himc, is_open)) {
+        fprintf(stderr, "imectl: failed to request IME %s\n", is_open ? "on" : "off");
+        ImmReleaseContext(hwnd, himc);
         return 1;
     }
 
-    if (current != is_open) {
+    current = ImmGetOpenStatus(himc);
+    ImmReleaseContext(hwnd, himc);
+
+    if (!!current != !!is_open) {
         fprintf(stderr, "imectl: failed to switch IME %s\n", is_open ? "on" : "off");
         return 1;
     }
