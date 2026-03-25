@@ -131,8 +131,15 @@ nvim
 ## 6. Custom LazyGit (optional: LazyGit 利用者向け)
 1. open LazyGit config
 
-- macOS/Linux: `~/.config/lazygit/config.yml` (or `~/Library/Application Support/lazygit/config.yml` on some macOS setups)
-- Windows: `%APPDATA%\\lazygit\\config.yml`
+- macOS/Linux:
+```
+~/.config/lazygit/config.yml` (or `~/Library/Application Support/lazygit/config.yml` on some macOS setups)
+```
+- Windows: 
+  `Get-Command lazygit`のSourceを確認．恐らく以下になる．
+  ```
+  cd $HOME\AppData\Local\Microsoft\WinGet\Packages\JesseDuff.
+  ```
 
 2. add custom commands (choose your shell variant)
 
