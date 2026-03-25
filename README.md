@@ -137,7 +137,8 @@ nvim
 ```
 - Windows: 
   ```powershell
-  mkdir $env:APPDATA\lazigit
+  mkdir $env:APPDATA\lazygit
+  cd $env:APPDATA\lazygit
   nvim config.yml
   ```
 
