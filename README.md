@@ -111,9 +111,15 @@ Get-ChildItem -Force $NVIM_CONFIG_DIR
 ```
 
 ## 4. Open Neovim
-```shell
-cd $NVIM_CONFIG_DIR
+- macOS
+```zsh
+cd ~/.config/nvim
 nvim
+```
+- Windows
+
+```powershell
+ここ
 ```
 `:Lazy`->`shift+s`(S)で読み込み
 
