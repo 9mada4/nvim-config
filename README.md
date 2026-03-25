@@ -137,8 +137,8 @@ nvim
 `:Lazy`->`shift+s`(S)で読み込み
 
 ## 5. IME setting (optional)
-1. Install the OS-specific binary and make sure it is on `PATH`.
-https://github.com/keaising/im-select.nvim
+1. Install the OS-specific binary and make sure it is on `PATH`.<br>
+https://github.com/daipeihust/im-select
 
 - macOS: install `macism`
   - check:
