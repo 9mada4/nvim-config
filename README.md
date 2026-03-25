@@ -154,6 +154,21 @@ Source:
 tools/src/imectl.c
 ```
 
+<details>
+<summary>未導入なら Visual Studio Build Tools を入れる</summary>
+
+通常は不要です。`tools/win-x64/imectl.exe` がすでにあるなら、そのまま使えます。
+
+Install:
+
+```powershell
+winget install -e --id Microsoft.VisualStudio.2022.BuildTools
+```
+
+ビルドは `Developer PowerShell for VS` か `x64 Native Tools Command Prompt for VS` で実行します。
+
+</details>
+
 Example build with Visual Studio Developer PowerShell:
 
 ```powershell
