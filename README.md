@@ -167,15 +167,6 @@ winget install -e --id Microsoft.VisualStudio.2022.BuildTools
 
 ビルドは `Developer PowerShell for VS` か `x64 Native Tools Command Prompt for VS` で実行します。
 
-今いる PowerShell で `cl` が見つからない場合は、Build Tools の開発環境を読み込んでから確認します。
-
-```powershell
-& "C:\Program Files\Microsoft Visual Studio\2022\BuildTools\Common7\Tools\VsDevCmd.bat"
-cl
-```
-
-恒久的に PATH を手で足すより、上の方法か専用の開発用ターミナルを使うのが安全です。
-
 </details>
 
 Example build with Visual Studio Developer PowerShell:
