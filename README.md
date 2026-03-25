@@ -119,7 +119,8 @@ nvim
 - Windows
 
 ```powershell
-ここ
+cd ~\AppData\Local\nvim
+nvim
 ```
 `:Lazy`->`shift+s`(S)で読み込み
 
