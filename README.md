@@ -95,7 +95,7 @@ fi
 $NVIM_CONFIG_DIR = nvim --headless --clean "+lua io.write(vim.fn.stdpath('config'))" +qa
 $NVIM_CONFIG_DIR
 ```
-
+- クローン(既にフォルダがあったら失敗するかも？)
 ```powershell
 New-Item -ItemType Directory -Force -Path $NVIM_CONFIG_DIR | Out-Null
 
@@ -105,6 +105,7 @@ if (-not (Test-Path (Join-Path $NVIM_CONFIG_DIR ".git"))) {
   git -C $NVIM_CONFIG_DIR pull
 }
 ```
+- 確認
 
 ## 4. Open Neovim
 nvim
