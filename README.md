@@ -167,6 +167,14 @@ winget install -e --id Microsoft.VisualStudio.2022.BuildTools
 
 ビルドは `Developer PowerShell for VS` か `x64 Native Tools Command Prompt for VS` で実行します。
 
+手順
+「Visual Studio Installer」を開く
+「Build Tools 2022」→「変更」
+これにチェック： `C++によるデスクトップ開発`
+<img width="1303" height="424" alt="image" src="https://github.com/user-attachments/assets/b2521d64-4414-439e-9831-ce9ed6b98395" />
+
+---
+
 </details>
 
 Example build with Visual Studio Developer PowerShell:
