@@ -140,6 +140,7 @@ nvim
 ### Windows terminal Neovim: built-in minimal IME OFF
 
 - This repo can use a bundled helper binary at `tools/win-x64/imectl.exe`.
+- The normal assumption is that `tools/win-x64/imectl.exe` is already built and checked into the repo.
 - Current behavior is intentionally minimal: on Windows only, `InsertLeave` runs `imectl.exe off` and turns IME OFF.
 - No Python host, `pynvim`, remote plugin, WSL, or Git Bash is required.
 - If `tools/win-x64/imectl.exe` does not exist, the Lua side skips the hook silently.
@@ -156,10 +157,48 @@ Source:
 tools/src/imectl.c
 ```
 
-Example build with Visual Studio Developer PowerShell:
+<details>
+<summary>clang が未導入のときだけ LLVM を入れる</summary>
+
+基本的には不要です。`tools/win-x64/imectl.exe` がすでにあるなら、そのまま使えます。
+
+Install:
 
 ```powershell
-cl /nologo /O2 /W4 tools\src\imectl.c /link /out:tools\win-x64\imectl.exe imm32.lib
+winget install -e --id LLVM.LLVM
+```
+
+PATH の確認:
+
+```powershell
+Test-Path "C:\Program Files\LLVM\bin\clang.exe"
+```
+
+`True` なら clang 自体は入っていて、PATH が通っていない可能性があります。
+
+その場で通るか確認:
+
+```powershell
+$env:Path = "C:\Program Files\LLVM\bin;$env:Path"
+clang --version
+```
+
+恒久的に PATH を通す:
+
+```powershell
+[Environment]::SetEnvironmentVariable(
+  "Path",
+  "C:\Program Files\LLVM\bin;" + [Environment]::GetEnvironmentVariable("Path", "User"),
+  "User"
+)
+```
+
+</details>
+
+If you need to rebuild it yourself, use `clang` on Windows:
+
+```powershell
+clang -O2 -Wall -Wextra tools\src\imectl.c -limm32 -o tools\win-x64\imectl.exe
 ```
 
 Quick check:
