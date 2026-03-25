@@ -155,58 +155,7 @@ Source:
 tools/src/imectl.c
 ```
 
-<details>
-<summary>clang が未導入のときだけ LLVM を入れる</summary>
-
-基本的には不要です。`tools/win-x64/imectl.exe` がすでにあるなら、そのまま使えます。
-
-Install:
-
-```powershell
-winget install -e --id LLVM.LLVM
-```
-
-PATH の確認:
-
-```powershell
-Test-Path "C:\Program Files\LLVM\bin\clang.exe"
-```
-
-`True` なら clang 自体は入っていて、PATH が通っていない可能性があります。
-
-その場で通るか確認:
-
-```powershell
-$env:Path = "C:\Program Files\LLVM\bin;$env:Path"
-clang --version
-```
-
-恒久的に PATH を通す:
-
-```powershell
-[Environment]::SetEnvironmentVariable(
-  "Path",
-  "C:\Program Files\LLVM\bin;" + [Environment]::GetEnvironmentVariable("Path", "User"),
-  "User"
-)
-```
-
-</details>
-
-If you need to rebuild it yourself, use `clang` from a shell where Windows SDK / MSVC include paths are already loaded.
-
-`windows.h file not found` means `clang.exe` was found, but Windows SDK headers were not on `INCLUDE`.
-
-Examples:
-
-```text
-- Developer PowerShell for VS
-- x64 Native Tools Command Prompt for VS
-```
-
-If those are not installed yet, add Visual Studio Build Tools with the C++ toolchain / Windows SDK first.
-
-Build command:
+If you need to rebuild it yourself, use `clang` on Windows:
 
 ```powershell
 clang -O2 -Wall -Wextra tools\src\imectl.c -limm32 -o tools\win-x64\imectl.exe
