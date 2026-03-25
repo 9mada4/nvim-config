@@ -125,7 +125,52 @@ nvim
 `:Lazy`->`shift+s`(S)で読み込み
 
 ## 5. IME setting (optional)
-- `im-select` の手順は、まだ README には追加していません。
+1. Install the OS-specific binary and make sure it is on `PATH`.
+
+- macOS: install `macism`
+  - check:
+
+```bash
+which macism
+macism
+macism com.apple.keylayout.ABC
+```
+
+- Windows: install `im-select.exe`
+  - check:
+
+```powershell
+where im-select.exe
+im-select.exe
+im-select.exe 1033
+```
+
+2. Install [`keaising/im-select.nvim`](https://github.com/keaising/im-select.nvim).
+
+```lua
+{
+  "keaising/im-select.nvim",
+  config = function()
+    require("im_select").setup({})
+  end,
+}
+```
+
+3. If you need to customize it, set the command and default English IM explicitly.
+
+```lua
+{
+  "keaising/im-select.nvim",
+  config = function()
+    require("im_select").setup({
+      default_im_select = "1033", -- Windows
+      default_command = "im-select.exe",
+    })
+  end,
+}
+```
+
+- On macOS, use `default_im_select = "com.apple.keylayout.ABC"` and `default_command = "macism"`.
 - 既存の Hammerspoon 方式（legacy）はこちらを参照してください: [docs/hammerspoon-ime-terminal.md](docs/hammerspoon-ime-terminal.md)
 
 ## 6. Custom LazyGit (optional: LazyGit 利用者向け)
