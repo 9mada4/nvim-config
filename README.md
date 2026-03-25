@@ -135,54 +135,24 @@ nvim
 `:Lazy`->`shift+s`(S)で読み込み
 
 ## 5. IME setting (optional)
-1. Install the OS-specific binary and make sure it is on `PATH`.
-https://github.com/keaising/im-select.nvim
+Windows terminal Neovim では、InsertLeave 時に PowerShell で「無変換」キーを送信して IME OFF を行います。
 
-- macOS: install `macism`
-  - check:
+- Script: `tools/windows/send-nonconvert.ps1`
+- Trigger: `InsertLeave` only
+- Scope: Windows only（macOS/Linux では何もしない）
+- Dependencies: PowerShell が必要
+- Not required: Python / `pynvim` / remote plugin / custom exe
 
-```bash
-which macism
-macism
-macism com.apple.keylayout.ABC
-```
+重要な前提:
 
-- Windows: install `im-select.exe`
-  - check:
+- Windows の IME 設定で「無変換」キーを「IME-オフ」に割り当ててください。
+- この割り当てをしていない場合、この機能は動きません。
+
+手動確認:
 
 ```powershell
-where im-select.exe
-im-select.exe
-im-select.exe 1033
+powershell -NoProfile -NonInteractive -ExecutionPolicy Bypass -File .\tools\windows\send-nonconvert.ps1
 ```
-
-2. Install [`keaising/im-select.nvim`](https://github.com/keaising/im-select.nvim).
-
-```lua
-{
-  "keaising/im-select.nvim",
-  config = function()
-    require("im_select").setup({})
-  end,
-}
-```
-
-3. If you need to customize it, set the command and default English IM explicitly.
-
-```lua
-{
-  "keaising/im-select.nvim",
-  config = function()
-    require("im_select").setup({
-      default_im_select = "1033", -- Windows
-      default_command = "im-select.exe",
-    })
-  end,
-}
-```
-
-- On macOS, use `default_im_select = "com.apple.keylayout.ABC"` and `default_command = "macism"`.
-- 既存の Hammerspoon 方式（legacy）はこちらを参照してください: [docs/hammerspoon-ime-terminal.md](docs/hammerspoon-ime-terminal.md)
 
 ## 6. Custom LazyGit (optional: LazyGit 利用者向け)
 1. open LazyGit config
