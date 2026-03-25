@@ -1,3 +1,5 @@
+Start-Sleep -Milliseconds 200
+
 function Send-NonConvert {
   Add-Type @"
 using System;
