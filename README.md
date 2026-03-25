@@ -193,7 +193,20 @@ clang --version
 
 </details>
 
-If you need to rebuild it yourself, use `clang` on Windows:
+If you need to rebuild it yourself, use `clang` from a shell where Windows SDK / MSVC include paths are already loaded.
+
+`windows.h file not found` means `clang.exe` was found, but Windows SDK headers were not on `INCLUDE`.
+
+Examples:
+
+```text
+- Developer PowerShell for VS
+- x64 Native Tools Command Prompt for VS
+```
+
+If those are not installed yet, add Visual Studio Build Tools with the C++ toolchain / Windows SDK first.
+
+Build command:
 
 ```powershell
 clang -O2 -Wall -Wextra tools\src\imectl.c -limm32 -o tools\win-x64\imectl.exe
