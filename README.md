@@ -136,8 +136,9 @@ nvim
 ~/.config/lazygit/config.yml` (or `~/Library/Application Support/lazygit/config.yml` on some macOS setups)
 ```
 - Windows: 
-  ```
-  nvim $env:APPDATA\lazygit\config.yml
+  ```powershell
+  mkdir $env:APPDATA\lazigit
+  nvim config.yml
   ```
 
 2. add custom commands (choose your shell variant)
