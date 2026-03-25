@@ -76,6 +76,7 @@ brew install ripgrep
   5. `保存` を押して新しいタブを開き直す
 
 ## 3. Clone(pull) config
+`macOS`:
 ```
 NVIM_CONFIG_DIR="$(nvim --headless --clean +'lua io.write(vim.fn.stdpath("config"))' +qa)"
 
