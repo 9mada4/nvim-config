@@ -1,4 +1,16 @@
 # Neovim setup
+## 目次
+- [todo](#todo)
+- [1. Install Neovim (include `Font`, `lazygit`)](#1-install-neovim-include-font-lazygit)
+- [2. Set Font](#2-set-font)
+- [3. Clone(pull) config](#3-clonepull-config)
+- [4. Open Neovim](#4-open-neovim)
+- [5. IME setting (optional)](#5-ime-setting-optional)
+- [6. Custom LazyGit](#6-custom-lazygit-optional-lazygit-利用者向け)
+- [7. First setup checklist](#7-first-setup-checklist)
+- [How to update](#how-to-update)
+- [If you require SSH](#if-you-require-ssh)
+- [Folder structure](#folder-structure)
 ## todo
 - [ ] Windowsセットアップ手順追記
 
