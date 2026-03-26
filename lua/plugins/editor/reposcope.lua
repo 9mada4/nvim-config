@@ -9,6 +9,7 @@ return {
   config = function()
     local gh = require("reposcope.network.request_tools.gh")
     local config = require("reposcope.config")
+    local provider_controller = require("reposcope.controllers.provider_controller")
 
     local function build_env(token)
       local env_map = vim.fn.environ()
@@ -104,6 +105,32 @@ return {
           end
         end)
       end
+    end
+
+    provider_controller.prompt_and_clone = function()
+      local cwd = vim.fn.getcwd()
+
+      vim.ui.input({
+        prompt = "Set clone path: ",
+        default = cwd,
+        completion = "file",
+      }, function(input)
+        if input == nil then
+          require("reposcope.utils.debug").notify("[reposcope] Cloning canceled.", 2)
+          return
+        end
+
+        local target = vim.trim(input)
+        if target == "" then
+          target = cwd
+        end
+
+        local uuid = require("reposcope.utils.core").generate_uuid()
+        require("reposcope.state.requests_state").register_request(uuid)
+        vim.schedule(function()
+          require("reposcope.providers.github.entrypoint").cloner.clone(target, uuid)
+        end)
+      end)
     end
 
     require("reposcope.init").setup({})
