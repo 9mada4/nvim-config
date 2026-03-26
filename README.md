@@ -69,7 +69,7 @@ Windows 11（PowerShell）での初回導入を想定した前提ツール（詳
   - Node.js / npm: 一部機能で利用
     - 確認: `node --version`, `npm --version`
     ```
-    winget install -e --id JesseDuffield.lazygit
+    winget install -e --id OpenJS.NodeJS.LTS
     ```
 ### macOS
 ```zsh
