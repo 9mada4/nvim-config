@@ -44,10 +44,10 @@ vim.api.nvim_create_autocmd("InsertLeave", {
   desc = "Send NonConvert key to turn IME off on Windows",
   callback = function()
     if vim.system then
-      vim.system(cmd, { detach = true })
+      vim.system(cmd, { text = true }, function() end)
       return
     end
 
-    vim.fn.jobstart(cmd, { detach = true })
+    vim.fn.jobstart(cmd)
   end,
 })
