@@ -20,6 +20,7 @@
 - [ ] macOSもターミナル上でキー送信で対応か？
 - [x] Lazy.gitの動作確認
   - [x] swapファイルが残る
+  - [x] Windowsのセットアップ手順を簡略化
 
 https://youtu.be/80zZQLe0NNg?si=i35CENhmjsgItoPy <br>
 zz, zb, zt
