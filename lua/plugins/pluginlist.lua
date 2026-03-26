@@ -12,6 +12,7 @@ return {
   require("plugins.editor.lazygit"),
   require("plugins.editor.noice"),
   require("plugins.editor.octo"),
+  require("plugins.editor.reposcope"),
   require("plugins.editor.telescope"),
 
   require("plugins.markdown.editing"),
