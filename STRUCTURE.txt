@@ -1,9 +1,12 @@
 Project tree
-Generated: 2026-03-11 17:28:34
+Generated: 2026-03-26 22:13:15
 
 .
+├── docs
+│   └── hammerspoon-ime-terminal.md
 ├── lua
 │   ├── config
+│   │   ├── ime.lua
 │   │   ├── keymaps.lua
 │   │   ├── options.lua
 │   │   └── os.lua
@@ -25,8 +28,7 @@ Generated: 2026-03-11 17:28:34
 │       ├── markdown
 │       │   ├── editing.lua
 │       │   ├── focus.lua
-│       │   ├── preview.lua
-│       │   └── render.lua
+│       │   └── preview.lua
 │       ├── ui
 │       │   ├── ccc.lua
 │       │   ├── lualine.lua
@@ -40,6 +42,12 @@ Generated: 2026-03-11 17:28:34
 │   │   └── save-tree.sh
 │   ├── generate-commit-msg.lua
 │   └── save-tree.lua
+├── tools
+│   ├── lazygit
+│   │   ├── commit-with-generated-msg.cmd
+│   │   └── config.windows.yml
+│   └── windows
+│       └── send-nonconvert.ps1
 ├── .gitignore
 ├── .luarc.json
 ├── .nvimlog
