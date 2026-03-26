@@ -4,6 +4,8 @@ return {
     ft = { "markdown" },
     cmd = { "Glow" },
     config = function()
+      local has_less = vim.fn.executable("less") == 1
+
       if vim.env.NO_COLOR ~= nil then
         vim.env.NO_COLOR = nil
       end
@@ -14,7 +16,7 @@ return {
 
       require("glow").setup({
         style = "dracula",
-        pager = true,
+        pager = has_less,
       })
     end,
   },
