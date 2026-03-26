@@ -19,7 +19,7 @@
   - [ ] ｊｊが入力されたらback２回にescを送信したら、.ps1も呼び出されていけそう。
 - [ ] macOSもターミナル上でキー送信で対応か？
 - [ ] Lazy.gitの動作確認
-  - [ ] swapファイルが残る
+  - [x] swapファイルが残る
 
 https://youtu.be/80zZQLe0NNg?si=i35CENhmjsgItoPy <br>
 zz, zb, zt
