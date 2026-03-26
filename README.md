@@ -163,61 +163,26 @@ powershell -NoProfile -NonInteractive -ExecutionPolicy Bypass -File .\tools\wind
 
 - 既存の Hammerspoon 方式（legacy）はこちらを参照してください: [docs/hammerspoon-ime-terminal.md](docs/hammerspoon-ime-terminal.md)
 
-## 6. Custom LazyGit (optional: LazyGit 利用者向け)
-1. open LazyGit config
+## 6. Custom LazyGit (optional: LazyGit users)
+1. prepare files in this repo
+- `tools/lazygit/config.windows.yml`
+- `tools/lazygit/commit-with-generated-msg.cmd`
 
-- macOS/Linux:
-```
-~/.config/lazygit/config.yml` (or `~/Library/Application Support/lazygit/config.yml` on some macOS setups)
-```
-- Windows: 
-  ```powershell
-  mkdir $env:APPDATA\lazygit
-  cd $env:APPDATA\lazygit
-  nvim config.yml
-  ```
+2. on Windows, run this from the repo root
+```powershell
+$LG = (lazygit --print-config-dir).Trim()
+New-Item -ItemType Directory -Force -Path $LG | Out-Null
+Copy-Item .\tools\lazygit\commit-with-generated-msg.cmd "$LG\commit-with-generated-msg.cmd" -Force
 
-2. add custom commands (choose your shell variant)
-
-`POSIX shell (zsh/bash/sh)`:
-```yaml
-customCommands:
-  - key: "R"
-    context: "global"
-    description: "Pull with rebase"
-    command: "git pull --rebase"
-    output: log
-  - key: "G"
-    context: "files"
-    description: "Generate commit message and open editor"
-    output: terminal
-    command: |
-      MSG="$(nvim --clean --headless +'lua dofile(vim.fn.stdpath("config") .. "/scripts/generate-commit-msg.lua")' +qa 2>&1)"
-      [ -n "$MSG" ] || { echo "failed to generate commit message"; exit 1; }
-      git commit -e -m "$MSG"
-```
-
-`PowerShell (Windows)`:
-```yaml
-customCommands:
-  - key: "R"
-    context: "global"
-    description: "Pull with rebase"
-    command: "git pull --rebase"
-    output: log
-  - key: "G"
-    context: "files"
-    description: "Generate commit message and open editor"
-    output: terminal
-    command: |
-      $MSG = (nvim --clean --headless "+lua dofile(vim.fn.stdpath('config') .. '/scripts/generate-commit-msg.lua')" +qa 2>&1 | Out-String).Trim()
-      if ([string]::IsNullOrWhiteSpace($MSG)) { Write-Host "failed to generate commit message"; exit 1 }
-      git commit -e -m "$MSG"
+$CFG = Get-Content .\tools\lazygit\config.windows.yml -Raw
+$CFG = $CFG.Replace('__LAZYGIT_DIR__', $LG)
+Set-Content "$LG\config.yml" -Value $CFG -Encoding utf8
 ```
 
 3. usage
 - `<leader>gg` opens LazyGit in Neovim
-- In LazyGit, press `R` or `G` after applying the matching customCommands block above
+- In LazyGit, press `R` or `G`
+- check config dir: `lazygit --print-config-dir`
 
 ## 7. First setup checklist
 - `nvim --version` / `git --version` が通る
