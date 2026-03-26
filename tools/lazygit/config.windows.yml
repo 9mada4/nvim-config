@@ -1,0 +1,11 @@
+﻿customCommands:
+  - key: "R"
+    context: "global"
+    description: "Pull with rebase"
+    command: "git pull --rebase"
+    output: log
+  - key: "G"
+    context: "files"
+    description: "Generate commit message and open editor"
+    output: terminal
+    command: '__LAZYGIT_DIR__\commit-with-generated-msg.cmd'
