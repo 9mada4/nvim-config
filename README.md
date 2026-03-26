@@ -200,6 +200,9 @@ customCommands:
 
 `Windows (repo-managed files)`:
 ```powershell
+cd $env:LOCALAPPDATA\nvim
+```
+```powershell
 Copy-Item .\tools\lazygit\commit-with-generated-msg.cmd "$LG\commit-with-generated-msg.cmd" -Force
 
 $CFG = Get-Content .\tools\lazygit\config.windows.yml -Raw
