@@ -1,5 +1,24 @@
 return {
   {
+    "iamcco/markdown-preview.nvim",
+    ft = { "markdown" },
+    cmd = { "MarkdownPreview", "MarkdownPreviewStop", "MarkdownPreviewToggle" },
+    build = "cd app && npm install",
+    init = function()
+      vim.g.mkdp_auto_start = 0
+      vim.g.mkdp_auto_close = 1
+      vim.g.mkdp_refresh_slow = 0
+      vim.g.mkdp_open_to_the_world = 0
+      vim.g.mkdp_open_ip = "127.0.0.1"
+      vim.g.mkdp_echo_preview_url = 1
+      vim.g.mkdp_filetypes = { "markdown" }
+      vim.g.mkdp_preview_options = {
+        sync_scroll_type = "middle",
+        disable_filename = 1,
+      }
+    end,
+  },
+  {
     "npxbr/glow.nvim",
     ft = { "markdown" },
     cmd = { "Glow" },

@@ -87,6 +87,22 @@ vim.keymap.set("n", "<leader>mg", function()
   })
 end, { desc = "Markdown preview" })
 
+-- Markdownプレビューを外部ブラウザで表示（VSCode風リッチ表示）
+vim.keymap.set("n", "<leader>mv", function()
+  local current_file = vim.fn.expand("%:p")
+  local ext = vim.fn.fnamemodify(current_file, ":e"):lower()
+  local is_markdown = vim.bo.filetype == "markdown" or ext == "md" or ext == "markdown"
+  if not is_markdown then
+    vim.notify("Current buffer is not markdown", vim.log.levels.WARN)
+    return
+  end
+
+  local ok = pcall(vim.cmd, "MarkdownPreviewToggle")
+  if not ok then
+    vim.notify("markdown-preview.nvim is not ready. Run :Lazy sync", vim.log.levels.WARN)
+  end
+end, { desc = "Markdown: browser preview toggle" })
+
 local image_extensions = {
   png = true,
   jpg = true,
