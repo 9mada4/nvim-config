@@ -58,6 +58,8 @@ return {
       pdf_engine = "lualatex",
       fonts = {
         main_font = "Hiragino Sans",
+        sans_font = "Hiragino Sans",
+        mono_font = "Hiragino Sans",
       },
     },
     config = function(_, opts)
