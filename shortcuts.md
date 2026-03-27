@@ -12,6 +12,7 @@
 [Edit]  Spc + mp  写真ペースト       u    undo
             + mi  環境で開く      Ctrl+r  redo
             + mb  ブラウザで開く    gcc   ｺﾒﾝﾄｱｳﾄ
+            + mv  md外部プレビュー
 
        Vmode 行全体 単語 Cursorから終わりまで   
  Copy   vy     yy   vwy    Y       
