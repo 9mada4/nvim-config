@@ -41,4 +41,40 @@ return {
       })
     end,
   },
+  {
+    "arminveres/md-pdf.nvim",
+    branch = "main",
+    lazy = true,
+    keys = {
+      {
+        "<leader>,",
+        function()
+          require("md-pdf").convert_md_to_pdf()
+        end,
+        desc = "Markdown preview",
+      },
+    },
+    opts = {
+      pdf_engine = "lualatex",
+      fonts = {
+        main_font = "Hiragino Sans",
+      },
+    },
+    config = function(_, opts)
+      local ok_utils, utils = pcall(require, "md-pdf.utils")
+      if ok_utils and utils.log and utils.log.warn then
+        local original_warn = utils.log.warn
+        utils.log.warn = function(msg)
+          if type(msg) == "string"
+            and msg:find("When specifying custom fonts, you may encounter utf-8 error", 1, true)
+            and opts.pdf_engine ~= "pdflatex"
+          then
+            return
+          end
+          original_warn(msg)
+        end
+      end
+      require("md-pdf").setup(opts)
+    end,
+  },
 }
