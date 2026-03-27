@@ -12,13 +12,79 @@ vim.keymap.set("n", "<leader>sr", [[:%s//gc<Left><Left><Left>]], {
   desc = "Replace last search with confirm",
 })
 
--- Markdownプレビューをブラウザで表示
+-- Markdownプレビューをポップアップで表示（色付き）
 vim.keymap.set("n", "<leader>mg", function()
+  local glow_wrapper = vim.fn.stdpath("config") .. "/tools/glow-color-preview"
+  local style_path = vim.fn.stdpath("config") .. "/styles/glow-tokyonight-headings.json"
+
+  if vim.fn.executable(glow_wrapper) ~= 1 then
+    vim.notify("glow preview wrapper is not executable: " .. glow_wrapper, vim.log.levels.WARN)
+    return
+  end
   if vim.fn.executable("glow") ~= 1 then
     vim.notify("'glow' is not installed or not on PATH", vim.log.levels.WARN)
     return
   end
-  vim.cmd("Glow")
+
+  local current_file = vim.fn.expand("%:p")
+  local ext = vim.fn.fnamemodify(current_file, ":e"):lower()
+  local is_markdown = vim.bo.filetype == "markdown" or ext == "md" or ext == "markdown"
+  if not is_markdown then
+    vim.notify("Current buffer is not markdown", vim.log.levels.WARN)
+    return
+  end
+
+  local target_file = current_file
+  local tmp_file = nil
+  if target_file == "" or vim.fn.filereadable(target_file) ~= 1 then
+    tmp_file = vim.fn.tempname() .. ".md"
+    vim.fn.writefile(vim.api.nvim_buf_get_lines(0, 0, -1, false), tmp_file)
+    target_file = tmp_file
+  end
+
+  local width = math.min(120, math.floor(vim.o.columns * 0.85))
+  local height = math.min(40, math.floor(vim.o.lines * 0.85))
+  local row = math.max(0, math.floor((vim.o.lines - height) / 2 - 1))
+  local col = math.max(0, math.floor((vim.o.columns - width) / 2))
+
+  local buf = vim.api.nvim_create_buf(false, true)
+  local win = vim.api.nvim_open_win(buf, true, {
+    style = "minimal",
+    relative = "editor",
+    width = width,
+    height = height,
+    row = row,
+    col = col,
+    border = "rounded",
+  })
+
+  vim.bo[buf].bufhidden = "wipe"
+
+  local function close_window()
+    if vim.api.nvim_win_is_valid(win) then
+      vim.api.nvim_win_close(win, true)
+    end
+  end
+
+  vim.keymap.set("n", "q", close_window, { buffer = buf, silent = true })
+  vim.keymap.set("n", "<Esc>", close_window, { buffer = buf, silent = true })
+
+  local cmd = {
+    glow_wrapper,
+    "-s",
+    style_path,
+    "-w",
+    tostring(math.max(20, width - 4)),
+    target_file,
+  }
+
+  vim.fn.termopen(cmd, {
+    on_exit = function()
+      if tmp_file and vim.fn.filereadable(tmp_file) == 1 then
+        vim.fn.delete(tmp_file)
+      end
+    end,
+  })
 end, { desc = "Markdown preview" })
 
 local image_extensions = {
