@@ -8,7 +8,9 @@ local uv = vim.uv or vim.loop
 local root = uv.cwd()
 
 local sep = package.config:sub(1, 1)
-local out_path = root .. sep .. "STRUCTURE.txt"
+local docs_dir = root .. sep .. "docs"
+vim.fn.mkdir(docs_dir, "p")
+local out_path = docs_dir .. sep .. "STRUCTURE.txt"
 
 local exclude = {
   [".git"] = true,
@@ -89,7 +91,7 @@ walk(root, "")
 
 local f, err = io.open(out_path, "w")
 if not f then
-  io.stderr:write("failed to write STRUCTURE.txt: " .. tostring(err) .. "\n")
+  io.stderr:write("failed to write docs/STRUCTURE.txt: " .. tostring(err) .. "\n")
   os.exit(1)
 end
 f:write(table.concat(lines, "\n"))

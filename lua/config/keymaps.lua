@@ -225,7 +225,7 @@ end, { desc = "Git diff popup" })
 -- ショートカットをポップアップ Spc + ?
 vim.keymap.set("n", "<leader>?", function()
   local sep = package.config:sub(1, 1)                        
-  local path = vim.fn.stdpath("config") .. sep .. "shortcuts.md"
+  local path = vim.fn.stdpath("config") .. sep .. "docs" .. sep .. "shortcuts.md"
 
   if vim.fn.filereadable(path) ~= 1 then
     vim.notify("memo file not found: " .. path, vim.log.levels.WARN, {

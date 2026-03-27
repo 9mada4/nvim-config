@@ -3,7 +3,7 @@
 # =========================================
 # save-tree.sh
 # Neovim設定フォルダの構造を tree で可視化し，
-# STRUCTURE.txt に自動保存するためのスクリプト
+# docs/STRUCTURE.txt に自動保存するためのスクリプト
 #
 # コマンド=======
 # 使い方:
@@ -21,12 +21,13 @@ set -e
 ROOT="${1:-.}"
 
 # 出力先ファイル
-OUT="${ROOT}/STRUCTURE.txt"
+OUT="${ROOT}/docs/STRUCTURE.txt"
+mkdir -p "$(dirname "$OUT")"
 
 # 対象フォルダへ移動
 cd "$ROOT"
 
-# tree の結果を STRUCTURE.txt に保存
+# tree の結果を docs/STRUCTURE.txt に保存
 {
   echo "Project tree"
   echo "Generated: $(date '+%Y-%m-%d %H:%M:%S')"

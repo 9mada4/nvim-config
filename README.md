@@ -263,3 +263,5 @@ Run this:
 ``` zsh
 nvim --clean --headless +"lua dofile(vim.fn.stdpath('config') .. '/scripts/save-tree.lua')" +qa
 ```
+
+Output: `docs/STRUCTURE.txt`
