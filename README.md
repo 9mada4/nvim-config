@@ -43,6 +43,7 @@ Windows 11（PowerShell）での初回導入を想定した前提ツール（詳
     ```
     winget install -e --id Git.Git
     ```
+
 - 推奨
   - Nerd Font (e.g. FiraCode Nerd Font): アイコン崩れ防止
     - 確認: ターミナルのフォント選択肢に表示されること
@@ -54,6 +55,7 @@ Windows 11（PowerShell）での初回導入を想定した前提ツール（詳
     ```
     winget install BurntSushi.ripgrep.MSVC
     ```
+
 - 任意
   - lazygit: `<leader>gg` を使う場合
     - 確認: `lazygit --version`
@@ -75,6 +77,7 @@ Windows 11（PowerShell）での初回導入を想定した前提ツール（詳
     ```
     winget install -e --id OpenJS.NodeJS.LTS
     ```
+
 ### macOS
 ```zsh
 brew install nvim
@@ -85,6 +88,7 @@ brew install pngpaste
 brew install glow
 brew install ripgrep
 ```
+
 - Nerd Fontをいれる (参考: https://formulae.brew.sh/cask/font-fira-code-nerd-font )
 
 ## 2. Set Font
