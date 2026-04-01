@@ -2,7 +2,7 @@
 ## 目次
 - [todo](#todo)
 - [1. Install Neovim (include `Font`, `lazygit`)](#install-neovim)
-- [2. Set Font](#2.-set-font)
+- [2. Set Font](#2.set-font)
 - [3. Clone(pull) config](#3.-clone-config)
 - [4. Open Neovim](#4.-open-neovim)
 - [5. IME setting (optional)](#5.-ime-setting)
