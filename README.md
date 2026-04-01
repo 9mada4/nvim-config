@@ -6,7 +6,7 @@
 - [3. Clone(pull) config](#3-clonepull-config)
 - [4. Open Neovim](#4-open-neovim)
 - [5. IME setting (optional)](#5-ime-setting-optional)
-- [6. Custom LazyGit](#6-custom-lazygit-optional-lazygit-利用者向け)
+- [6. Custom LazyGit (optional: LazyGit users)](#6-custom-lazygit-optional-lazygit-users)
 - [7. First setup checklist](#7-first-setup-checklist)
 - [How to update](#how-to-update)
 - [If you require SSH](#if-you-require-ssh)
