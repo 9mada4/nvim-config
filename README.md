@@ -25,7 +25,11 @@
 https://youtu.be/80zZQLe0NNg?si=i35CENhmjsgItoPy <br>
 zz, zb, zt
 
-<h2 id="install-neovim">1. Install Neovim (include <code>Font</code>, <code>Lazygit</code>)</h2>
+<h2 id="install-neovim">
+
+## 1. Install Neovim (include `Font`, `Lazygit`)
+
+</h2>
 
 ### Windows
 Windows 11（PowerShell）での初回導入を想定した前提ツール（詳細インストール手順は省略）:
