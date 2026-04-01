@@ -91,7 +91,9 @@ brew install ripgrep
 
 - Nerd Fontをいれる (参考: https://formulae.brew.sh/cask/font-fira-code-nerd-font )
 
-<h2 id="set-font">2. Set Font</h2>
+<h2 id="set-font"></h2>
+
+## 2. Set Font
 - macOS (Terminal.app)
   - `設定 > プロファイル > フォント` から `FiraCode Nerd Font Mono` へ変更
 - Windows (Windows Terminal)
@@ -101,7 +103,9 @@ brew install ripgrep
   4. `外観` > `フォント フェイス` を `JetBrainsMono Nerd Font`（または導入済みの Nerd Font）に変更
   5. `保存` を押して新しいタブを開き直す
 
-<h2 id="clone-config">3. Clone config</h2>
+<h2 id="clone-config"></h2>
+
+## 3. Clone config
 `macOS`:
 ```
 NVIM_CONFIG_DIR="$(nvim --headless --clean +'lua io.write(vim.fn.stdpath("config"))' +qa)"
@@ -136,7 +140,9 @@ if (-not (Test-Path (Join-Path $NVIM_CONFIG_DIR ".git"))) {
 Get-ChildItem -Force $NVIM_CONFIG_DIR
 ```
 
-<h2 id="open-neovim">4. Open Neovim</h2>
+<h2 id="open-neovim"></h2>
+
+## 4. Open Neovim
 - macOS
 ```zsh
 cd ~/.config/nvim
@@ -150,7 +156,9 @@ nvim
 ```
 `:Lazy`->`shift+s`(S)で読み込み
 
-<h2 id="ime-setting">5. IME setting</h2>
+<h2 id="ime-setting"></h2>
+
+## 5. IME setting
 (optional)
 Windows terminal Neovim では、InsertLeave 時に PowerShell で「無変換」キーを送信して IME OFF を行います。
 
@@ -173,7 +181,9 @@ powershell -NoProfile -NonInteractive -ExecutionPolicy Bypass -File .\tools\wind
 
 - 既存の Hammerspoon 方式（legacy）はこちらを参照してください: [docs/hammerspoon-ime-terminal.md](docs/hammerspoon-ime-terminal.md)
 
-<h2 id="custom-lazygit">6. Custom LazyGit</h2>
+<h2 id="custom-lazygit"></h2>
+
+## 6. Custom LazyGit
 (optional: LazyGit users)
 1. open LazyGit config
 
@@ -225,7 +235,9 @@ Set-Content "$LG\config.yml" -Value $CFG -Encoding utf8
 - In LazyGit, press `R` or `G` after applying the matching block above
 - check config dir: `lazygit --print-config-dir`
 
-<h2 id="first-setup-checklist">7. First setup checklist</h2>
+<h2 id="first-setup-checklist"></h2>
+
+## 7. First setup checklist
 - `nvim --version` / `git --version` が通る
 - Step 3 実行後に `nvim` で起動できる
 - 初回起動で lazy.nvim / plugins の自動セットアップが完了する
