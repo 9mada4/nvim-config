@@ -10,6 +10,25 @@ return {
       local cmp = require("cmp")
 
       cmp.setup({
+        mapping = cmp.mapping.preset.insert({
+          ["<C-n>"] = cmp.mapping(function()
+            if cmp.visible() then
+              cmp.select_next_item({ behavior = cmp.SelectBehavior.Select })
+            else
+              cmp.complete()
+            end
+          end, { "i" }),
+          ["<C-p>"] = cmp.mapping(function()
+            if cmp.visible() then
+              cmp.select_prev_item({ behavior = cmp.SelectBehavior.Select })
+            else
+              cmp.complete()
+            end
+          end, { "i" }),
+          ["<C-Space>"] = cmp.mapping.complete(),
+          ["<C-e>"] = cmp.mapping.abort(),
+          ["<CR>"] = cmp.mapping.confirm({ select = false }),
+        }),
         sources = cmp.config.sources({
           { name = "nvim_lsp" },
           { name = "path" },

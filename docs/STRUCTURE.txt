@@ -1,9 +1,11 @@
 Project tree
-Generated: 2026-03-26 22:13:15
+Generated: 2026-03-27 15:39:28
 
 .
 ├── docs
-│   └── hammerspoon-ime-terminal.md
+│   ├── STRUCTURE.txt
+│   ├── hammerspoon-ime-terminal.md
+│   └── shortcuts.md
 ├── lua
 │   ├── config
 │   │   ├── ime.lua
@@ -24,6 +26,7 @@ Generated: 2026-03-26 22:13:15
 │       │   ├── lazygit.lua
 │       │   ├── noice.lua
 │       │   ├── octo.lua
+│       │   ├── reposcope.lua
 │       │   └── telescope.lua
 │       ├── markdown
 │       │   ├── editing.lua
@@ -42,17 +45,17 @@ Generated: 2026-03-26 22:13:15
 │   │   └── save-tree.sh
 │   ├── generate-commit-msg.lua
 │   └── save-tree.lua
+├── styles
+│   └── glow-tokyonight-headings.json
 ├── tools
 │   ├── lazygit
 │   │   ├── commit-with-generated-msg.cmd
 │   │   └── config.windows.yml
-│   └── windows
-│       └── send-nonconvert.ps1
+│   ├── windows
+│   │   └── send-nonconvert.ps1
+│   └── glow-color-preview
 ├── .gitignore
 ├── .luarc.json
-├── .nvimlog
 ├── Neovim 備忘録.md
 ├── README.md
-├── STRUCTURE.txt
-├── init.lua
-└── shortcuts.md
+└── init.lua
