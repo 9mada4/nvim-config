@@ -2,12 +2,12 @@
 ## 目次
 - [todo](#todo)
 - [1. Install Neovim (include `Font`, `lazygit`)](#install-neovim)
-- [2. Set Font](#2.set-font)
-- [3. Clone(pull) config](#3.-clone-config)
-- [4. Open Neovim](#4.-open-neovim)
-- [5. IME setting (optional)](#5.-ime-setting)
-- [6. Custom LazyGit](#6.-custom-lazygit)
-- [7. First setup checklist](#7.-first-setup-checklist)
+- [2. Set Font](#set-font)
+- [3. Clone config](#clone-config)
+- [4. Open Neovim](#open-neovim)
+- [5. IME setting (optional)](#ime-setting)
+- [6. Custom LazyGit (optional: LazyGit users)](#custom-lazygit)
+- [7. First setup checklist](#first-setup-checklist)
 - [How to update](#how-to-update)
 - [If you require SSH](#if-you-require-ssh)
 - [Folder structure](#folder-structure)
@@ -25,9 +25,7 @@
 https://youtu.be/80zZQLe0NNg?si=i35CENhmjsgItoPy <br>
 zz, zb, zt
 
-<h2 id="install-neovim">
-
-## 1. Install Neovim (include `Font`, `Lazygit`) </h2>
+<h2 id="install-neovim">1. Install Neovim (include <code>Font</code>, <code>Lazygit</code>)</h2>
 
 ### Windows
 Windows 11（PowerShell）での初回導入を想定した前提ツール（詳細インストール手順は省略）:
@@ -91,7 +89,7 @@ brew install ripgrep
 
 - Nerd Fontをいれる (参考: https://formulae.brew.sh/cask/font-fira-code-nerd-font )
 
-## 2. Set Font
+<h2 id="set-font">2. Set Font</h2>
 - macOS (Terminal.app)
   - `設定 > プロファイル > フォント` から `FiraCode Nerd Font Mono` へ変更
 - Windows (Windows Terminal)
@@ -101,7 +99,7 @@ brew install ripgrep
   4. `外観` > `フォント フェイス` を `JetBrainsMono Nerd Font`（または導入済みの Nerd Font）に変更
   5. `保存` を押して新しいタブを開き直す
 
-## 3. Clone config
+<h2 id="clone-config">3. Clone config</h2>
 `macOS`:
 ```
 NVIM_CONFIG_DIR="$(nvim --headless --clean +'lua io.write(vim.fn.stdpath("config"))' +qa)"
@@ -136,7 +134,7 @@ if (-not (Test-Path (Join-Path $NVIM_CONFIG_DIR ".git"))) {
 Get-ChildItem -Force $NVIM_CONFIG_DIR
 ```
 
-## 4. Open Neovim
+<h2 id="open-neovim">4. Open Neovim</h2>
 - macOS
 ```zsh
 cd ~/.config/nvim
@@ -150,7 +148,7 @@ nvim
 ```
 `:Lazy`->`shift+s`(S)で読み込み
 
-## 5. IME setting
+<h2 id="ime-setting">5. IME setting</h2>
 (optional)
 Windows terminal Neovim では、InsertLeave 時に PowerShell で「無変換」キーを送信して IME OFF を行います。
 
@@ -173,7 +171,7 @@ powershell -NoProfile -NonInteractive -ExecutionPolicy Bypass -File .\tools\wind
 
 - 既存の Hammerspoon 方式（legacy）はこちらを参照してください: [docs/hammerspoon-ime-terminal.md](docs/hammerspoon-ime-terminal.md)
 
-## 6. Custom LazyGit
+<h2 id="custom-lazygit">6. Custom LazyGit</h2>
 (optional: LazyGit users)
 1. open LazyGit config
 
@@ -225,7 +223,7 @@ Set-Content "$LG\config.yml" -Value $CFG -Encoding utf8
 - In LazyGit, press `R` or `G` after applying the matching block above
 - check config dir: `lazygit --print-config-dir`
 
-## 7. First setup checklist
+<h2 id="first-setup-checklist">7. First setup checklist</h2>
 - `nvim --version` / `git --version` が通る
 - Step 3 実行後に `nvim` で起動できる
 - 初回起動で lazy.nvim / plugins の自動セットアップが完了する
