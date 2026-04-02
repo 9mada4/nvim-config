@@ -5,10 +5,31 @@ vim.keymap.set("i", "jj", "<Esc>", { noremap = true, silent = true })
 vim.keymap.set("v", "K", ":m '<-2<CR>gv=gv")
 vim.keymap.set("v", "J", ":m '>+1<CR>gv=gv")
 
--- 最後に検索した語を使って，確認しながら置換する
+-- 最後に検索した語を使って，カーソル位置以降を確認しながら置換する
 -- 例: /status で検索したあと <leader>sr
-vim.keymap.set("n", "<leader>sr", [[:%s//gc<Left><Left><Left>]], {
+vim.keymap.set("n", "<leader>sr", function()
+  local last_search = vim.fn.getreg("/")
+  if last_search == "" then
+    vim.notify("No previous search pattern", vim.log.levels.WARN)
+    return ""
+  end
+
+  local lnum = vim.fn.line(".")
+  local col = vim.fn.col(".")
+
+  -- current line starts at current column; later lines start from column 1
+  local tail = "/gc|nohlsearch"
+  return string.format(
+    ":.,$s/\\%%(\\%%>%dl\\|\\%%%dl\\%%>%dc\\)\\zs<C-r>/%s%s",
+    lnum,
+    lnum,
+    col - 1,
+    tail,
+    string.rep("<Left>", #tail)
+  )
+end, {
   noremap = true,
+  expr = true,
   desc = "Replace last search with confirm",
 })
 

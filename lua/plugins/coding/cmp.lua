@@ -11,12 +11,23 @@ return {
       local luasnip = require("luasnip")
 
       require("config.cmp_html_tag_pairs").register()
+      vim.api.nvim_set_hl(0, "CmpBorderWhite", { fg = "#ffffff", bg = "NONE" })
 
       cmp.setup({
         snippet = {
           expand = function(args)
             luasnip.lsp_expand(args.body)
           end,
+        },
+        window = {
+          completion = cmp.config.window.bordered({
+            border = "rounded",
+            winhighlight = "Normal:NormalFloat,FloatBorder:CmpBorderWhite,CursorLine:Visual,Search:None",
+          }),
+          documentation = cmp.config.window.bordered({
+            border = "rounded",
+            winhighlight = "Normal:NormalFloat,FloatBorder:CmpBorderWhite,CursorLine:Visual,Search:None",
+          }),
         },
         mapping = cmp.mapping.preset.insert({
           ["<C-n>"] = cmp.mapping(function()
