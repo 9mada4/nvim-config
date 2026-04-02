@@ -8,8 +8,16 @@ return {
     },
     config = function()
       local cmp = require("cmp")
+      local luasnip = require("luasnip")
+
+      require("config.cmp_html_tag_pairs").register()
 
       cmp.setup({
+        snippet = {
+          expand = function(args)
+            luasnip.lsp_expand(args.body)
+          end,
+        },
         mapping = cmp.mapping.preset.insert({
           ["<C-n>"] = cmp.mapping(function()
             if cmp.visible() then
@@ -37,6 +45,7 @@ return {
 
       cmp.setup.filetype("markdown", {
         sources = cmp.config.sources({
+          { name = "html_tag_pairs" },
           { name = "path" },
           { name = "nvim_lsp" },
         }),
