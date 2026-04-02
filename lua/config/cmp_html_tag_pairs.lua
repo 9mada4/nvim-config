@@ -116,17 +116,16 @@ end
 
 function source:complete(params, callback)
   local line = params.context.cursor_before_line
-  local prefix = line:match("<([%w-]+)$")
-  local in_tag_context = line:match("<[%w-]*$") ~= nil
+  local prefix = line:match("<([%w-]*)$")
 
-  if not prefix or prefix == "" then
-    callback({ items = {}, isIncomplete = in_tag_context })
+  if prefix == nil then
+    callback({ items = {}, isIncomplete = false })
     return
   end
 
   local items = {}
   for _, tag in ipairs(tags) do
-    if vim.startswith(tag, prefix) then
+    if prefix == "" or vim.startswith(tag, prefix) then
       table.insert(items, {
         label = ("%s /%s"):format(tag, tag),
         filterText = tag,
@@ -137,7 +136,7 @@ function source:complete(params, callback)
     end
   end
 
-  callback({ items = items, isIncomplete = in_tag_context })
+  callback({ items = items, isIncomplete = false })
 end
 
 function M.register()
