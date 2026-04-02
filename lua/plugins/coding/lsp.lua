@@ -4,6 +4,14 @@ return {
     config = function()
       local has_npm = vim.fn.executable("npm") == 1
 
+      -- Allow HTML completion inside Markdown buffers.
+      vim.lsp.config("html", {
+        filetypes = { "html", "markdown" },
+      })
+      vim.lsp.config("superhtml", {
+        filetypes = { "superhtml", "html", "markdown" },
+      })
+
       -- diagnostics の表示設定
       vim.diagnostic.config({
         virtual_text = true,   -- 行末にエラー内容を表示
