@@ -117,9 +117,10 @@ end
 function source:complete(params, callback)
   local line = params.context.cursor_before_line
   local prefix = line:match("<([%w-]+)$")
+  local in_tag_context = line:match("<[%w-]*$") ~= nil
 
   if not prefix or prefix == "" then
-    callback({ items = {}, isIncomplete = false })
+    callback({ items = {}, isIncomplete = in_tag_context })
     return
   end
 
@@ -136,7 +137,7 @@ function source:complete(params, callback)
     end
   end
 
-  callback({ items = items, isIncomplete = false })
+  callback({ items = items, isIncomplete = in_tag_context })
 end
 
 function M.register()
