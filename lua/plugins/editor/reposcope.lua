@@ -134,6 +134,7 @@ return {
     end
 
     require("reposcope.init").setup({})
+    require("config.reposcope_patch").setup()
 
     vim.keymap.set("n", "<leader>rs", "<cmd>ReposcopeStart<CR>", {
       desc = "Reposcope: search repositories",
