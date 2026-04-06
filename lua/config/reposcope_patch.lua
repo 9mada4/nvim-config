@@ -12,7 +12,6 @@ function M.setup()
   local repo_cache = require("reposcope.cache.repository_cache")
   local readme_manager = require("reposcope.providers.github.readme.readme_manager")
   local core = require("reposcope.utils.core")
-  local debug = require("reposcope.utils.debug")
   local config = require("reposcope.config")
   local get_clone_informations = require("reposcope.providers.github.clone.clone_info").get_clone_informations
 
@@ -57,13 +56,6 @@ function M.setup()
     return nil
   end
 
-  local original_open_ui = reposcope_init.open_ui
-  reposcope_init.open_ui = function(...)
-    local result = original_open_ui(...)
-    status.open()
-    return result
-  end
-
   local original_close_ui = reposcope_init.close_ui
   reposcope_init.close_ui = function(...)
     status.close()
@@ -95,7 +87,6 @@ function M.setup()
     end
 
     if attempt >= 8 then
-      status.clear_search()
       return
     end
 
@@ -117,129 +108,38 @@ function M.setup()
     end)
   end
 
-  local original_update_preview = require("reposcope.ui.preview.preview_manager").update_preview
-  require("reposcope.ui.preview.preview_manager").update_preview = function(owner, repo_name)
-    status.clear_search()
-    return original_update_preview(owner, repo_name)
-  end
-
-  local original_fetch_repositories_and_display = provider_controller.fetch_repositories_and_display
-  provider_controller.fetch_repositories_and_display = function(query)
-    status.set_search("Search: " .. query)
-    return original_fetch_repositories_and_display(query)
-  end
-
   local function normalize_path(path)
     return vim.fs.normalize(vim.fn.expand(path))
   end
 
-  local function update_clone_status(repo_name, message)
-    status.set_clone(string.format("Clone %s: %s", repo_name, message))
-  end
-
-  local function parse_git_progress(data)
-    if not data or data == "" then
-      return nil
-    end
-
-    local cleaned = data:gsub("\r", "\n")
-    local last
-    for line in cleaned:gmatch("[^\n]+") do
-      local phase, percent = line:match("(Counting objects):%s+(%d+%%)")
-      if not phase then
-        phase, percent = line:match("(Compressing objects):%s+(%d+%%)")
-      end
-      if not phase then
-        phase, percent = line:match("(Receiving objects):%s+(%d+%%)")
-      end
-      if not phase then
-        phase, percent = line:match("(Resolving deltas):%s+(%d+%%)")
-      end
-      if phase and percent then
-        last = phase .. " " .. percent
-      elseif line:match("^Cloning into") then
-        last = line
-      end
-    end
-    return last
-  end
-
-  local function spawn_clone(args, repo_name, uuid)
-    local stdout = vim.uv.new_pipe(false)
-    local stderr = vim.uv.new_pipe(false)
-    local stderr_chunks = {}
-
-    update_clone_status(repo_name, "starting")
-
-    local handle
-    handle = vim.uv.spawn(args[1], {
-      args = vim.list_slice(args, 2),
-      stdio = { nil, stdout, stderr },
-    }, vim.schedule_wrap(function(code)
-      if stdout then
-        stdout:close()
-      end
-      if stderr then
-        stderr:close()
-      end
-      if handle then
-        handle:close()
-      end
-
+  local function spawn_clone_in_terminal(args, repo_name, uuid)
+    local ok = status.run_clone_terminal(args, function(code)
       request_state.end_request(uuid)
 
-      if code == 0 then
-        update_clone_status(repo_name, "done")
-        vim.defer_fn(function()
-          status.clear_clone()
-        end, 2000)
-        return
+      if code ~= 0 then
+        vim.notify(
+          string.format("[reposcope] Clone failed for %s (exit %d)", repo_name, code),
+          vim.log.levels.ERROR
+        )
       end
+    end)
 
-      local err = table.concat(stderr_chunks):gsub("%s+$", "")
-      if err == "" then
-        err = "failed"
-      end
-      update_clone_status(repo_name, err)
-      debug.notify("[reposcope] Clone failed: " .. err, vim.log.levels.ERROR)
-    end))
-
-    if not handle then
+    if not ok then
       request_state.end_request(uuid)
-      update_clone_status(repo_name, "failed to start")
-      debug.notify("[reposcope] Failed to spawn clone command", vim.log.levels.ERROR)
-      return
-    end
-
-    local function on_progress(err, data)
-      if err then
-        return
-      end
-      local progress = parse_git_progress(data)
-      if progress then
-        update_clone_status(repo_name, progress)
-      end
-    end
-
-    if stdout then
-      stdout:read_start(on_progress)
-    end
-
-    if stderr then
-      stderr:read_start(function(err, data)
-        if err then
-          return
-        end
-        if data then
-          stderr_chunks[#stderr_chunks + 1] = data
-        end
-        on_progress(nil, data)
-      end)
+      vim.notify("[reposcope] Failed to open clone terminal window", vim.log.levels.ERROR)
     end
   end
 
   provider_controller.prompt_and_clone = function()
     local cwd = vim.fn.getcwd()
+    local infos = get_clone_informations()
+
+    if not infos then
+      return
+    end
+
+    local repo_name = infos.name
+    local repo_url = infos.url
 
     vim.ui.input({
       prompt = "Set clone path: ",
@@ -247,7 +147,6 @@ function M.setup()
       completion = "file",
     }, function(input)
       if input == nil then
-        debug.notify("[reposcope] Cloning canceled.", 2)
         return
       end
 
@@ -258,12 +157,10 @@ function M.setup()
       target_root = normalize_path(target_root)
 
       if vim.fn.isdirectory(target_root) ~= 1 then
-        debug.notify("[reposcope] Clone request: Invalid path", vim.log.levels.ERROR)
-        return
-      end
-
-      local infos = get_clone_informations()
-      if not infos then
+        vim.notify(
+          string.format("[reposcope] Clone path does not exist: %s", target_root),
+          vim.log.levels.ERROR
+        )
         return
       end
 
@@ -271,8 +168,6 @@ function M.setup()
       request_state.register_request(uuid)
       request_state.start_request(uuid)
 
-      local repo_name = infos.name
-      local repo_url = infos.url
       local clone_type = config.options.clone.type
       local output_dir = normalize_path(target_root .. "/" .. repo_name)
 
@@ -280,14 +175,30 @@ function M.setup()
       if clone_type == "gh" then
         args = { "gh", "repo", "clone", repo_url, output_dir, "--", "--progress" }
       elseif clone_type == "curl" then
-        args = { "curl", "-L", "-#","-o", output_dir .. ".zip", repo_url:gsub("%.git$", "/archive/refs/heads/main.zip") }
+        args = {
+          "curl",
+          "-L",
+          "-#",
+          "-o",
+          output_dir .. ".zip",
+          repo_url:gsub("%.git$", "/archive/refs/heads/main.zip"),
+        }
       elseif clone_type == "wget" then
-        args = { "wget", "--show-progress", "-O", output_dir .. ".zip", repo_url:gsub("%.git$", "/archive/refs/heads/main.zip") }
+        args = {
+          "wget",
+          "--show-progress",
+          "-O",
+          output_dir .. ".zip",
+          repo_url:gsub("%.git$", "/archive/refs/heads/main.zip"),
+        }
       else
         args = { "git", "clone", "--progress", repo_url, output_dir }
       end
 
-      spawn_clone(args, repo_name, uuid)
+      reposcope_init.close_ui()
+      vim.schedule(function()
+        spawn_clone_in_terminal(args, repo_name, uuid)
+      end)
     end)
   end
 end
