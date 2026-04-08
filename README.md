@@ -11,6 +11,7 @@
 - [How to update](#how-to-update)
 - [If you require SSH](#if-you-require-ssh)
 - [Folder structure](#folder-structure)
+
 ## todo
 - [x] Windowsセットアップ手順追記
 - [x] IME自動切り替え実装

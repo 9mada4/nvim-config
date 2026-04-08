@@ -61,6 +61,14 @@ return {
           { name = "nvim_lsp" },
         }),
       })
+
+      cmp.setup.filetype("html", {
+        sources = cmp.config.sources({
+          { name = "html_tag_pairs" },
+          { name = "nvim_lsp" },
+          { name = "path" },
+        }),
+      })
     end,
   },
 }
