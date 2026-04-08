@@ -98,12 +98,28 @@ local tags = {
 
 local source = {}
 
+local function build_insert_text(tag)
+  if tag == "details" then
+    return "details><summary>${1}</summary>\n\t$0\n\t\n\t\n</details>"
+  end
+
+  return ("%s>$0</%s>"):format(tag, tag)
+end
+
+local function build_label(tag)
+  if tag == "details" then
+    return "details summary /details"
+  end
+
+  return ("%s /%s"):format(tag, tag)
+end
+
 function source:new()
   return setmetatable({}, { __index = self })
 end
 
 function source:is_available()
-  return vim.bo.filetype == "markdown"
+  return vim.bo.filetype == "markdown" or vim.bo.filetype == "html"
 end
 
 function source:get_debug_name()
@@ -127,9 +143,9 @@ function source:complete(params, callback)
   for _, tag in ipairs(tags) do
     if prefix == "" or vim.startswith(tag, prefix) then
       table.insert(items, {
-        label = ("%s /%s"):format(tag, tag),
+        label = build_label(tag),
         filterText = tag,
-        insertText = ("%s>$0</%s>"):format(tag, tag),
+        insertText = build_insert_text(tag),
         insertTextFormat = 2,
         kind = 10,
       })
