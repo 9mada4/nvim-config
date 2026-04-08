@@ -83,6 +83,7 @@ Windows 11（PowerShell）での初回導入を想定した前提ツール（詳
 ```zsh
 brew install nvim
 brew install --cask font-fira-code-nerd-font
+brew install --cask font-udev-gothic-nf
 brew install lazygit
 brew install gh
 brew install pngpaste
@@ -90,13 +91,15 @@ brew install glow
 brew install ripgrep
 ```
 
-
 <h2 id="set-font"></h2>
 
 ## 2. Set Font
 - macOS (Terminal.app)
-  - Nerd Fontをいれる (参考: https://formulae.brew.sh/cask/font-fira-code-nerd-font )
-  - `設定 > プロファイル > フォント` から `FiraCode Nerd Font Mono` へ変更
+  - Nerd Fontをいれる (参考: `https://formulae.brew.sh/cask/font-fira-code-nerd-font`)
+  - UDEV Gothic NFLG をいれる (参考: `https://formulae.brew.sh/cask/font-udev-gothic-nf`) 
+  - `設定 > プロファイル > フォント > 変更` → 左上で `等幅` へ変更し
+  - `FiraCode Nerd Font Mono` や `UDEV Gothic NFLG` へ変更
+
 - Windows (Windows Terminal)
   1. Windows Terminal を開く
   2. `設定` (`Ctrl + ,`) を開く
