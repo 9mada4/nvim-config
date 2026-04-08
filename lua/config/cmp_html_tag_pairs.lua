@@ -99,19 +99,15 @@ local tags = {
 local source = {}
 
 local function build_insert_text(tag)
-  if tag == "details" then
-    return "details><summary>${1}</summary>\n\t$0\n\t\n\t\n</details>"
-  end
-
   return ("%s>$0</%s>"):format(tag, tag)
 end
 
 local function build_label(tag)
-  if tag == "details" then
-    return "details summary /details"
-  end
-
   return ("%s /%s"):format(tag, tag)
+end
+
+local function build_details_summary_insert_text()
+  return "details><summary>${1}</summary>\n$0\n\n</details>"
 end
 
 function source:new()
@@ -149,6 +145,16 @@ function source:complete(params, callback)
         insertTextFormat = 2,
         kind = 10,
       })
+
+      if tag == "details" then
+        table.insert(items, {
+          label = "details summary /details",
+          filterText = tag,
+          insertText = build_details_summary_insert_text(),
+          insertTextFormat = 2,
+          kind = 10,
+        })
+      end
     end
   end
 
