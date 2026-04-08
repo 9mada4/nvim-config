@@ -90,12 +90,12 @@ brew install glow
 brew install ripgrep
 ```
 
-- Nerd Fontをいれる (参考: https://formulae.brew.sh/cask/font-fira-code-nerd-font )
 
 <h2 id="set-font"></h2>
 
 ## 2. Set Font
 - macOS (Terminal.app)
+  - Nerd Fontをいれる (参考: https://formulae.brew.sh/cask/font-fira-code-nerd-font )
   - `設定 > プロファイル > フォント` から `FiraCode Nerd Font Mono` へ変更
 - Windows (Windows Terminal)
   1. Windows Terminal を開く
