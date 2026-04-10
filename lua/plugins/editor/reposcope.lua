@@ -78,7 +78,7 @@ return {
         end
 
         if not is_valid_win(state.win) then
-          state.win = vim.api.nvim_open_win(state.buf, false, float_config())
+          state.win = vim.api.nvim_open_win(state.buf, true, float_config())
         else
           vim.api.nvim_win_set_config(state.win, float_config())
         end
@@ -90,6 +90,7 @@ return {
         vim.wo[state.win].relativenumber = false
         vim.wo[state.win].cursorline = false
         vim.wo[state.win].signcolumn = "no"
+        pcall(vim.api.nvim_set_current_win, state.win)
       end
 
       local function schedule_close(timeout)
@@ -151,6 +152,12 @@ return {
         end
 
         state.chan = chan
+        vim.schedule(function()
+          if is_valid_win(state.win) then
+            pcall(vim.api.nvim_set_current_win, state.win)
+            pcall(vim.cmd, "startinsert")
+          end
+        end)
         return true
       end
 
@@ -377,74 +384,61 @@ return {
 
       local repo_name = infos.name
       local repo_url = infos.url
+      local target_root = normalize_path(cwd)
 
-      vim.ui.input({
-        prompt = "Set clone path: ",
-        default = cwd,
-        completion = "file",
-      }, function(input)
-        if input == nil then
-          return
-        end
+      if vim.fn.isdirectory(target_root) ~= 1 then
+        vim.notify(
+          string.format("[reposcope] Clone path does not exist: %s", target_root),
+          vim.log.levels.ERROR
+        )
+        return
+      end
 
-        local target_root = vim.trim(input)
-        if target_root == "" then
-          target_root = cwd
-        end
-        target_root = normalize_path(target_root)
+      local uuid = core.generate_uuid()
+      request_state.register_request(uuid)
+      request_state.start_request(uuid)
 
-        if vim.fn.isdirectory(target_root) ~= 1 then
+      local clone_type = reposcope_config.options.clone.type
+      local output_dir = normalize_path(target_root .. "/" .. repo_name)
+
+      local args
+      if clone_type == "gh" then
+        args = { "gh", "repo", "clone", repo_url, output_dir, "--", "--progress" }
+      elseif clone_type == "curl" then
+        args = {
+          "curl",
+          "-L",
+          "-#",
+          "-o",
+          output_dir .. ".zip",
+          repo_url:gsub("%.git$", "/archive/refs/heads/main.zip"),
+        }
+      elseif clone_type == "wget" then
+        args = {
+          "wget",
+          "--show-progress",
+          "-O",
+          output_dir .. ".zip",
+          repo_url:gsub("%.git$", "/archive/refs/heads/main.zip"),
+        }
+      else
+        args = { "git", "clone", "--progress", repo_url, output_dir }
+      end
+
+      vim.schedule(function()
+        local ok, err = pcall(reposcope_init.close_ui)
+        if not ok then
+          request_state.end_request(uuid)
           vim.notify(
-            string.format("[reposcope] Clone path does not exist: %s", target_root),
+            string.format("[reposcope] Failed to close UI before clone: %s", tostring(err)),
             vim.log.levels.ERROR
           )
           return
         end
 
-        local uuid = core.generate_uuid()
-        request_state.register_request(uuid)
-        request_state.start_request(uuid)
-
-        local clone_type = reposcope_config.options.clone.type
-        local output_dir = normalize_path(target_root .. "/" .. repo_name)
-
-        local args
-        if clone_type == "gh" then
-          args = { "gh", "repo", "clone", repo_url, output_dir, "--", "--progress" }
-        elseif clone_type == "curl" then
-          args = {
-            "curl",
-            "-L",
-            "-#",
-            "-o",
-            output_dir .. ".zip",
-            repo_url:gsub("%.git$", "/archive/refs/heads/main.zip"),
-          }
-        elseif clone_type == "wget" then
-          args = {
-            "wget",
-            "--show-progress",
-            "-O",
-            output_dir .. ".zip",
-            repo_url:gsub("%.git$", "/archive/refs/heads/main.zip"),
-          }
-        else
-          args = { "git", "clone", "--progress", repo_url, output_dir }
-        end
-
-        vim.schedule(function()
-          local ok, err = pcall(reposcope_init.close_ui)
-          if not ok then
-            request_state.end_request(uuid)
-            vim.notify(
-              string.format("[reposcope] Failed to close UI before clone: %s", tostring(err)),
-              vim.log.levels.ERROR
-            )
-            return
-          end
-
+        vim.defer_fn(function()
           spawn_clone_in_terminal(args, repo_name, uuid)
-        end)
+        end, 10)
       end)
     end
 
