@@ -6,6 +6,7 @@ return {
   require("plugins.ui.which-key"),
 
   require("plugins.editor.autopairs"),
+  require("plugins.editor.codex"),
   require("plugins.editor.comment"),
   require("plugins.editor.gitsigns"),
   require("plugins.editor.img-clip"),
