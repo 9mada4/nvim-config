@@ -1,5 +1,5 @@
 Project tree
-Generated: 2026-03-27 15:39:28
+Generated: 2026-04-15 16:26:34
 
 .
 ├── docs
@@ -8,6 +8,7 @@ Generated: 2026-03-27 15:39:28
 │   └── shortcuts.md
 ├── lua
 │   ├── config
+│   │   ├── cmp_html_tag_pairs.lua
 │   │   ├── ime.lua
 │   │   ├── keymaps.lua
 │   │   ├── options.lua
@@ -20,6 +21,7 @@ Generated: 2026-03-27 15:39:28
 │       │   └── treesitter.lua
 │       ├── editor
 │       │   ├── autopairs.lua
+│       │   ├── codex.lua
 │       │   ├── comment.lua
 │       │   ├── gitsigns.lua
 │       │   ├── img-clip.lua
@@ -58,4 +60,5 @@ Generated: 2026-03-27 15:39:28
 ├── .luarc.json
 ├── Neovim 備忘録.md
 ├── README.md
-└── init.lua
+├── init.lua
+└── nvim.log
