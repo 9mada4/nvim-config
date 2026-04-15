@@ -27,3 +27,12 @@ vim.api.nvim_create_autocmd("FileType", {
     vim.opt_local.swapfile = false
   end,
 })
+
+-- CSV は BOM 付き UTF-8 で保存する
+vim.api.nvim_create_autocmd("FileType", {
+  pattern = "csv",
+  callback = function()
+    vim.opt_local.fileencoding = "utf-8"
+    vim.opt_local.bomb = true
+  end,
+})
