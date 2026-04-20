@@ -8,6 +8,7 @@ return {
   },
   config = function()
     local gh = require("reposcope.network.request_tools.gh")
+    local os_config = require("config.os")
     local reposcope_config = require("reposcope.config")
     local provider_controller = require("reposcope.controllers.provider_controller")
     local request_state = require("reposcope.state.requests_state")
@@ -21,6 +22,11 @@ return {
     local list_manager = require("reposcope.ui.list.list_manager")
     local display_repositories = require("reposcope.controllers.list_controller").display_repositories
     local ui_loader = require("reposcope.providers.github.repositories.repository_ui_loader")
+    local joinpath = vim.fs and vim.fs.joinpath or function(...)
+      return table.concat({ ... }, package.config:sub(1, 1))
+    end
+    local clone_spawn_delay_ms = os_config.is_windows and 35 or 10
+    local terminal_focus_delay_ms = os_config.is_windows and 20 or 0
 
     local clone_terminal = (function()
       local M = {}
@@ -152,12 +158,12 @@ return {
         end
 
         state.chan = chan
-        vim.schedule(function()
+        vim.defer_fn(function()
           if is_valid_win(state.win) then
             pcall(vim.api.nvim_set_current_win, state.win)
             pcall(vim.cmd, "startinsert")
           end
-        end)
+        end, terminal_focus_delay_ms)
         return true
       end
 
@@ -399,7 +405,7 @@ return {
       request_state.start_request(uuid)
 
       local clone_type = reposcope_config.options.clone.type
-      local output_dir = normalize_path(target_root .. "/" .. repo_name)
+      local output_dir = normalize_path(joinpath(target_root, repo_name))
 
       local args
       if clone_type == "gh" then
@@ -438,7 +444,7 @@ return {
 
         vim.defer_fn(function()
           spawn_clone_in_terminal(args, repo_name, uuid)
-        end, 10)
+        end, clone_spawn_delay_ms)
       end)
     end
 
