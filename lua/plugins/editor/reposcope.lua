@@ -77,7 +77,7 @@ return {
 
       local function ensure_term_window()
         if not is_valid_buf(state.buf) then
-          state.buf = vim.api.nvim_create_buf(false, true)
+          state.buf = vim.api.nvim_create_buf(false, false)
           vim.api.nvim_buf_set_name(state.buf, "reposcope://clone-terminal")
           vim.bo[state.buf].bufhidden = "wipe"
           vim.bo[state.buf].swapfile = false
@@ -129,12 +129,12 @@ return {
 
         if is_valid_buf(state.buf) then
           vim.bo[state.buf].modifiable = true
-          vim.api.nvim_buf_set_lines(state.buf, 0, -1, false, {})
-          vim.bo[state.buf].modifiable = false
+          vim.bo[state.buf].readonly = false
+          vim.bo[state.buf].modified = false
         end
 
         local chan = nil
-        vim.api.nvim_buf_call(state.buf, function()
+        local ok, err = pcall(vim.api.nvim_buf_call, state.buf, function()
           chan = vim.fn.termopen(args, {
             on_exit = function(_, code, _)
               vim.schedule(function()
@@ -151,6 +151,17 @@ return {
             end,
           })
         end)
+
+        if not ok then
+          M.close()
+          vim.schedule(function()
+            vim.notify(
+              string.format("[reposcope] Failed to start clone terminal: %s", tostring(err)),
+              vim.log.levels.ERROR
+            )
+          end)
+          return false
+        end
 
         if not chan or chan <= 0 then
           M.close()
