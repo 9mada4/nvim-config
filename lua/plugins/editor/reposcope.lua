@@ -77,7 +77,7 @@ return {
 
       local function ensure_term_window()
         if not is_valid_buf(state.buf) then
-          state.buf = vim.api.nvim_create_buf(false, false)
+          state.buf = vim.api.nvim_create_buf(false, true)
           vim.api.nvim_buf_set_name(state.buf, "reposcope://clone-terminal")
           vim.bo[state.buf].bufhidden = "wipe"
           vim.bo[state.buf].swapfile = false
@@ -126,12 +126,6 @@ return {
 
         M.close()
         ensure_term_window()
-
-        if is_valid_buf(state.buf) then
-          vim.bo[state.buf].modifiable = true
-          vim.bo[state.buf].readonly = false
-          vim.bo[state.buf].modified = false
-        end
 
         local chan = nil
         local ok, err = pcall(vim.api.nvim_buf_call, state.buf, function()
