@@ -15,6 +15,7 @@ return {
   require("plugins.editor.octo"),
   require("plugins.editor.reposcope"),
   require("plugins.editor.telescope"),
+  require("plugins.editor.toggleterm"),
 
   require("plugins.markdown.editing"),
   require("plugins.markdown.preview"),
