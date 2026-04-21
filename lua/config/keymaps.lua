@@ -309,3 +309,9 @@ vim.keymap.set("n", "<leader>gg", function()
   ensure_lazygit_color_env()
   vim.cmd("LazyGit")
 end, { desc = "Open LazyGit" })
+
+vim.keymap.set("t", "<Esc><Esc>", [[<C-\><C-n>]], {
+  noremap = true,
+  silent = true,
+  desc = "Terminal: normal mode",
+})
