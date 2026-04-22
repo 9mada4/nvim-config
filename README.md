@@ -33,6 +33,7 @@ zz, zb, zt
 ### Windows
 Windows 11（PowerShell）での初回導入を想定した前提ツール（詳細インストール手順は省略）:
 
+
 ```powershell
 winget install -e --id Neovim.Neovim
 winget install -e --id Git.Git
@@ -43,6 +44,7 @@ winget install -e --id charmbracelet.glow    # markdownプレビュー用
 winget install -e --id GitHub.cli    # octo.nvim用
 winget install -e --id OpenJS.NodeJS.LTS
 ```
+- Nodejsは管理者必要かも
 
 ### macOS
 
@@ -68,10 +70,13 @@ brew install codex
   - `FiraCode Nerd Font Mono` や `UDEV Gothic NFLG` へ変更
 
 - Windows (Windows Terminal)
-  1. Windows Terminal を開く
+
+  1. https://github.com/yuru7/udev-gothic/releases/ で`Nerd Fonts 合成版`のzipファイルをダウンロード
+  2. 設定 > フォント > `UDEV Gothic NFLG Regular`をインストール
+  3. Windows Terminal を開く
   2. `設定` (`Ctrl + ,`) を開く
   3. 対象プロファイル（例: PowerShell）を選択
-  4. `外観` > `フォント フェイス` を `JetBrainsMono Nerd Font`（または導入済みの Nerd Font）に変更
+  4. `外観` > `フォント フェイス` を `UDEV Gothic NFLG Regular`に変更
   5. `保存` を押して新しいタブを開き直す
 
 <h2 id="clone-config"></h2>
