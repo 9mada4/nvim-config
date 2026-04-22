@@ -8,6 +8,7 @@ return {
   require("plugins.editor.autopairs"),
   require("plugins.editor.codex"),
   require("plugins.editor.comment"),
+  require("plugins.editor.csvview"),
   require("plugins.editor.gitsigns"),
   require("plugins.editor.img-clip"),
   require("plugins.editor.lazygit"),
