@@ -65,6 +65,17 @@ return {
 
     require("nvim-tree").setup({
       on_attach = on_attach,
+      sync_root_with_cwd = true,
+      respect_buf_cwd = true,
+      update_focused_file = {
+        enable = true,
+        update_root = {
+          enable = true,
+        },
+      },
+      filters = {
+        git_ignored = false,
+      },
     })
     vim.keymap.set("n", "<leader>e", "<cmd>NvimTreeToggle<CR>")
   end,
