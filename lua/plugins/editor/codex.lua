@@ -26,6 +26,13 @@ return {
 
       return {
         terminal_cmd = cmd,
+        terminal = {
+          provider = "snacks",
+          snacks_win_opts = {
+            position = "bottom",
+            height = 0.35,
+          },
+        },
         status_indicator = {
           enabled = false,
         },
