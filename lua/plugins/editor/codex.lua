@@ -30,7 +30,7 @@ return {
           provider = "snacks",
           snacks_win_opts = {
             position = "bottom",
-            height = 0.35,
+            height = 0.5,
           },
         },
         status_indicator = {

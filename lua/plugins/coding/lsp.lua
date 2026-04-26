@@ -2,14 +2,16 @@ return {
   {
     "neovim/nvim-lspconfig",
     config = function()
-      local has_npm = vim.fn.executable("npm") == 1
+      local has_html_lsp = vim.fn.executable("node") == 1
+        and vim.fn.executable("vscode-html-language-server") == 1
+      local has_superhtml = vim.fn.executable("superhtml") == 1
 
       -- Allow HTML completion inside Markdown buffers.
       vim.lsp.config("html", {
         filetypes = { "html", "markdown" },
       })
       vim.lsp.config("superhtml", {
-        filetypes = { "superhtml", "html", "markdown" },
+        filetypes = { "superhtml" },
       })
 
       -- diagnostics の表示設定
@@ -26,9 +28,9 @@ return {
       })
 
       -- LSP servers
-      if has_npm then
+      if has_html_lsp then
         vim.lsp.enable("html")
-      else
+      elseif has_superhtml then
         vim.lsp.enable("superhtml")
       end
       vim.lsp.enable("lua_ls")
