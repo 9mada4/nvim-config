@@ -161,11 +161,13 @@ powershell -NoProfile -NonInteractive -ExecutionPolicy Bypass -File .\tools\wind
 
 ## 6. Custom LazyGit
 (optional: LazyGit users)
-1. open LazyGit config
+1. create a symlink to the repo-managed config
 
-- macOS/Linux:
+- macOS:
 ```
-~/.config/lazygit/config.yml (or ~/Library/Application Support/lazygit/config.yml on some macOS setups)
+cd ~/.config/nvim
+mkdir -p "$(lazygit --print-config-dir)"
+ln -sfn "$PWD/tools/lazygit/config.mac.yml" "$(lazygit --print-config-dir)/config.yml"
 ```
 
 - Windows:
@@ -174,25 +176,12 @@ $LG = (lazygit --print-config-dir).Trim()
 New-Item -ItemType Directory -Force -Path $LG | Out-Null
 ```
 
-2. apply customCommands
+2. apply repo-managed files
 
-`POSIX shell (macOS/Linux: zsh/bash/sh)`:
-```yaml
-customCommands:
-  - key: "R"
-    context: "global"
-    description: "Pull with rebase"
-    command: "git pull --rebase"
-    output: log
-  - key: "G"
-    context: "files"
-    description: "Generate commit message and open editor"
-    output: terminal
-    command: |
-      MSG="$(nvim --clean --headless +'lua dofile(vim.fn.stdpath("config") .. "/scripts/generate-commit-msg.lua")' +qa 2>&1)"
-      [ -n "$MSG" ] || { echo "failed to generate commit message"; exit 1; }
-      git commit -e -m "$MSG"
-```
+`macOS`:
+- repo-managed config: [`tools/lazygit/config.mac.yml`](/Users/Kuma/.config/nvim/tools/lazygit/config.mac.yml)
+- after the first symlink, `git pull` updates the LazyGit config automatically
+- if colors still look disabled outside Neovim, check whether `NO_COLOR` is set in your shell startup files
 
 `Windows (repo-managed files)`:
 ```powershell
@@ -208,7 +197,7 @@ Set-Content "$LG\config.yml" -Value $CFG -Encoding utf8
 
 3. usage
 - `<leader>gg` opens LazyGit in Neovim
-- In LazyGit, press `R` or `G` after applying the matching block above
+- In LazyGit, press `R` or `G` after applying the matching setup above
 - check config dir: `lazygit --print-config-dir`
 
 <h2 id="first-setup-checklist"></h2>
