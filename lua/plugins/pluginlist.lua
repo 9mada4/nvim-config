@@ -2,6 +2,7 @@ return {
   require("plugins.ui.ccc"),
   require("plugins.ui.lualine"),
   require("plugins.ui.nvim-tree"),
+  require("plugins.ui.scrollbar"),
   require("plugins.ui.tokyonight"),
   require("plugins.ui.which-key"),
 
