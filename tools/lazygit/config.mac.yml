@@ -1,25 +1,5 @@
-gui:
-  theme:
-    activeBorderColor:
-      - "#7aa2f7"
-      - bold
-    inactiveBorderColor:
-      - "#565f89"
-    searchingActiveBorderColor:
-      - "#7dcfff"
-      - bold
-    optionsTextColor:
-      - "#7aa2f7"
-    selectedLineBgColor:
-      - "#283457"
-    cherryPickedCommitBgColor:
-      - "#414868"
-    cherryPickedCommitFgColor:
-      - "#7aa2f7"
-    unstagedChangesColor:
-      - "#f7768e"
-    defaultFgColor:
-      - "#c0caf5"
+os:
+  editPreset: "nvim"
 
 customCommands:
   - key: "R"
@@ -35,4 +15,4 @@ customCommands:
     command: |
       MSG="$(nvim --clean --headless +'lua dofile(vim.fn.stdpath("config") .. "/scripts/generate-commit-msg.lua")' +qa 2>&1)"
       [ -n "$MSG" ] || { echo "failed to generate commit message"; exit 1; }
-      git commit -e -m "$MSG"
+      git -c core.editor=nvim commit -e -m "$MSG"

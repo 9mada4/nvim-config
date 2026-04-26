@@ -182,6 +182,7 @@ New-Item -ItemType Directory -Force -Path $LG | Out-Null
 - repo-managed config: [`tools/lazygit/config.mac.yml`](/Users/Kuma/.config/nvim/tools/lazygit/config.mac.yml)
 - after the first symlink, `git pull` updates the LazyGit config automatically
 - if colors still look disabled outside Neovim, check whether `NO_COLOR` is set in your shell startup files
+- `G` opens the commit-message editor with `nvim`, so the `gitcommit` buffer uses your Neovim colorscheme
 
 `Windows (repo-managed files)`:
 ```powershell
