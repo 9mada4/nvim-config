@@ -1,0 +1,38 @@
+gui:
+  theme:
+    activeBorderColor:
+      - "#7aa2f7"
+      - bold
+    inactiveBorderColor:
+      - "#565f89"
+    searchingActiveBorderColor:
+      - "#7dcfff"
+      - bold
+    optionsTextColor:
+      - "#7aa2f7"
+    selectedLineBgColor:
+      - "#283457"
+    cherryPickedCommitBgColor:
+      - "#414868"
+    cherryPickedCommitFgColor:
+      - "#7aa2f7"
+    unstagedChangesColor:
+      - "#f7768e"
+    defaultFgColor:
+      - "#c0caf5"
+
+customCommands:
+  - key: "R"
+    context: "global"
+    description: "Pull with rebase"
+    command: "git pull --rebase"
+    output: log
+
+  - key: "G"
+    context: "files"
+    description: "Generate commit message and open editor"
+    output: terminal
+    command: |
+      MSG="$(nvim --clean --headless +'lua dofile(vim.fn.stdpath("config") .. "/scripts/generate-commit-msg.lua")' +qa 2>&1)"
+      [ -n "$MSG" ] || { echo "failed to generate commit message"; exit 1; }
+      git commit -e -m "$MSG"
