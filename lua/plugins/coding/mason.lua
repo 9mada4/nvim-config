@@ -5,6 +5,7 @@ return {
       "williamboman/mason-lspconfig.nvim",
     },
     config = function()
+      local has_node = vim.fn.executable("node") == 1
       local ensure_installed = {
         "lua_ls",
         "marksman",
@@ -12,7 +13,7 @@ return {
         "ts_ls",
       }
 
-      if vim.fn.executable("npm") == 1 then
+      if has_node then
         table.insert(ensure_installed, "html")
       else
         table.insert(ensure_installed, "superhtml")
