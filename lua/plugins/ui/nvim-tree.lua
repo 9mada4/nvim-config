@@ -12,6 +12,8 @@ return {
       local ns = vim.api.nvim_create_namespace("MyNvimTreeHelp")
       local lines = vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)
       local key_hl_map = {
+        ["<C-]>"] = "NvimTreeHelpOpen",
+        a = "NvimTreeHelpCreate",
         d = "NvimTreeHelpDanger",
         D = "NvimTreeHelpDanger",
         e = "NvimTreeHelpRename",
@@ -60,6 +62,7 @@ return {
     end
 
     vim.api.nvim_set_hl(0, "NvimTreeHelpDanger", { link = "DiagnosticError" })
+    vim.api.nvim_set_hl(0, "NvimTreeHelpCreate", { link = "DiagnosticHint" })
     vim.api.nvim_set_hl(0, "NvimTreeHelpRename", { link = "DiagnosticWarn" })
     vim.api.nvim_set_hl(0, "NvimTreeHelpOpen", { link = "DiagnosticInfo" })
 
