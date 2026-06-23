@@ -98,21 +98,23 @@ fi
 `Windows 11 (PowerShell)`:
 - 設定ディレクトリの設定->確認
 ```powershell
-$NVIM_CONFIG_DIR = nvim --headless --clean "+lua io.write(vim.fn.stdpath('config'))" +qa
-$NVIM_CONFIG_DIR
-```
-- クローン(既にフォルダがあったら失敗するかも？)
-```powershell
+# 1. 設定ディレクトリのパスを設定（環境変数を使うのが一番確実！）
+$NVIM_CONFIG_DIR = "$env:LOCALAPPDATA\nvim"
+Write-Host "Config Directory: $NVIM_CONFIG_DIR"
+
+# 2. フォルダの作成（すでにあってもエラーになりません）
 New-Item -ItemType Directory -Force -Path $NVIM_CONFIG_DIR | Out-Null
 
+# 3. クローンまたは更新の判定
 if (-not (Test-Path (Join-Path $NVIM_CONFIG_DIR ".git"))) {
-  git clone https://github.com/9mada4/nvim-config.git $NVIM_CONFIG_DIR
+    # 注意: フォルダ内に .git はないが他のファイルがある場合、下の clone は失敗します。
+    # その場合は、あらかじめ手動で nvim フォルダを削除するか中身を空にしてください。
+    git clone https://github.com/9mada4/nvim-config.git $NVIM_CONFIG_DIR
 } else {
-  git -C $NVIM_CONFIG_DIR pull
+    git -C $NVIM_CONFIG_DIR pull
 }
-```
-- 確認
-```
+
+# 4. 完了確認
 Get-ChildItem -Force $NVIM_CONFIG_DIR
 ```
 
