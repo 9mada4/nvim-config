@@ -135,6 +135,9 @@ vim.keymap.set("n", "<leader>mb", function()
   vim.ui.open(preview_file)
 end, { desc = "Image: browser preview" })
 
+-- LaTeXプロジェクトのPDFを既定のアプリで開く
+vim.keymap.set("n", "<leader>mf", "<cmd>TexOpenPdf<CR>", { desc = "LaTeX: open PDF" })
+
 -- Git diff をポップアップ表示 Spc gd
 vim.keymap.set("n", "<leader>gd", function()
   local file = vim.fn.expand("%")
