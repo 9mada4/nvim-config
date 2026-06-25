@@ -227,10 +227,13 @@ end
 
 vim.api.nvim_create_autocmd("FileType", {
   group = edit_group,
-  pattern = { "tex", "plaintex" },
+  pattern = { "tex", "plaintex", "latex" },
   callback = function()
     vim.opt_local.autoindent = true
     vim.opt_local.smartindent = false
+    vim.opt_local.cindent = false
+    vim.opt_local.indentexpr = ""
+    vim.opt_local.indentkeys = ""
     vim.opt_local.textwidth = 0
     vim.opt_local.wrap = true
     vim.opt_local.linebreak = true
