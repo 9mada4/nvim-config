@@ -1,4 +1,5 @@
-local group = vim.api.nvim_create_augroup("latex-auto-build", { clear = true })
+local build_group = vim.api.nvim_create_augroup("latex-auto-build", { clear = true })
+local edit_group = vim.api.nvim_create_augroup("latex-edit-options", { clear = true })
 local os = require("config.os")
 
 local running = {}
@@ -224,8 +225,22 @@ local function build_tex(root_file)
   end)
 end
 
+vim.api.nvim_create_autocmd("FileType", {
+  group = edit_group,
+  pattern = { "tex", "plaintex" },
+  callback = function()
+    vim.opt_local.autoindent = true
+    vim.opt_local.smartindent = false
+    vim.opt_local.textwidth = 0
+    vim.opt_local.wrap = true
+    vim.opt_local.linebreak = true
+    vim.opt_local.breakindent = true
+    vim.opt_local.formatoptions:remove({ "t", "c", "r", "o" })
+  end,
+})
+
 vim.api.nvim_create_autocmd("BufWritePost", {
-  group = group,
+  group = build_group,
   pattern = "*.tex",
   callback = function(args)
     local root_file = find_tex_root(args.buf)
