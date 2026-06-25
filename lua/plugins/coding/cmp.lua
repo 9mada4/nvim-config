@@ -11,6 +11,7 @@ return {
       local luasnip = require("luasnip")
 
       require("config.cmp_html_tag_pairs").register()
+      require("config.cmp_tex_commands").register()
       vim.api.nvim_set_hl(0, "CmpBorderWhite", { fg = "#ffffff", bg = "NONE" })
 
       cmp.setup({
@@ -69,6 +70,16 @@ return {
           { name = "path" },
         }),
       })
+
+      for _, filetype in ipairs({ "tex", "plaintex", "latex" }) do
+        cmp.setup.filetype(filetype, {
+          sources = cmp.config.sources({
+            { name = "tex_commands", keyword_length = 0 },
+            { name = "path" },
+            { name = "nvim_lsp" },
+          }),
+        })
+      end
     end,
   },
 }
