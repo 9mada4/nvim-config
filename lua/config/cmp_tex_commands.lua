@@ -65,7 +65,8 @@ local commands = {
 
 local environment_snippets = {
   { name = "figure", insert = "begin{figure}[${1:H}]\n\t\\\\centering\n\t\\\\includegraphics[${2:width=0.8\\\\linewidth}]{${3:file}}\n\t\\\\caption{${4:caption}}\n\t\\\\label{fig:${5:label}}\n\\\\end{figure}", detail = "figure environment" },
-  { name = "table", insert = "begin{table}[${1:H}]\n\t\\\\centering\n\t\\\\caption{${2:caption}}\n\t\\\\label{table:${3:label}}\n\t\\\\begin{tabular}{${4:c}}\n\t\t$0\n\t\\\\end{tabular}\n\\\\end{table}", detail = "table environment" },
+  { name = "table", insert = "begin{table}[H]\n\t$0\n\\\\end{table}", detail = "table environment" },
+  { name = "tabular", insert = "begin{tabular}{${1:c}}\n\t$0\n\\\\end{tabular}", detail = "tabular environment" },
   { name = "itemize", insert = "begin{itemize}\n\t\\\\item $0\n\\\\end{itemize}", detail = "itemize environment" },
   { name = "enumerate", insert = "begin{enumerate}\n\t\\\\item $0\n\\\\end{enumerate}", detail = "enumerate environment" },
   { name = "equation", insert = "begin{equation}\n\t$0\n\\\\end{equation}", detail = "equation environment" },

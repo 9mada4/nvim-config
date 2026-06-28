@@ -11,7 +11,7 @@
  左 右 下 上           行    矩形
 [Edit]  Spc + mp  写真ペースト       u    undo
             + mi  環境で開く      Ctrl+r  redo
-            + mb  ブラウザで開く    gcc   ｺﾒﾝﾄｱｳﾄ
+            + mb  ブラウザで開く    v選択→gc  ｺﾒﾝﾄ
             + mv  md外部プレビュー
             + mf  TeX PDFを開く
        CSV   Tab/Shift-Tab/Enter  セル移動
@@ -20,7 +20,9 @@
  Copy   vy     yy   vwy    Y       
  編集   vc     cc   vwc    C       
  カット vd     dd   vwd    D       
-[Search]   N ← /word → n    Spc sr  単語置換
+[Search]           ? 上に検索   * カーソル単語検索
+Spc sr  単語置換   / 下に検索   N ←→ n 選択
+:noh    検索Highlight
 [Git] p  pull   Spc gg  Open LazyGit   G  auto comit msg  
       P  push   Spc gd  git diff       R  pull --rebase   
 [VimCmd]    :q  quit    :q!  force
