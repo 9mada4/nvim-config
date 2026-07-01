@@ -143,16 +143,55 @@ vim.keymap.set("n", "<leader>mc", "<cmd>TexClean<CR>", { desc = "LaTeX: clean in
 
 -- Git diff をポップアップ表示 Spc gd
 vim.keymap.set("n", "<leader>gd", function()
-  local file = vim.fn.expand("%")
-  if file == "" then
+  local file = vim.fn.expand("%:p")
+  if file == "" or vim.fn.filereadable(file) ~= 1 then
     vim.notify("No file is open", vim.log.levels.WARN)
     return
   end
 
-  local buf = vim.api.nvim_create_buf(false, true)
+  local file_dir = vim.fn.fnamemodify(file, ":h")
+  local root_result = vim.system({ "git", "-C", file_dir, "rev-parse", "--show-toplevel" }, {
+    text = true,
+  }):wait()
+  if root_result.code ~= 0 then
+    vim.notify("Current file is not in a git repository", vim.log.levels.WARN)
+    return
+  end
 
-  local width = math.floor(vim.o.columns * 0.9)
-  local height = math.floor(vim.o.lines * 0.8)
+  local root = vim.trim(root_result.stdout)
+  local relpath = vim.fs.relpath(root, file) or file
+  local diff_result = vim.system({
+    "git",
+    "-C",
+    root,
+    "--no-pager",
+    "diff",
+    "--no-ext-diff",
+    "--",
+    relpath,
+  }, {
+    text = true,
+  }):wait()
+
+  if diff_result.code ~= 0 then
+    vim.notify(vim.trim(diff_result.stderr), vim.log.levels.ERROR)
+    return
+  end
+
+  if diff_result.stdout == "" then
+    vim.notify("No diff for " .. relpath, vim.log.levels.INFO)
+    return
+  end
+
+  local buf = vim.api.nvim_create_buf(false, true)
+  local diff_lines = vim.split(diff_result.stdout, "\n", { plain = true })
+  if diff_lines[#diff_lines] == "" then
+    table.remove(diff_lines)
+  end
+  vim.api.nvim_buf_set_lines(buf, 0, -1, false, diff_lines)
+
+  local width = math.max(20, vim.o.columns - 4)
+  local height = math.max(5, vim.o.lines - vim.o.cmdheight - 4)
   local row = math.floor((vim.o.lines - height) / 2)
   local col = math.floor((vim.o.columns - width) / 2)
 
@@ -166,9 +205,17 @@ vim.keymap.set("n", "<leader>gd", function()
     border = "rounded",
   })
 
-  vim.fn.termopen({ "git", "diff", "--", file })
-
+  vim.bo[buf].buftype = "nofile"
   vim.bo[buf].bufhidden = "wipe"
+  vim.bo[buf].filetype = "diff"
+  vim.bo[buf].modifiable = false
+  vim.bo[buf].swapfile = false
+  vim.wo[win].wrap = false
+  vim.wo[win].linebreak = false
+  vim.wo[win].number = false
+  vim.wo[win].relativenumber = false
+  vim.wo[win].signcolumn = "no"
+  vim.wo[win].foldcolumn = "0"
   vim.keymap.set("n", "q", "<cmd>close<CR>", { buffer = buf, silent = true })
   vim.keymap.set("n", "<Esc>", "<cmd>close<CR>", { buffer = buf, silent = true })
   vim.keymap.set("n", "<C-[>", "<cmd>close<CR>", { buffer = buf, silent = true })
