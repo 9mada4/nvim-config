@@ -168,11 +168,15 @@ Neovim 内の Codex では次のショートカットを使えます。
 - `<leader>cc`: Codex を開閉
 - `<leader>cf`: Codex へ移動
 - `<leader>ci`: `$CHAPPY_SCREENSHOT_PATH` の画像パスを Codex に送信
-- `<leader>cM`: Codex に `/model` を送信し、モデルと推論強度を選択
-- `<leader>cn`: Codex に `/new` を送信し、新規チャットを開始
 - Visual mode の `<leader>cs`: 選択範囲を Codex に送信
 
 `<leader>ci` は、環境変数が未設定の場合も `$HOME/Pictures/Screenshot/screenshotToText.png` を既定値として使います。
+
+Codex CLI に直接打つコマンド:
+
+- `/model`: モデル変更
+- `/new`: 新規チャット
+- `Spc+ci`: 画像パス送信
 
 <h2 id="ime-setting"></h2>
 
