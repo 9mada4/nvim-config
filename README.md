@@ -5,9 +5,10 @@
 - [2. Set Font](#set-font)
 - [3. Clone config](#clone-config)
 - [4. Open Neovim](#open-neovim)
-- [5. IME setting (optional)](#ime-setting)
-- [6. Custom LazyGit (optional: LazyGit users)](#custom-lazygit)
-- [7. First setup checklist](#first-setup-checklist)
+- [5. Codex image shortcut](#codex-image-shortcut)
+- [6. IME setting (optional)](#ime-setting)
+- [7. Custom LazyGit (optional: LazyGit users)](#custom-lazygit)
+- [8. First setup checklist](#first-setup-checklist)
 - [How to update](#how-to-update)
 - [If you require SSH](#if-you-require-ssh)
 - [Folder structure](#folder-structure)
@@ -134,9 +135,52 @@ nvim
 ```
 `:Lazy`->`shift+s`(S)で読み込み
 
+<h2 id="codex-image-shortcut"></h2>
+
+## 5. Codex image shortcut
+macOS の Shortcuts.app（ショートカット.app）で、クリップボードの画像を特定のパスへ同じファイル名で上書き保存できるようにしておきます。Shortcuts.app 側の詳細設定は割愛します。
+
+この設定では、保存先を次のファイルとして扱います。
+
+```zsh
+$HOME/Pictures/Screenshot/screenshotToText.png
+```
+
+ターミナルで環境変数を設定します。
+
+```zsh
+export CHAPPY_SCREENSHOT_PATH="$HOME/Pictures/Screenshot/screenshotToText.png"
+```
+
+毎回使う場合は `~/.zshrc` などにも同じ設定を追加します。
+
+```zsh
+echo 'export CHAPPY_SCREENSHOT_PATH="$HOME/Pictures/Screenshot/screenshotToText.png"' >> ~/.zshrc
+```
+
+確認:
+
+```zsh
+echo "$CHAPPY_SCREENSHOT_PATH"
+mkdir -p "$(dirname "$CHAPPY_SCREENSHOT_PATH")"
+cd "$(dirname "$CHAPPY_SCREENSHOT_PATH")"
+ls -l "$CHAPPY_SCREENSHOT_PATH"
+```
+
+`CHAPPY_SCREENSHOT_PATH` は画像ファイルのパスなので、`cd "$CHAPPY_SCREENSHOT_PATH"` ではなく `cd "$(dirname "$CHAPPY_SCREENSHOT_PATH")"` を使います。
+
+Neovim 内の Codex では次のショートカットを使えます。
+
+- `<leader>cc`: Codex を開閉
+- `<leader>cf`: Codex へ移動
+- `<leader>ci`: `$CHAPPY_SCREENSHOT_PATH` の画像パスを Codex に送信
+- Visual mode の `<leader>cs`: 選択範囲を Codex に送信
+
+`<leader>ci` は、環境変数が未設定の場合も `$HOME/Pictures/Screenshot/screenshotToText.png` を既定値として使います。
+
 <h2 id="ime-setting"></h2>
 
-## 5. IME setting
+## 6. IME setting
 (optional)
 Windows terminal Neovim では、InsertLeave 時に PowerShell で「無変換」キーを送信して IME OFF を行います。
 
@@ -161,7 +205,7 @@ powershell -NoProfile -NonInteractive -ExecutionPolicy Bypass -File .\tools\wind
 
 <h2 id="custom-lazygit"></h2>
 
-## 6. Custom LazyGit
+## 7. Custom LazyGit
 (optional: LazyGit users)
 1. create a symlink to the repo-managed config
 
@@ -205,7 +249,7 @@ Set-Content "$LG\config.yml" -Value $CFG -Encoding utf8
 
 <h2 id="first-setup-checklist"></h2>
 
-## 7. First setup checklist
+## 8. First setup checklist
 - `nvim --version` / `git --version` が通る
 - Step 3 実行後に `nvim` で起動できる
 - 初回起動で lazy.nvim / plugins の自動セットアップが完了する

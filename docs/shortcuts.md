@@ -16,6 +16,11 @@
             + mf  TeX PDFを開く
        CSV   Tab/Shift-Tab/Enter  セル移動
 
+[Codex] Spc + cc  Codex開閉
+            + cf  Codexへ移動
+            + ci  画像パス送信
+       v選択 + cs  選択範囲送信
+
        Vmode 行全体 単語 Cursorから終わりまで   
  Copy   vy     yy   vwy    Y       
  編集   vc     cc   vwc    C       
