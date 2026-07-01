@@ -138,6 +138,9 @@ end, { desc = "Image: browser preview" })
 -- LaTeXプロジェクトのPDFを既定のアプリで開く
 vim.keymap.set("n", "<leader>mf", "<cmd>TexOpenPdf<CR>", { desc = "LaTeX: open PDF" })
 
+-- LaTeXプロジェクトの途中生成物を削除
+vim.keymap.set("n", "<leader>mc", "<cmd>TexClean<CR>", { desc = "LaTeX: clean intermediate files" })
+
 -- Git diff をポップアップ表示 Spc gd
 vim.keymap.set("n", "<leader>gd", function()
   local file = vim.fn.expand("%")

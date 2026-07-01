@@ -14,6 +14,7 @@
             + mb  ブラウザで開く    v選択→gc  ｺﾒﾝﾄ
             + mv  md外部プレビュー
             + mf  TeX PDFを開く
+            + mc  TeX途中生成物を削除
        CSV   Tab/Shift-Tab/Enter  セル移動
 
 [Codex] Spc + cc  Codex開閉

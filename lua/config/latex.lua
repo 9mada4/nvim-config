@@ -262,6 +262,19 @@ vim.api.nvim_create_user_command("TexBuild", function()
   build_tex(root_file)
 end, { desc = "Build the current LaTeX project" })
 
+vim.api.nvim_create_user_command("TexClean", function()
+  local root_file = find_tex_root(0)
+  if not root_file then
+    vim.notify("TeX root file was not found", vim.log.levels.WARN, { title = "LaTeX" })
+    return
+  end
+
+  clean_aux_files(root_file)
+  vim.notify("cleaned intermediate files for " .. vim.fn.fnamemodify(root_file, ":t"), vim.log.levels.INFO, {
+    title = "LaTeX",
+  })
+end, { desc = "Clean intermediate files for the current LaTeX project" })
+
 vim.api.nvim_create_user_command("TexOpenPdf", function()
   local root_file = find_tex_root(0)
   if not root_file then
