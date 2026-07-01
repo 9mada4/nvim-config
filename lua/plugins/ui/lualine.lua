@@ -26,7 +26,7 @@ return {
     end
 
     local function codex_hint()
-      return "Codex  /model: model  /new: new chat  Spc+ci: image"
+      return "Codex  Ctrl-J: newline  /model: model  /new: new chat  Spc+ci: image  /vim: vim mode  /exit: exit"
     end
 
     local function special_hint()
