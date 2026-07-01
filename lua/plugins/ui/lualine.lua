@@ -8,12 +8,43 @@ return {
       return vim.api.nvim_buf_get_name(0):match("^reposcope://") ~= nil
     end
 
+    local function is_codex_terminal()
+      local bufnr = vim.api.nvim_get_current_buf()
+      if vim.bo[bufnr].buftype ~= "terminal" then
+        return false
+      end
+
+      if vim.b[bufnr].codex_terminal == true then
+        return true
+      end
+
+      return vim.api.nvim_buf_get_name(bufnr):lower():find("codex", 1, true) ~= nil
+    end
+
     local function reposcope_hint()
       return "Reposcope  <CR>: search  <C-c>: clone  <C-v>: README  <Esc>: close"
     end
 
-    local function not_reposcope()
-      return not is_reposcope()
+    local function codex_hint()
+      return "Codex  <C-]>: back  <S-CR>: newline  Spc+cM: model  Spc+cn: new  Spc+ci: image"
+    end
+
+    local function special_hint()
+      if is_reposcope() then
+        return reposcope_hint()
+      end
+      if is_codex_terminal() then
+        return codex_hint()
+      end
+      return ""
+    end
+
+    local function is_special()
+      return is_reposcope() or is_codex_terminal()
+    end
+
+    local function not_special()
+      return not is_special()
     end
 
     require("lualine").setup({
@@ -22,47 +53,46 @@ return {
       },
       sections = {
         lualine_a = {
-          { "mode", cond = not_reposcope },
+          { "mode", cond = not_special },
         },
         lualine_b = {
-          { "branch", cond = not_reposcope },
-          { "diff", cond = not_reposcope },
-          { "diagnostics", cond = not_reposcope },
+          { "branch", cond = not_special },
+          { "diff", cond = not_special },
+          { "diagnostics", cond = not_special },
         },
         lualine_c = {
-          { reposcope_hint, cond = is_reposcope },
-          { "filename", cond = not_reposcope },
+          { special_hint, cond = is_special },
+          { "filename", cond = not_special },
         },
         lualine_x = {
-          { "encoding", cond = not_reposcope },
-          { "fileformat", cond = not_reposcope },
-          { "filetype", cond = not_reposcope },
+          { "encoding", cond = not_special },
+          { "fileformat", cond = not_special },
+          { "filetype", cond = not_special },
         },
         lualine_y = {
-          { "progress", cond = not_reposcope },
+          { "progress", cond = not_special },
         },
         lualine_z = {
-          { "location", cond = not_reposcope },
+          { "location", cond = not_special },
         },
       },
       inactive_sections = {
         lualine_a = {},
         lualine_b = {},
         lualine_c = {
-          { reposcope_hint, cond = is_reposcope },
-          { "filename", cond = not_reposcope },
+          { special_hint, cond = is_special },
+          { "filename", cond = not_special },
         },
         lualine_x = {
-          { "location", cond = not_reposcope },
+          { "location", cond = not_special },
         },
         lualine_y = {},
         lualine_z = {},
       },
     })
 
-    vim.api.nvim_create_autocmd({ "BufEnter", "BufLeave", "WinEnter", "WinLeave" }, {
+    vim.api.nvim_create_autocmd({ "BufEnter", "BufLeave", "TermOpen", "WinEnter", "WinLeave" }, {
       group = refresh_group,
-      pattern = "reposcope://*",
       callback = function()
         require("lualine").refresh()
       end,

@@ -19,6 +19,8 @@
 [Codex] Spc + cc  Codex開閉
             + cf  Codexへ移動
             + ci  画像パス送信
+            + cM  モデル選択
+            + cn  新規チャット
        v選択 + cs  選択範囲送信
 
        Vmode 行全体 単語 Cursorから終わりまで   
