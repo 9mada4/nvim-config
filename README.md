@@ -146,13 +146,7 @@ macOS の Shortcuts.app（ショートカット.app）で、クリップボー�
 $HOME/Pictures/Screenshot/screenshotToText.png
 ```
 
-ターミナルで環境変数を設定します。
-
-```zsh
-export CHAPPY_SCREENSHOT_PATH="$HOME/Pictures/Screenshot/screenshotToText.png"
-```
-
-毎回使う場合は `~/.zshrc` などにも同じ設定を追加します。
+ターミナルで環境変数を設定する．`~/.zshrc` に設定を追加して永続化．
 
 ```zsh
 echo 'export CHAPPY_SCREENSHOT_PATH="$HOME/Pictures/Screenshot/screenshotToText.png"' >> ~/.zshrc
