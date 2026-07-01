@@ -21,6 +21,10 @@
             + cf  Codexへ移動
             + ci  画像パス送信
        v選択 + cs  選択範囲送信
+       Ctrl-J      入力欄で改行
+       /model      モデル変更
+       /vim        Vimモード切替
+       /exit       Codex終了
 
        Vmode 行全体 単語 Cursorから終わりまで   
  Copy   vy     yy   vwy    Y       

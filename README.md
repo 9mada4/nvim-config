@@ -174,9 +174,12 @@ Neovim 内の Codex では次のショートカットを使えます。
 
 Codex CLI に直接打つコマンド:
 
+- `Ctrl-J`: 入力欄で改行
 - `/model`: モデル変更
 - `/new`: 新規チャット
 - `Spc+ci`: 画像パス送信
+- `/vim`: Vim モード切替
+- `/exit`: Codex 終了
 
 <h2 id="ime-setting"></h2>
 

@@ -142,6 +142,25 @@ local function open_path(path)
   vim.fn.jobstart(command, { detach = true })
 end
 
+local function pdf_path_for_root(root_file)
+  return vim.fn.fnamemodify(root_file, ":r") .. ".pdf"
+end
+
+local function open_pdf_for_root(root_file, opts)
+  opts = opts or {}
+
+  local pdf = pdf_path_for_root(root_file)
+  if vim.fn.filereadable(pdf) ~= 1 then
+    if opts.notify_missing ~= false then
+      vim.notify("PDF not found: " .. pdf, vim.log.levels.WARN, { title = "LaTeX" })
+    end
+    return false
+  end
+
+  open_path(pdf)
+  return true
+end
+
 local function build_tex(root_file)
   if not root_file or vim.fn.filereadable(root_file) ~= 1 then
     return
@@ -202,7 +221,8 @@ local function build_tex(root_file)
       vim.schedule(function()
         clean_aux_files(root_file)
         vim.fn.setqflist({}, "r")
-        vim.notify("updated " .. vim.fn.fnamemodify(root_file, ":r") .. ".pdf", vim.log.levels.INFO, {
+        open_pdf_for_root(root_file, { notify_missing = false })
+        vim.notify("updated " .. pdf_path_for_root(root_file), vim.log.levels.INFO, {
           title = "LaTeX",
         })
       end)
@@ -282,11 +302,5 @@ vim.api.nvim_create_user_command("TexOpenPdf", function()
     return
   end
 
-  local pdf = vim.fn.fnamemodify(root_file, ":r") .. ".pdf"
-  if vim.fn.filereadable(pdf) ~= 1 then
-    vim.notify("PDF not found: " .. pdf, vim.log.levels.WARN, { title = "LaTeX" })
-    return
-  end
-
-  open_path(pdf)
+  open_pdf_for_root(root_file)
 end, { desc = "Open the current LaTeX project's PDF" })
