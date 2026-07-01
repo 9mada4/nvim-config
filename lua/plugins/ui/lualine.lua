@@ -26,7 +26,7 @@ return {
     end
 
     local function codex_hint()
-      return "Codex  <C-]>: back  <S-CR>: newline  Spc+cM: model  Spc+cn: new  Spc+ci: image"
+      return "Codex  /model: model  /new: new chat  Spc+ci: image"
     end
 
     local function special_hint()

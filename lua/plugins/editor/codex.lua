@@ -25,18 +25,6 @@ local function send_chappy_screenshot_to_codex()
   end
 end
 
-local function send_codex_slash_command(command)
-  local ok, terminal = pcall(require, "codex.terminal")
-  if not ok or type(terminal.send) ~= "function" then
-    vim.notify("Codex terminal is not ready", vim.log.levels.WARN)
-    return
-  end
-
-  if not terminal.send(command) then
-    vim.notify("Could not send Codex command: " .. command, vim.log.levels.WARN)
-  end
-end
-
 return {
   {
     "ishiooon/codex.nvim",
@@ -47,15 +35,12 @@ return {
       "Codex",
       "CodexFocus",
       "CodexSend",
-      "CodexSelectModel",
       "CodexTreeAdd",
     },
     keys = {
       { "<leader>cc", "<cmd>Codex<CR>", desc = "Codex: Toggle" },
       { "<leader>cf", "<cmd>CodexFocus<CR>", desc = "Codex: Focus" },
       { "<leader>ci", send_chappy_screenshot_to_codex, desc = "Codex: Send screenshot image" },
-      { "<leader>cM", function() send_codex_slash_command("/model") end, desc = "Codex: Select model" },
-      { "<leader>cn", function() send_codex_slash_command("/new") end, desc = "Codex: New chat" },
       { "<leader>cs", "<cmd>CodexSend<CR>", mode = "v", desc = "Codex: Send selection" },
     },
     opts = function()
