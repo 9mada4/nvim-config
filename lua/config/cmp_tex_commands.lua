@@ -8,8 +8,8 @@ local commands = {
   { name = "bibliography", insert = "bibliography{${1:Ref/References}}", detail = "bibliography database" },
   { name = "defaultbibliographystyle", insert = "defaultbibliographystyle{${1:unsrt}}", detail = "bibunits bibliography style" },
   { name = "defaultbibliography", insert = "defaultbibliography{${1:Ref/References}}", detail = "bibunits bibliography database" },
-  { name = "begin", insert = "begin{${1:environment}}\n\t$0\n\\\\end{$1}", detail = "environment block" },
-  { name = "end", insert = "end{${1:environment}}", detail = "environment end" },
+  { name = "begin", insert = "begin{${1}}\n\t$0\n\\\\end{$1}", detail = "environment block" },
+  { name = "end", insert = "end{${1}}", detail = "environment end" },
   { name = "section", insert = "section{${1:title}}", detail = "section" },
   { name = "subsection", insert = "subsection{${1:title}}", detail = "subsection" },
   { name = "subsubsection", insert = "subsubsection{${1:title}}", detail = "subsubsection" },
@@ -65,6 +65,7 @@ local commands = {
 
 local environment_snippets = {
   { name = "figure", insert = "begin{figure}[${1:H}]\n\t\\\\centering\n\t\\\\includegraphics[${2:width=0.8\\\\linewidth}]{${3:file}}\n\t\\\\caption{${4:caption}}\n\t\\\\label{fig:${5:label}}\n\\\\end{figure}", detail = "figure environment" },
+  { name = "figure", label = "\\figure textwidth", insert = "begin{figure}[H]\n\t\\\\centering\n\t\\\\includegraphics[width=1.0\\\\textwidth]{${1:file_path}}\n\t\\\\caption{sample_fig}\n\t\\\\label{fig:sample}\n\\\\end{figure}", detail = "figure environment with 1.0 textwidth image" },
   { name = "table", insert = "begin{table}[H]\n\t$0\n\\\\end{table}", detail = "table environment" },
   { name = "tabular", insert = "begin{tabular}{${1:c}}\n\t$0\n\\\\end{tabular}", detail = "tabular environment" },
   { name = "itemize", insert = "begin{itemize}\n\t\\\\item $0\n\\\\end{itemize}", detail = "itemize environment" },
@@ -74,7 +75,15 @@ local environment_snippets = {
   { name = "bibunit", insert = "begin{bibunit}\n\t$0\n\\\\putbib\n\\\\end{bibunit}", detail = "bibunit environment" },
 }
 
+local environment_names = {}
+local seen_environment_names = {}
+
 for _, spec in ipairs(environment_snippets) do
+  if not seen_environment_names[spec.name] then
+    table.insert(environment_names, spec.name)
+    seen_environment_names[spec.name] = true
+  end
+
   table.insert(commands, spec)
 end
 
@@ -82,13 +91,37 @@ local source = {}
 
 local function item_from_spec(spec)
   return {
-    label = "\\" .. spec.name,
-    filterText = spec.name,
+    label = spec.label or "\\" .. spec.name,
+    filterText = spec.filterText or spec.name,
     insertText = spec.insert or spec.name,
     insertTextFormat = 2,
     kind = 15,
     detail = spec.detail,
   }
+end
+
+local function environment_item(name)
+  return {
+    label = name,
+    filterText = name,
+    insertText = name,
+    insertTextFormat = 1,
+    kind = 15,
+    detail = "LaTeX environment name",
+  }
+end
+
+local function complete_environments(prefix)
+  local items = {}
+  local lower_prefix = prefix:lower()
+
+  for _, name in ipairs(environment_names) do
+    if prefix == "" or vim.startswith(name:lower(), lower_prefix) then
+      table.insert(items, environment_item(name))
+    end
+  end
+
+  return items
 end
 
 function source:new()
@@ -104,11 +137,18 @@ function source:get_debug_name()
 end
 
 function source:get_trigger_characters()
-  return { "\\" }
+  return { "\\", "{" }
 end
 
 function source:complete(params, callback)
   local line = params.context.cursor_before_line
+  local environment_prefix = line:match("\\begin%{([%w*%-]*)$") or line:match("\\end%{([%w*%-]*)$")
+
+  if environment_prefix ~= nil then
+    callback({ items = complete_environments(environment_prefix), isIncomplete = false })
+    return
+  end
+
   local prefix = line:match("\\([%a]*)$")
 
   if prefix == nil then
