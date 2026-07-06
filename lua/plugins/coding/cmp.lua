@@ -4,6 +4,7 @@ return {
     dependencies = {
       "hrsh7th/cmp-nvim-lsp",
       "hrsh7th/cmp-path",
+      "hrsh7th/cmp-buffer",
       "L3MON4D3/LuaSnip",
     },
     config = function()
@@ -75,6 +76,7 @@ return {
         cmp.setup.filetype(filetype, {
           sources = cmp.config.sources({
             { name = "tex_commands", keyword_length = 0 },
+            { name = "buffer", keyword_length = 1 },
             { name = "path" },
             { name = "nvim_lsp" },
           }),
