@@ -203,6 +203,41 @@ local function graphics_path_prefix(line)
     or line:match("\\includegraphics%{([^{}]*)$")
 end
 
+local function math_rm_item()
+  return {
+    label = "$\\mathrm{}$",
+    filterText = "$",
+    insertText = "\\mathrm{${1}}$",
+    insertTextFormat = 2,
+    kind = 15,
+    detail = "inline math roman text",
+  }
+end
+
+local function is_escaped_at(line, index)
+  local backslash_count = 0
+  local current = index - 1
+
+  while current >= 1 and line:sub(current, current) == "\\" do
+    backslash_count = backslash_count + 1
+    current = current - 1
+  end
+
+  return backslash_count % 2 == 1
+end
+
+local function is_opening_math_dollar(line)
+  local dollar_count = 0
+
+  for index = 1, #line do
+    if line:sub(index, index) == "$" and not is_escaped_at(line, index) then
+      dollar_count = dollar_count + 1
+    end
+  end
+
+  return dollar_count % 2 == 1
+end
+
 function source:new()
   return setmetatable({}, { __index = self })
 end
@@ -216,11 +251,17 @@ function source:get_debug_name()
 end
 
 function source:get_trigger_characters()
-  return { "\\", "{", "/", "." }
+  return { "\\", "{", "/", ".", "$" }
 end
 
 function source:complete(params, callback)
   local line = params.context.cursor_before_line
+
+  if line:match("%$$") and is_opening_math_dollar(line) then
+    callback({ items = { math_rm_item() }, isIncomplete = false })
+    return
+  end
+
   local path_prefix = graphics_path_prefix(line)
 
   if path_prefix ~= nil then
