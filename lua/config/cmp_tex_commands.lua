@@ -9,7 +9,7 @@ local commands = {
   { name = "defaultbibliographystyle", insert = "defaultbibliographystyle{${1:unsrt}}", detail = "bibunits bibliography style" },
   { name = "defaultbibliography", insert = "defaultbibliography{${1:Ref/References}}", detail = "bibunits bibliography database" },
   { name = "begin", insert = "begin{${1}}\n\t$0\n\\\\end{$1}", detail = "environment block" },
-  { name = "begin", label = "\\begin figure textwidth", insert = "begin{figure}[H]\n    \\\\centering\n    \\\\includegraphics[width=1.0\\\\textwidth]{${1:file_path}}\n    \\\\caption{sample_fig}\n    \\\\label{fig:sample}\n\\\\end{figure}", detail = "figure environment with 1.0 textwidth image" },
+  { name = "begin", label = "\\begin figure textwidth", insert = "begin{figure}[H]\n    \\\\centering\n    \\\\includegraphics[width=1.0\\\\textwidth]{${1}}\n    \\\\caption{${2:変更図名}}\n    \\\\label{fig:${3:変更タグ}}\n\\\\end{figure}", detail = "figure environment with 1.0 textwidth image" },
   { name = "begin", label = "\\begin table booktabs", insert = "begin{table}[H]\n\\\\centering\n\\\\caption{${1:変更}}\n    \\\\begin{tabular}{l c}\n    \\\\toprule\n\t    項目 & 番号\\\\\\\\\n    \\\\midrule\n        い & 1\\\\\\\\\n        ろ & 2\\\\\\\\\n    \\\\bottomrule\n    \\\\end{tabular}\n\\\\label{table:$1}\n\\\\end{table}", detail = "booktabs table environment" },
   { name = "end", insert = "end{${1}}", detail = "environment end" },
   { name = "section", insert = "section{${1:title}}", detail = "section" },
@@ -125,6 +125,84 @@ local function complete_environments(prefix)
   return items
 end
 
+local function get_buffer_dir(params)
+  local buffer_dir = vim.fn.expand(("#%d:p:h"):format(params.context.bufnr))
+
+  if buffer_dir == "" then
+    return vim.fn.getcwd()
+  end
+
+  return buffer_dir
+end
+
+local function split_path_prefix(path_prefix)
+  local dir_prefix, name_prefix = path_prefix:match("^(.*[/])([^/]*)$")
+
+  if dir_prefix == nil then
+    return "", path_prefix
+  end
+
+  return dir_prefix, name_prefix
+end
+
+local function expand_path_dir(params, dir_prefix)
+  if dir_prefix:sub(1, 1) == "/" then
+    return dir_prefix
+  end
+
+  if dir_prefix:sub(1, 2) == "~/" then
+    return vim.fn.expand("~") .. dir_prefix:sub(2)
+  end
+
+  return vim.fs.normalize(vim.fs.joinpath(get_buffer_dir(params), dir_prefix))
+end
+
+local function path_item(name, fs_type)
+  local is_directory = fs_type == "directory"
+
+  return {
+    label = is_directory and name .. "/" or name,
+    filterText = name,
+    insertText = is_directory and name .. "/" or name,
+    insertTextFormat = 1,
+    kind = is_directory and 19 or 17,
+    detail = is_directory and "directory" or "file",
+  }
+end
+
+local function complete_graphics_paths(params, path_prefix)
+  local dir_prefix, name_prefix = split_path_prefix(path_prefix)
+  local scan_dir = expand_path_dir(params, dir_prefix)
+  local fs = vim.loop.fs_scandir(scan_dir)
+
+  if not fs then
+    return {}
+  end
+
+  local items = {}
+  local include_hidden = name_prefix:sub(1, 1) == "."
+  local lower_prefix = name_prefix:lower()
+
+  while true do
+    local name, fs_type = vim.loop.fs_scandir_next(fs)
+
+    if not name then
+      break
+    end
+
+    if (include_hidden or name:sub(1, 1) ~= ".") and (name_prefix == "" or vim.startswith(name:lower(), lower_prefix)) then
+      table.insert(items, path_item(name, fs_type))
+    end
+  end
+
+  return items
+end
+
+local function graphics_path_prefix(line)
+  return line:match("\\includegraphics%[[^%]]*%]%{([^{}]*)$")
+    or line:match("\\includegraphics%{([^{}]*)$")
+end
+
 function source:new()
   return setmetatable({}, { __index = self })
 end
@@ -138,11 +216,18 @@ function source:get_debug_name()
 end
 
 function source:get_trigger_characters()
-  return { "\\", "{" }
+  return { "\\", "{", "/", "." }
 end
 
 function source:complete(params, callback)
   local line = params.context.cursor_before_line
+  local path_prefix = graphics_path_prefix(line)
+
+  if path_prefix ~= nil then
+    callback({ items = complete_graphics_paths(params, path_prefix), isIncomplete = false })
+    return
+  end
+
   local environment_prefix = line:match("\\begin%{([%w*%-]*)$") or line:match("\\end%{([%w*%-]*)$")
 
   if environment_prefix ~= nil then
