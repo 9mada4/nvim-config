@@ -9,6 +9,7 @@ local commands = {
   { name = "defaultbibliographystyle", insert = "defaultbibliographystyle{${1:unsrt}}", detail = "bibunits bibliography style" },
   { name = "defaultbibliography", insert = "defaultbibliography{${1:Ref/References}}", detail = "bibunits bibliography database" },
   { name = "begin", insert = "begin{${1}}\n\t$0\n\\\\end{$1}", detail = "environment block" },
+  { name = "begin", label = "\\begin figure textwidth", insert = "begin{figure}[H]\n    \\\\centering\n    \\\\includegraphics[width=1.0\\\\textwidth]{${1:file_path}}\n    \\\\caption{sample_fig}\n    \\\\label{fig:sample}\n\\\\end{figure}", detail = "figure environment with 1.0 textwidth image" },
   { name = "end", insert = "end{${1}}", detail = "environment end" },
   { name = "section", insert = "section{${1:title}}", detail = "section" },
   { name = "subsection", insert = "subsection{${1:title}}", detail = "subsection" },
@@ -65,7 +66,6 @@ local commands = {
 
 local environment_snippets = {
   { name = "figure", insert = "begin{figure}[${1:H}]\n\t\\\\centering\n\t\\\\includegraphics[${2:width=0.8\\\\linewidth}]{${3:file}}\n\t\\\\caption{${4:caption}}\n\t\\\\label{fig:${5:label}}\n\\\\end{figure}", detail = "figure environment" },
-  { name = "figure", label = "\\figure textwidth", insert = "begin{figure}[H]\n\t\\\\centering\n\t\\\\includegraphics[width=1.0\\\\textwidth]{${1:file_path}}\n\t\\\\caption{sample_fig}\n\t\\\\label{fig:sample}\n\\\\end{figure}", detail = "figure environment with 1.0 textwidth image" },
   { name = "table", insert = "begin{table}[H]\n\t$0\n\\\\end{table}", detail = "table environment" },
   { name = "tabular", insert = "begin{tabular}{${1:c}}\n\t$0\n\\\\end{tabular}", detail = "tabular environment" },
   { name = "itemize", insert = "begin{itemize}\n\t\\\\item $0\n\\\\end{itemize}", detail = "itemize environment" },
