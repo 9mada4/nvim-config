@@ -10,7 +10,7 @@ local commands = {
   { name = "defaultbibliography", insert = "defaultbibliography{${1:Ref/References}}", detail = "bibunits bibliography database" },
   { name = "begin", insert = "begin{${1}}\n\t$0\n\\\\end{$1}", detail = "environment block" },
   { name = "begin", label = "\\begin figure textwidth", insert = "begin{figure}[H]\n    \\\\centering\n    \\\\includegraphics[width=1.0\\\\textwidth]{${1}}\n    \\\\caption{${2:変更図名}}\n    \\\\label{fig:${3:変更タグ}}\n\\\\end{figure}", detail = "figure environment with 1.0 textwidth image" },
-  { name = "begin", label = "\\begin table booktabs", insert = "begin{table}[H]\n\\\\centering\n\\\\caption{${1:変更}}\n    \\\\begin{tabular}{l c}\n    \\\\toprule\n\t    項目 & 番号\\\\\\\\\n    \\\\midrule\n        い & 1\\\\\\\\\n        ろ & 2\\\\\\\\\n    \\\\bottomrule\n    \\\\end{tabular}\n\\\\label{table:$1}\n\\\\end{table}", detail = "booktabs table environment" },
+  { name = "begin", label = "\\begin table booktabs", insert = "begin{table}[H]\n\\\\centering\n\\\\caption{${1:変更}}\n    \\\\begin{tabular}{l c}\n    \\\\toprule\n\t    項目 & 番号\\\\\\\\\n    \\\\midrule\n        い & 1\\\\\\\\\n        ろ & 2\\\\\\\\\n    \\\\bottomrule\n    \\\\end{tabular}\n\\\\label{table:${2:変更タグ}}\n\\\\end{table}", detail = "booktabs table environment" },
   { name = "end", insert = "end{${1}}", detail = "environment end" },
   { name = "section", insert = "section{${1:title}}", detail = "section" },
   { name = "subsection", insert = "subsection{${1:title}}", detail = "subsection" },
