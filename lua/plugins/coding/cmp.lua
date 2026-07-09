@@ -10,9 +10,10 @@ return {
     config = function()
       local cmp = require("cmp")
       local luasnip = require("luasnip")
+      local tex_commands = require("config.cmp_tex_commands")
 
       require("config.cmp_html_tag_pairs").register()
-      require("config.cmp_tex_commands").register()
+      tex_commands.register()
       vim.api.nvim_set_hl(0, "CmpBorderWhite", { fg = "#ffffff", bg = "NONE" })
 
       cmp.setup({
@@ -76,7 +77,13 @@ return {
         cmp.setup.filetype(filetype, {
           sources = cmp.config.sources({
             { name = "tex_commands", keyword_length = 0 },
-            { name = "buffer", keyword_length = 1 },
+            {
+              name = "buffer",
+              keyword_length = 1,
+              entry_filter = function(_, ctx)
+                return not tex_commands.is_reference_context(ctx.cursor_before_line)
+              end,
+            },
             { name = "path" },
             { name = "nvim_lsp" },
           }),

@@ -34,6 +34,190 @@ local function has_ext(path, ext)
   return path_ends_with(path, "." .. ext)
 end
 
+local function basename(path)
+  local name = vim.fn.fnamemodify(path, ":t")
+  return name ~= "" and name or path
+end
+
+local function lower_ext(path)
+  local ext = path:match("%.([^%.%/%\\]+)$")
+  return ext and ext:lower() or ""
+end
+
+local function path_tail(path, parts)
+  local chunks = {}
+  for chunk in path:gmatch("[^/\\]+") do
+    table.insert(chunks, chunk)
+  end
+
+  local start = math.max(1, #chunks - parts + 1)
+  local tail = {}
+  for i = start, #chunks do
+    table.insert(tail, chunks[i])
+  end
+
+  return table.concat(tail, "/")
+end
+
+local function truncate_name(name)
+  if #name <= 34 then
+    return name
+  end
+
+  return name:sub(1, 31) .. "..."
+end
+
+local function make_display_names(paths)
+  local basename_counts = {}
+  for _, path in ipairs(paths) do
+    local name = basename(path)
+    basename_counts[name] = (basename_counts[name] or 0) + 1
+  end
+
+  local names = {}
+  for _, path in ipairs(paths) do
+    local name = basename(path)
+    if basename_counts[name] and basename_counts[name] > 1 then
+      name = path_tail(path, 2)
+    end
+    table.insert(names, truncate_name(name))
+  end
+
+  return names
+end
+
+local function join_names(names)
+  if #names <= 1 then
+    return names[1] or ""
+  end
+
+  if #names == 2 then
+    return names[1] .. "と" .. names[2]
+  end
+
+  return table.concat(names, "、")
+end
+
+local function normalize_numstat_path(path)
+  local renamed_to = path:match("=>%s*(.+)$")
+  if renamed_to then
+    return renamed_to:gsub("^%s+", ""):gsub("%s+$", "")
+  end
+
+  return path
+end
+
+local function parse_num(value)
+  if value == "-" then
+    return 0
+  end
+
+  return tonumber(value) or 0
+end
+
+local function get_numstat(use_cached)
+  local cmd = { "git", "diff", "--numstat" }
+  if use_cached then
+    cmd = { "git", "diff", "--cached", "--numstat" }
+  end
+
+  local lines = vim.fn.systemlist(cmd)
+  local stats = {}
+  for _, line in ipairs(lines) do
+    local added, deleted, path = line:match("^([^\t]+)\t([^\t]+)\t(.+)$")
+    if added and deleted and path then
+      stats[normalize_numstat_path(path)] = parse_num(added) + parse_num(deleted)
+    end
+  end
+
+  return stats
+end
+
+local code_exts = {
+  c = true,
+  cpp = true,
+  go = true,
+  h = true,
+  java = true,
+  js = true,
+  jsx = true,
+  lua = true,
+  py = true,
+  rs = true,
+  ts = true,
+  tsx = true,
+}
+
+local generated_or_lock_names = {
+  ["lazy-lock.json"] = true,
+  ["package-lock.json"] = true,
+  ["pnpm-lock.yaml"] = true,
+  ["yarn.lock"] = true,
+}
+
+local function file_score(path, stats)
+  local ext = lower_ext(path)
+  local score = 0
+
+  if path == "init.lua" or path_starts_with(path, "lua/") then
+    score = score + 95
+  elseif path_starts_with(path, "scripts/") or has_ext(path, "sh") or has_ext(path, "cmd") or has_ext(path, "ps1") then
+    score = score + 85
+  elseif code_exts[ext] then
+    score = score + 80
+  elseif path_starts_with(path, ".github/") or path == ".gitlab-ci.yml" or path_starts_with(path, ".circleci/") then
+    score = score + 75
+  elseif has_ext(path, "json") or has_ext(path, "yaml") or has_ext(path, "yml") or has_ext(path, "toml") then
+    score = score + 65
+  elseif path == "README.md" or path_ends_with(path, "/README.md") then
+    score = score + 60
+  elseif path_starts_with(path, "docs/") or has_ext(path, "md") or has_ext(path, "txt") then
+    score = score + 50
+  else
+    score = score + 40
+  end
+
+  if generated_or_lock_names[basename(path)] then
+    score = score - 35
+  end
+
+  score = score + math.min(stats[path] or 0, 200) / 10
+  return score
+end
+
+local function pick_main_paths(items, limit, stats)
+  if #items <= limit then
+    local paths = {}
+    for _, item in ipairs(items) do
+      table.insert(paths, item.path)
+    end
+    return paths
+  end
+
+  local scored = {}
+  for index, item in ipairs(items) do
+    table.insert(scored, {
+      index = index,
+      path = item.path,
+      score = file_score(item.path, stats),
+    })
+  end
+
+  table.sort(scored, function(a, b)
+    if a.score == b.score then
+      return a.index < b.index
+    end
+    return a.score > b.score
+  end)
+
+  local paths = {}
+  for i = 1, math.min(limit, #scored) do
+    table.insert(paths, scored[i].path)
+  end
+
+  return paths
+end
+
 run_in_repo_root()
 
 local use_staged = false
@@ -83,8 +267,17 @@ local has_added = false
 local has_deleted = false
 local has_renamed = false
 local has_modified = false
+local has_copied = false
 
 local first_target = ""
+local changed_items = {}
+local op_counts = {
+  added = 0,
+  copied = 0,
+  deleted = 0,
+  modified = 0,
+  renamed = 0,
+}
 
 for _, line in ipairs(changes) do
   if line ~= "" then
@@ -97,16 +290,32 @@ for _, line in ipairs(changes) do
     path2 = path2 or ""
 
     local target = path1
+    local op = "modified"
     if status:sub(1, 1) == "A" then
       has_added = true
+      op = "added"
     elseif status:sub(1, 1) == "D" then
       has_deleted = true
+      op = "deleted"
     elseif status:sub(1, 1) == "R" then
       has_renamed = true
       target = path2 ~= "" and path2 or path1
+      op = "renamed"
+    elseif status:sub(1, 1) == "C" then
+      has_copied = true
+      target = path2 ~= "" and path2 or path1
+      op = "copied"
     elseif status:sub(1, 1) == "M" or status:sub(1, 1) == "C" then
       has_modified = true
     end
+
+    op_counts[op] = (op_counts[op] or 0) + 1
+    table.insert(changed_items, {
+      old_path = path1,
+      op = op,
+      path = target,
+      status = status,
+    })
 
     if first_target == "" then
       first_target = target
@@ -174,6 +383,8 @@ for _, f in ipairs(files) do
   end
 end
 
+local stats = get_numstat(use_staged)
+
 local prefix = "chore"
 if has_ci then
   prefix = "ci"
@@ -198,14 +409,91 @@ elseif has_docs and has_readme then
   scope = "(readme)"
 end
 
+local function subject_action()
+  if op_counts.added > 0 and op_counts.modified == 0 and op_counts.deleted == 0 and op_counts.renamed == 0 then
+    return "を追加"
+  end
+
+  if op_counts.deleted > 0 and op_counts.added == 0 and op_counts.modified == 0 and op_counts.renamed == 0 then
+    return "を削除"
+  end
+
+  if op_counts.renamed > 0 and op_counts.added == 0 and op_counts.modified == 0 and op_counts.deleted == 0 then
+    return "をリネーム"
+  end
+
+  if op_counts.added > 0 or op_counts.deleted > 0 or op_counts.renamed > 0 or op_counts.copied > 0 then
+    return "を整理"
+  end
+
+  return "を更新"
+end
+
+local function operation_summary()
+  local parts = {}
+  if op_counts.added > 0 then
+    table.insert(parts, op_counts.added .. "件追加")
+  end
+  if op_counts.modified > 0 then
+    table.insert(parts, op_counts.modified .. "件更新")
+  end
+  if op_counts.deleted > 0 then
+    table.insert(parts, op_counts.deleted .. "件削除")
+  end
+  if op_counts.renamed > 0 then
+    table.insert(parts, op_counts.renamed .. "件リネーム")
+  end
+  if op_counts.copied > 0 then
+    table.insert(parts, op_counts.copied .. "件コピー")
+  end
+
+  if #parts == 0 then
+    return "更新"
+  end
+
+  return table.concat(parts, " / ")
+end
+
+local function area_summary()
+  local areas = {}
+  if has_lua then
+    table.insert(areas, "Neovim Lua設定")
+  elseif has_code then
+    table.insert(areas, "コード")
+  end
+  if has_script then
+    table.insert(areas, "スクリプト")
+  end
+  if has_ci then
+    table.insert(areas, "CI設定")
+  end
+  if has_build then
+    table.insert(areas, "ビルド/依存設定")
+  elseif has_config and not has_lua then
+    table.insert(areas, "設定ファイル")
+  end
+  if has_docs then
+    table.insert(areas, "文書")
+  end
+
+  if #areas == 0 then
+    return ""
+  end
+
+  return table.concat(areas, "、")
+end
+
 local subject = ""
+local body = {}
 if count == 1 then
-  local base = vim.fn.fnamemodify(first_target, ":t")
+  local base = basename(first_target)
   if has_renamed then
     subject = base .. "をリネーム"
   elseif has_deleted then
     subject = base .. "を削除"
   elseif has_added then
+    subject = base .. "を追加"
+  elseif has_copied then
     subject = base .. "を追加"
   else
     if has_readme then
@@ -215,20 +503,24 @@ if count == 1 then
     end
   end
 else
-  if has_renamed then
-    subject = "複数ファイルを整理"
-  elseif has_added and has_script then
-    subject = "スクリプトを追加"
-  elseif has_readme and has_script then
-    subject = "READMEとスクリプトを更新"
-  elseif has_docs and (not has_code) then
-    subject = "文書を更新"
-  elseif has_lua then
-    subject = "Neovim設定を更新"
-  else
-    subject = "複数ファイルを更新"
+  local subject_paths = pick_main_paths(changed_items, 3, stats)
+  local names = make_display_names(subject_paths)
+  local suffix = count > #subject_paths and "など" or ""
+  subject = join_names(names) .. suffix .. subject_action()
+
+  table.insert(body, "")
+  table.insert(body, "対象: " .. join_names(names) .. (count > #subject_paths and "（ほか" .. (count - #subject_paths) .. "件）" or ""))
+  table.insert(body, "内容: " .. operation_summary())
+
+  local areas = area_summary()
+  if areas ~= "" then
+    table.insert(body, "種別: " .. areas)
   end
 end
 
 local msg = prefix .. scope .. ": " .. subject
-print(msg)
+local output = { msg }
+for _, line in ipairs(body) do
+  table.insert(output, line)
+end
+io.stdout:write(table.concat(output, "\n") .. "\n")
