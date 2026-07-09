@@ -13,10 +13,43 @@ local reference_commands = {
   Vref = true,
 }
 
+local citation_commands = {
+  autocite = true,
+  Autocite = true,
+  cite = true,
+  Cite = true,
+  citealp = true,
+  citealt = true,
+  citeauthor = true,
+  Citeauthor = true,
+  citep = true,
+  citet = true,
+  citeyear = true,
+  citeyearpar = true,
+  footcite = true,
+  nocite = true,
+  parencite = true,
+  Parencite = true,
+  smartcite = true,
+  Smartcite = true,
+  supercite = true,
+  textcite = true,
+  Textcite = true,
+}
+
 local include_commands = {
   "include",
   "input",
   "subfile",
+}
+
+local bibliography_commands = {
+  "addbibresource",
+  "addglobalbib",
+  "addsectionbib",
+  "bibliography",
+  "defaultbibliography",
+  "nobibliography",
 }
 
 local commands = {
@@ -370,6 +403,36 @@ local function resolve_tex_path(base_dir, tex_path)
   return nil
 end
 
+local function resolve_bib_path(base_dir, bib_path)
+  local clean_path = vim.trim(bib_path)
+
+  if clean_path == "" then
+    return nil
+  end
+
+  if clean_path:sub(1, 2) == "~/" then
+    clean_path = vim.fn.expand("~") .. clean_path:sub(2)
+  elseif clean_path:sub(1, 1) ~= "/" then
+    clean_path = vim.fs.joinpath(base_dir, clean_path)
+  end
+
+  clean_path = vim.fs.normalize(clean_path)
+
+  if vim.fn.filereadable(clean_path) == 1 then
+    return vim.fn.fnamemodify(clean_path, ":p")
+  end
+
+  if vim.fn.fnamemodify(clean_path, ":e") == "" then
+    local bib_file = clean_path .. ".bib"
+
+    if vim.fn.filereadable(bib_file) == 1 then
+      return vim.fn.fnamemodify(bib_file, ":p")
+    end
+  end
+
+  return nil
+end
+
 local function remove_environment(environment_stack, name)
   for index = #environment_stack, 1, -1 do
     if environment_stack[index] == name then
@@ -521,15 +584,197 @@ local function collect_project_labels(bufnr)
   return items
 end
 
-local function reference_argument_prefix(line)
-  local command, argument = line:match("\\([%a]+)%*?%{([^{}]*)$")
+local ignored_bib_entries = {
+  comment = true,
+  preamble = true,
+  string = true,
+}
 
-  if not command or not reference_commands[command] then
-    return nil
+local function add_bib_key(items, seen, key, entry_type, path, lnum)
+  if seen[key] then
+    return
   end
 
-  local active_argument = argument:match("([^,]*)$") or argument
-  return vim.trim(active_argument)
+  seen[key] = true
+
+  table.insert(items, {
+    label = key,
+    entry_type = entry_type,
+    path = path,
+    lnum = lnum,
+    detail = entry_type .. " citation key",
+  })
+end
+
+local function collect_bib_keys_from_lines(lines, path, items, seen)
+  local pending_entry_type
+  local pending_lnum
+
+  for lnum, raw_line in ipairs(lines) do
+    local line = strip_tex_comment(raw_line)
+    local entry_type, key = line:match("@%s*([%a]+)%s*[%{%(%[]%s*([^,%s{}%)]+)%s*,")
+
+    if entry_type and key then
+      local normalized_entry_type = entry_type:lower()
+
+      if not ignored_bib_entries[normalized_entry_type] then
+        add_bib_key(items, seen, vim.trim(key), normalized_entry_type, path, lnum)
+      end
+
+      pending_entry_type = nil
+      pending_lnum = nil
+    else
+      local header_entry_type = line:match("@%s*([%a]+)%s*[%{%(%[]%s*$")
+
+      if header_entry_type then
+        local normalized_entry_type = header_entry_type:lower()
+
+        if ignored_bib_entries[normalized_entry_type] then
+          pending_entry_type = nil
+          pending_lnum = nil
+        else
+          pending_entry_type = normalized_entry_type
+          pending_lnum = lnum
+        end
+      elseif pending_entry_type then
+        local pending_key = line:match("^%s*([^,%s{}%)]+)%s*,")
+
+        if pending_key then
+          add_bib_key(items, seen, vim.trim(pending_key), pending_entry_type, path, pending_lnum or lnum)
+          pending_entry_type = nil
+          pending_lnum = nil
+        elseif line:find("[{}%)]") then
+          pending_entry_type = nil
+          pending_lnum = nil
+        end
+      end
+    end
+  end
+end
+
+local function for_each_command_argument(line, command, callback)
+  local patterns = {
+    "\\" .. command .. "%*?%s*%{([^{}]+)%}",
+    "\\" .. command .. "%*?%s*%b[]%s*%{([^{}]+)%}",
+    "\\" .. command .. "%*?%s*%b[]%s*%b[]%s*%{([^{}]+)%}",
+  }
+
+  for _, pattern in ipairs(patterns) do
+    for argument in line:gmatch(pattern) do
+      callback(argument)
+    end
+  end
+end
+
+local function for_each_comma_value(argument, callback)
+  for value in (argument .. ","):gmatch("%s*([^,]-)%s*,") do
+    if value ~= "" then
+      callback(value)
+    end
+  end
+end
+
+local function collect_project_bib_keys(bufnr)
+  local current_file = vim.api.nvim_buf_get_name(bufnr)
+  local root_file = find_tex_root(bufnr)
+  local items = {}
+  local seen_keys = {}
+  local seen_tex_files = {}
+  local seen_bib_files = {}
+
+  local function scan_bib_file(path)
+    path = vim.fn.fnamemodify(path, ":p")
+
+    if seen_bib_files[path] then
+      return
+    end
+
+    seen_bib_files[path] = true
+
+    local lines = read_lines_from_buffer_or_file(path)
+    if lines then
+      collect_bib_keys_from_lines(lines, path, items, seen_keys)
+    end
+  end
+
+  local function scan_tex_file(path)
+    path = vim.fn.fnamemodify(path, ":p")
+
+    if seen_tex_files[path] then
+      return
+    end
+
+    seen_tex_files[path] = true
+
+    local lines = read_lines_from_buffer_or_file(path)
+    if not lines then
+      return
+    end
+
+    local base_dir = vim.fn.fnamemodify(path, ":p:h")
+    for _, raw_line in ipairs(lines) do
+      local line = strip_tex_comment(raw_line)
+
+      for _, command in ipairs(bibliography_commands) do
+        for_each_command_argument(line, command, function(argument)
+          for_each_comma_value(argument, function(bib_path)
+            local resolved_path = resolve_bib_path(base_dir, bib_path)
+
+            if resolved_path then
+              scan_bib_file(resolved_path)
+            end
+          end)
+        end)
+      end
+
+      for _, command in ipairs(include_commands) do
+        for include_path in line:gmatch("\\" .. command .. "%*?%{([^{}]+)%}") do
+          local resolved_path = resolve_tex_path(base_dir, include_path)
+
+          if resolved_path then
+            scan_tex_file(resolved_path)
+          end
+        end
+      end
+    end
+  end
+
+  if root_file then
+    scan_tex_file(root_file)
+  end
+
+  if current_file ~= "" then
+    scan_tex_file(current_file)
+  end
+
+  return items
+end
+
+local function command_argument_prefix(line, command_set)
+  local patterns = {
+    "\\([%a]+)%*?%s*%{([^{}]*)$",
+    "\\([%a]+)%*?%s*%b[]%s*%{([^{}]*)$",
+    "\\([%a]+)%*?%s*%b[]%s*%b[]%s*%{([^{}]*)$",
+  }
+
+  for _, pattern in ipairs(patterns) do
+    local command, argument = line:match(pattern)
+
+    if command and command_set[command] then
+      local active_argument = argument:match("([^,]*)$") or argument
+      return vim.trim(active_argument)
+    end
+  end
+
+  return nil
+end
+
+local function reference_argument_prefix(line)
+  return command_argument_prefix(line, reference_commands)
+end
+
+local function citation_argument_prefix(line)
+  return command_argument_prefix(line, citation_commands)
 end
 
 local function label_matches_prefix(label, prefix)
@@ -586,6 +831,52 @@ local function complete_labels(params, prefix)
   return items
 end
 
+local function citation_item(spec, params, prefix)
+  local cursor = params.context.cursor
+  local start_character = cursor.col - 1 - #prefix
+
+  return {
+    label = spec.label,
+    filterText = spec.label,
+    insertTextFormat = 1,
+    kind = 18,
+    detail = spec.detail,
+    documentation = spec.path and {
+      kind = "markdown",
+      value = ("`%s:%d`"):format(vim.fn.fnamemodify(spec.path, ":~:."), spec.lnum),
+    } or nil,
+    textEdit = {
+      range = {
+        start = {
+          line = cursor.row - 1,
+          character = start_character,
+        },
+        ["end"] = {
+          line = cursor.row - 1,
+          character = cursor.col - 1,
+        },
+      },
+      newText = spec.label,
+    },
+  }
+end
+
+local function complete_citations(params, prefix)
+  local items = {}
+
+  for _, spec in ipairs(collect_project_bib_keys(params.context.bufnr)) do
+    if label_matches_prefix(spec.label, prefix) then
+      table.insert(items, citation_item(spec, params, prefix))
+    end
+  end
+
+  table.sort(items, function(left, right)
+    return left.label < right.label
+  end)
+
+  return items
+end
+
 function source:new()
   return setmetatable({}, { __index = self })
 end
@@ -609,6 +900,13 @@ function source:complete(params, callback)
 
   if label_prefix ~= nil then
     callback({ items = complete_labels(params, label_prefix), isIncomplete = false })
+    return
+  end
+
+  local citation_prefix = citation_argument_prefix(line)
+
+  if citation_prefix ~= nil then
+    callback({ items = complete_citations(params, citation_prefix), isIncomplete = false })
     return
   end
 
@@ -662,7 +960,7 @@ function M.register()
 end
 
 function M.is_reference_context(line)
-  return reference_argument_prefix(line) ~= nil
+  return reference_argument_prefix(line) ~= nil or citation_argument_prefix(line) ~= nil
 end
 
 return M
