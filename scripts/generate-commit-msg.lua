@@ -429,58 +429,37 @@ local function subject_action()
   return "を更新"
 end
 
-local function operation_summary()
-  local parts = {}
-  if op_counts.added > 0 then
-    table.insert(parts, op_counts.added .. "件追加")
-  end
-  if op_counts.modified > 0 then
-    table.insert(parts, op_counts.modified .. "件更新")
-  end
-  if op_counts.deleted > 0 then
-    table.insert(parts, op_counts.deleted .. "件削除")
-  end
-  if op_counts.renamed > 0 then
-    table.insert(parts, op_counts.renamed .. "件リネーム")
-  end
-  if op_counts.copied > 0 then
-    table.insert(parts, op_counts.copied .. "件コピー")
+local function op_label(op)
+  if op == "added" then
+    return "追加"
+  elseif op == "deleted" then
+    return "削除"
+  elseif op == "renamed" then
+    return "リネーム"
+  elseif op == "copied" then
+    return "コピー"
   end
 
-  if #parts == 0 then
-    return "更新"
-  end
-
-  return table.concat(parts, " / ")
+  return "更新"
 end
 
-local function area_summary()
-  local areas = {}
-  if has_lua then
-    table.insert(areas, "Neovim Lua設定")
-  elseif has_code then
-    table.insert(areas, "コード")
-  end
-  if has_script then
-    table.insert(areas, "スクリプト")
-  end
-  if has_ci then
-    table.insert(areas, "CI設定")
-  end
-  if has_build then
-    table.insert(areas, "ビルド/依存設定")
-  elseif has_config and not has_lua then
-    table.insert(areas, "設定ファイル")
-  end
-  if has_docs then
-    table.insert(areas, "文書")
+local function change_details(items)
+  local paths = {}
+  for _, item in ipairs(items) do
+    table.insert(paths, item.path)
   end
 
-  if #areas == 0 then
-    return ""
+  local names = make_display_names(paths)
+  local details = {}
+  for index, item in ipairs(items) do
+    local name = names[index]
+    if item.op == "renamed" and item.old_path ~= "" and item.old_path ~= item.path then
+      name = basename(item.old_path) .. " -> " .. name
+    end
+    table.insert(details, name .. "(" .. op_label(item.op) .. ")")
   end
 
-  return table.concat(areas, "、")
+  return table.concat(details, "、")
 end
 
 local subject = ""
@@ -509,13 +488,7 @@ else
   subject = join_names(names) .. suffix .. subject_action()
 
   table.insert(body, "")
-  table.insert(body, "対象: " .. join_names(names) .. (count > #subject_paths and "（ほか" .. (count - #subject_paths) .. "件）" or ""))
-  table.insert(body, "内容: " .. operation_summary())
-
-  local areas = area_summary()
-  if areas ~= "" then
-    table.insert(body, "種別: " .. areas)
-  end
+  table.insert(body, "更新内容: " .. change_details(changed_items))
 end
 
 local msg = prefix .. scope .. ": " .. subject
