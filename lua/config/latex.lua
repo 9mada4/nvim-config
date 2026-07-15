@@ -1,5 +1,6 @@
 local build_group = vim.api.nvim_create_augroup("latex-auto-build", { clear = true })
 local edit_group = vim.api.nvim_create_augroup("latex-edit-options", { clear = true })
+local line_ending_group = vim.api.nvim_create_augroup("latex-line-endings", { clear = true })
 local os = require("config.os")
 
 local running = {}
@@ -260,6 +261,20 @@ vim.api.nvim_create_autocmd("FileType", {
     vim.opt_local.breakindent = true
     vim.opt_local.formatoptions:remove({ "t", "c", "r", "o" })
   end,
+})
+
+vim.api.nvim_create_autocmd("BufWritePre", {
+  group = line_ending_group,
+  pattern = { "*.tex", "*.bib", "*.sty", "*.cls" },
+  callback = function(args)
+    vim.api.nvim_buf_call(args.buf, function()
+      local view = vim.fn.winsaveview()
+      vim.bo.fileformat = "unix"
+      vim.cmd([[silent! keepjumps keeppatterns %s/\r$//e]])
+      vim.fn.winrestview(view)
+    end)
+  end,
+  desc = "Normalize TeX-related files to LF",
 })
 
 vim.api.nvim_create_autocmd("BufWritePost", {
