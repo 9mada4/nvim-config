@@ -177,15 +177,14 @@ local function complete_environments(prefix)
   return items
 end
 
-local function get_buffer_dir(params)
-  local buffer_dir = vim.fn.expand(("#%d:p:h"):format(params.context.bufnr))
-
-  if buffer_dir == "" then
-    return vim.fn.getcwd()
-  end
-
-  return buffer_dir
-end
+local graphics_extensions = {
+  eps = true,
+  jpeg = true,
+  jpg = true,
+  pdf = true,
+  png = true,
+  svg = true,
+}
 
 local function split_path_prefix(path_prefix)
   local dir_prefix, name_prefix = path_prefix:match("^(.*[/])([^/]*)$")
@@ -197,7 +196,7 @@ local function split_path_prefix(path_prefix)
   return dir_prefix, name_prefix
 end
 
-local function expand_path_dir(params, dir_prefix)
+local function expand_path_dir(dir_prefix)
   if dir_prefix:sub(1, 1) == "/" then
     return dir_prefix
   end
@@ -206,25 +205,58 @@ local function expand_path_dir(params, dir_prefix)
     return vim.fn.expand("~") .. dir_prefix:sub(2)
   end
 
-  return vim.fs.normalize(vim.fs.joinpath(get_buffer_dir(params), dir_prefix))
+  return vim.fs.normalize(vim.fs.joinpath(vim.fn.getcwd(), dir_prefix))
 end
 
-local function path_item(name, fs_type)
+local function path_item(path_prefix, name, fs_type, filter_text, text_edit_range)
   local is_directory = fs_type == "directory"
+  local insert_text = path_prefix .. name .. (is_directory and "/" or "")
 
   return {
-    label = is_directory and name .. "/" or name,
-    filterText = name,
-    insertText = is_directory and name .. "/" or name,
+    label = insert_text,
+    filterText = filter_text or name,
+    insertText = insert_text,
     insertTextFormat = 1,
     kind = is_directory and 19 or 17,
     detail = is_directory and "directory" or "file",
+    textEdit = text_edit_range and {
+      newText = insert_text,
+      range = text_edit_range,
+    } or nil,
   }
 end
 
-local function complete_graphics_paths(params, path_prefix)
-  local dir_prefix, name_prefix = split_path_prefix(path_prefix)
-  local scan_dir = expand_path_dir(params, dir_prefix)
+local function graphics_text_edit_range(params, path_prefix, path_suffix)
+  local cursor = params.context.cursor
+
+  return {
+    start = {
+      line = cursor.row - 1,
+      character = cursor.col - 1 - #path_prefix,
+    },
+    ["end"] = {
+      line = cursor.row - 1,
+      character = cursor.col - 1 + #path_suffix,
+    },
+  }
+end
+
+local function is_graphics_candidate(name, fs_type)
+  if fs_type == "directory" then
+    return true
+  end
+
+  local extension = name:match("%.([^./]+)$")
+  return extension ~= nil and graphics_extensions[extension:lower()] == true
+end
+
+local function complete_graphics_paths(params, path_prefix, path_suffix)
+  local current_path = path_prefix .. path_suffix
+  local dir_prefix, current_name = split_path_prefix(current_path)
+  local _, name_prefix = split_path_prefix(path_prefix)
+  local replacing_existing_path = path_suffix ~= "" or current_name:match("%.[^./]+$") ~= nil
+  local candidate_prefix = replacing_existing_path and "" or name_prefix
+  local scan_dir = expand_path_dir(dir_prefix)
   local fs = vim.loop.fs_scandir(scan_dir)
 
   if not fs then
@@ -232,8 +264,9 @@ local function complete_graphics_paths(params, path_prefix)
   end
 
   local items = {}
-  local include_hidden = name_prefix:sub(1, 1) == "."
-  local lower_prefix = name_prefix:lower()
+  local include_hidden = candidate_prefix:sub(1, 1) == "."
+  local lower_prefix = candidate_prefix:lower()
+  local text_edit_range = graphics_text_edit_range(params, path_prefix, path_suffix)
 
   while true do
     local name, fs_type = vim.loop.fs_scandir_next(fs)
@@ -242,10 +275,26 @@ local function complete_graphics_paths(params, path_prefix)
       break
     end
 
-    if (include_hidden or name:sub(1, 1) ~= ".") and (name_prefix == "" or vim.startswith(name:lower(), lower_prefix)) then
-      table.insert(items, path_item(name, fs_type))
+    local prefix_matches = candidate_prefix == "" or vim.startswith(name:lower(), lower_prefix)
+
+    if (include_hidden or name:sub(1, 1) ~= ".") and prefix_matches and is_graphics_candidate(name, fs_type) then
+      local filter_text = name
+
+      if replacing_existing_path and path_prefix ~= "" then
+        filter_text = path_prefix
+      end
+
+      table.insert(items, path_item(dir_prefix, name, fs_type, filter_text, text_edit_range))
     end
   end
+
+  table.sort(items, function(left, right)
+    if left.kind ~= right.kind then
+      return left.kind == 19
+    end
+
+    return left.label:lower() < right.label:lower()
+  end)
 
   return items
 end
@@ -253,6 +302,10 @@ end
 local function graphics_path_prefix(line)
   return line:match("\\includegraphics%[[^%]]*%]%{([^{}]*)$")
     or line:match("\\includegraphics%{([^{}]*)$")
+end
+
+local function graphics_path_suffix(line)
+  return line:match("^([^{}]*)%}") or ""
 end
 
 local function math_rm_item()
@@ -918,7 +971,8 @@ function source:complete(params, callback)
   local path_prefix = graphics_path_prefix(line)
 
   if path_prefix ~= nil then
-    callback({ items = complete_graphics_paths(params, path_prefix), isIncomplete = false })
+    local path_suffix = graphics_path_suffix(params.context.cursor_after_line or "")
+    callback({ items = complete_graphics_paths(params, path_prefix, path_suffix), isIncomplete = false })
     return
   end
 
