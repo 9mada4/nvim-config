@@ -3,6 +3,7 @@ return {
   name = "reposcope",
   event = "VeryLazy",
   dependencies = {
+    "StefanBartl/lib.nvim",
     "nvim-lua/plenary.nvim",
     "nvim-telescope/telescope.nvim",
   },
