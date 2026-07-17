@@ -3,9 +3,14 @@ return {
     "iamcco/markdown-preview.nvim",
     ft = { "markdown" },
     cmd = { "MarkdownPreview", "MarkdownPreviewStop", "MarkdownPreviewToggle" },
-    build = function()
-      -- Use the prebuilt bundle installer so node/yarn are not required.
-      vim.fn["mkdp#util#install"]()
+    build = function(plugin)
+      local result = vim.system({ "yarn", "install", "--frozen-lockfile" }, {
+        cwd = plugin.dir .. "/app",
+        text = true,
+      }):wait()
+      if result.code ~= 0 then
+        error("Failed to install markdown-preview.nvim: " .. (result.stderr or "unknown error"))
+      end
     end,
     init = function()
       vim.g.mkdp_auto_start = 0
