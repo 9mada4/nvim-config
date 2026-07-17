@@ -43,7 +43,7 @@ vim.keymap.set("n", "<leader>mv", function()
     return
   end
 
-  local ok = pcall(vim.cmd, "MarkdownPreviewToggle")
+  local ok = require("config.markdown_preview").toggle()
   if not ok then
     vim.notify("markdown-preview.nvim is not ready. Run :Lazy sync", vim.log.levels.WARN)
   end
