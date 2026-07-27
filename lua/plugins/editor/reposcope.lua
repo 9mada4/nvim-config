@@ -16,7 +16,6 @@ return {
     local repo_cache = require("reposcope.cache.repository_cache")
     local core = require("reposcope.utils.core")
     local readme_manager = require("reposcope.providers.github.readme.readme_manager")
-    local get_clone_informations = require("reposcope.providers.github.clone.clone_info").get_clone_informations
     local reposcope_init
     local ui_state = require("reposcope.state.ui.ui_state")
     local list_window = require("reposcope.ui.list.list_window")
@@ -276,6 +275,41 @@ return {
       return vim.fs.normalize(vim.fn.expand(path))
     end
 
+    -- reposcope's clone_info module was an internal API and was removed upstream.
+    -- Build the small amount of clone metadata we need from the selected GitHub
+    -- repository instead, so plugin updates cannot break setup at require time.
+    local function get_clone_information()
+      local repo = repo_cache.get_selected()
+      if type(repo) ~= "table" then
+        vim.notify("[reposcope] Select a repository before cloning", vim.log.levels.WARN)
+        return nil
+      end
+
+      local name = repo.name
+      local owner = type(repo.owner) == "table" and repo.owner.login or nil
+      if type(name) ~= "string" or name == "" then
+        vim.notify("[reposcope] Selected repository has no name", vim.log.levels.ERROR)
+        return nil
+      end
+
+      local clone_type = reposcope_config.options.clone.type
+      local url
+      if clone_type == "gh" and type(owner) == "string" and owner ~= "" then
+        url = owner .. "/" .. name
+      elseif clone_type == "ssh" then
+        url = repo.ssh_url or repo.clone_url or repo.html_url
+      else
+        url = repo.clone_url or repo.html_url or repo.ssh_url
+      end
+
+      if type(url) ~= "string" or url == "" then
+        vim.notify("[reposcope] Selected repository has no clone URL", vim.log.levels.ERROR)
+        return nil
+      end
+
+      return { name = name, url = url }
+    end
+
     local function fetch_selected_readme_with_retry(attempt)
       attempt = attempt or 1
       local selected = repo_cache.get_selected()
@@ -346,7 +380,7 @@ return {
 
     provider_controller.prompt_and_clone = function()
       local cwd = vim.fn.getcwd()
-      local infos = get_clone_informations()
+      local infos = get_clone_information()
 
       if not infos then
         return
