@@ -33,7 +33,7 @@
 [Search]           ? 上に検索   * カーソル単語検索
 Spc sr  単語置換   / 下に検索   N ←→ n 選択
 Spc sR  作業ディレクトリ全体の検索・置換
-         Normal Enter  Replace/Syncアクション選択
+         Normal Enter  全アクション選択（下分割）
 :noh    検索Highlight
 [Git] p  pull   Spc gg  Open LazyGit   G  auto comit msg  
       P  push   Spc gd  git diff       R  pull --rebase   
