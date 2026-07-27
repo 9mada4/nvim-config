@@ -15,9 +15,14 @@ return {
     local request_state = require("reposcope.state.requests_state")
     local repo_cache = require("reposcope.cache.repository_cache")
     local core = require("reposcope.utils.core")
+    local readme_manager = require("reposcope.providers.github.readme.readme_manager")
+    local get_clone_informations = require("reposcope.providers.github.clone.clone_info").get_clone_informations
     local reposcope_init
     local ui_state = require("reposcope.state.ui.ui_state")
     local list_window = require("reposcope.ui.list.list_window")
+    local list_manager = require("reposcope.ui.list.list_manager")
+    local display_repositories = require("reposcope.controllers.list_controller").display_repositories
+    local ui_loader = require("reposcope.providers.github.repositories.repository_ui_loader")
     local joinpath = vim.fs and vim.fs.joinpath or function(...)
       return table.concat({ ... }, package.config:sub(1, 1))
     end
@@ -271,39 +276,23 @@ return {
       return vim.fs.normalize(vim.fn.expand(path))
     end
 
-    -- reposcope's clone_info module was an internal API and was removed upstream.
-    -- Build the small amount of clone metadata we need from the selected GitHub
-    -- repository instead, so plugin updates cannot break setup at require time.
-    local function get_clone_information()
-      local repo = repo_cache.get_selected()
-      if type(repo) ~= "table" then
-        vim.notify("[reposcope] Select a repository before cloning", vim.log.levels.WARN)
-        return nil
+    local function fetch_selected_readme_with_retry(attempt)
+      attempt = attempt or 1
+      local selected = repo_cache.get_selected()
+      if selected and selected.owner and selected.owner.login and selected.name then
+        local uuid = core.generate_uuid()
+        request_state.register_request(uuid)
+        readme_manager.fetch_for_selected(uuid)
+        return
       end
 
-      local name = repo.name
-      local owner = type(repo.owner) == "table" and repo.owner.login or nil
-      if type(name) ~= "string" or name == "" then
-        vim.notify("[reposcope] Selected repository has no name", vim.log.levels.ERROR)
-        return nil
+      if attempt >= 8 then
+        return
       end
 
-      local clone_type = reposcope_config.options.clone.type
-      local url
-      if clone_type == "gh" and type(owner) == "string" and owner ~= "" then
-        url = owner .. "/" .. name
-      elseif clone_type == "ssh" then
-        url = repo.ssh_url or repo.clone_url or repo.html_url
-      else
-        url = repo.clone_url or repo.html_url or repo.ssh_url
-      end
-
-      if type(url) ~= "string" or url == "" then
-        vim.notify("[reposcope] Selected repository has no clone URL", vim.log.levels.ERROR)
-        return nil
-      end
-
-      return { name = name, url = url }
+      vim.defer_fn(function()
+        fetch_selected_readme_with_retry(attempt + 1)
+      end, 80)
     end
 
     local function spawn_clone_in_terminal(args, repo_name, uuid)
@@ -357,7 +346,7 @@ return {
 
     provider_controller.prompt_and_clone = function()
       local cwd = vim.fn.getcwd()
-      local infos = get_clone_information()
+      local infos = get_clone_informations()
 
       if not infos then
         return
@@ -486,6 +475,16 @@ return {
         ui_state.buffers.list = nil
       end
       return original_open_window()
+    end
+
+    ui_loader.load_ui_after_fetch = function()
+      vim.schedule(function()
+        local selected_line = list_window.highlighted_line or ui_state.list.last_selected_line or 1
+        ui_state.list.last_selected_line = selected_line
+        list_manager.reset_selected_line()
+        display_repositories()
+        fetch_selected_readme_with_retry()
+      end)
     end
 
     vim.keymap.set("n", "<leader>rs", "<cmd>ReposcopeStart<CR>", {
