@@ -262,6 +262,25 @@ Set-Content "$LG\config.yml" -Value $CFG -Encoding utf8
 ## How to update
 Finder > `⌘ + Shift + .` > drag `$NVIM_CONFIG_DIR/lua` to upload file this repo
 
+### `:Lazy` に `Breaking Changes` と表示された場合
+
+`Sync` 後の更新履歴に出るオレンジ色の `Breaking Changes` はエラーではなく、
+プラグイン側が破壊的変更として印を付けたコミットです。青色の
+`updated from ... to ...` が表示されていれば、そのプラグインの更新自体は完了しています。
+たとえば nvim-lspconfig の `` drop `lsp/rls.lua` `` は、廃止済みの Rust Language
+Server (RLS) 用設定が削除されたという更新履歴です。この設定では RLS を使用して
+いないため、追加の変更は不要です。
+
+実際の起動エラーがないことは、Lazy の画面を閉じてから次のコマンドで確認できます。
+
+```zsh
+nvim --headless "+checkhealth vim.lsp" +qa
+```
+
+失敗する場合は、`nvim --version` で Neovim 0.11.3 以降を使用していることを確認した後、
+`:Lazy sync` を再実行してください。エラーメッセージが表示されていない場合、
+`Breaking Changes` の表示だけを理由にプラグインをダウングレードする必要はありません。
+
 ## If you require SSH
 1. make `~/.ssh/config`
 ``` zsh
