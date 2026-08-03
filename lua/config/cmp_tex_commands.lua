@@ -186,6 +186,33 @@ local graphics_extensions = {
   svg = true,
 }
 
+local tex_file_extensions = { tex = true }
+local bibliography_file_extensions = { bib = true }
+local workspace_file_commands = {
+  addbibresource = bibliography_file_extensions,
+  addglobalbib = bibliography_file_extensions,
+  addsectionbib = bibliography_file_extensions,
+  bibliography = bibliography_file_extensions,
+  defaultbibliography = bibliography_file_extensions,
+  include = tex_file_extensions,
+  input = tex_file_extensions,
+  nobibliography = bibliography_file_extensions,
+  subfile = tex_file_extensions,
+}
+
+local ignored_workspace_directories = {
+  [".git"] = true,
+  [".hg"] = true,
+  [".svn"] = true,
+  [".venv"] = true,
+  ["__pycache__"] = true,
+  ["node_modules"] = true,
+  ["vendor"] = true,
+}
+
+local workspace_file_cache = {}
+local uv = vim.uv or vim.loop
+
 local function split_path_prefix(path_prefix)
   local dir_prefix, name_prefix = path_prefix:match("^(.*[/])([^/]*)$")
 
@@ -226,7 +253,7 @@ local function path_item(path_prefix, name, fs_type, filter_text, text_edit_rang
   }
 end
 
-local function graphics_text_edit_range(params, path_prefix, path_suffix)
+local function workspace_path_text_edit_range(params, path_prefix, path_suffix)
   local cursor = params.context.cursor
 
   return {
@@ -241,43 +268,97 @@ local function graphics_text_edit_range(params, path_prefix, path_suffix)
   }
 end
 
-local function is_graphics_candidate(name, fs_type)
+local function is_workspace_file_candidate(name, fs_type, allowed_extensions)
   if fs_type == "directory" then
     return true
   end
 
   local extension = name:match("%.([^./]+)$")
-  return extension ~= nil and graphics_extensions[extension:lower()] == true
+  return extension ~= nil and allowed_extensions[extension:lower()] == true
 end
 
-local function complete_graphics_paths(params, path_prefix, path_suffix)
+local function should_skip_workspace_directory(path, include_hidden)
+  for segment in path:gmatch("[^/\\]+") do
+    if ignored_workspace_directories[segment] or (not include_hidden and segment:sub(1, 1) == ".") then
+      return true
+    end
+  end
+
+  return false
+end
+
+local function scan_workspace_entries(scan_dir, include_hidden, recursive)
+  scan_dir = vim.fs.normalize(scan_dir)
+  if vim.fn.isdirectory(scan_dir) ~= 1 then
+    return {}
+  end
+
+  local cache_key = table.concat({
+    scan_dir,
+    include_hidden and "hidden" or "visible",
+    recursive and "recursive" or "direct",
+  }, "\0")
+  local now = uv.now()
+  local cached = workspace_file_cache[cache_key]
+
+  if cached and now - cached.created_at < 2000 then
+    return cached.entries
+  end
+
+  local entries = {}
+  for name, fs_type in vim.fs.dir(scan_dir, {
+    depth = recursive and 20 or 1,
+    skip = function(directory_name)
+      return not should_skip_workspace_directory(directory_name, include_hidden)
+    end,
+  }) do
+    local is_immediate_directory = fs_type == "directory" and name:find("[/\\]") == nil
+    local is_visible = include_hidden or not should_skip_workspace_directory(name, false)
+
+    if is_visible and (is_immediate_directory or fs_type ~= "directory") then
+      table.insert(entries, { name = name, fs_type = fs_type })
+    end
+  end
+
+  workspace_file_cache[cache_key] = {
+    created_at = now,
+    entries = entries,
+  }
+
+  return entries
+end
+
+local function candidate_matches_prefix(name, prefix)
+  if prefix == "" then
+    return true
+  end
+
+  local lower_prefix = prefix:lower()
+  return vim.startswith(name:lower(), lower_prefix)
+    or vim.startswith(vim.fs.basename(name):lower(), lower_prefix)
+end
+
+local function complete_workspace_paths(params, path_prefix, path_suffix, allowed_extensions)
   local current_path = path_prefix .. path_suffix
   local dir_prefix, current_name = split_path_prefix(current_path)
   local _, name_prefix = split_path_prefix(path_prefix)
   local replacing_existing_path = path_suffix ~= "" or current_name:match("%.[^./]+$") ~= nil
   local candidate_prefix = replacing_existing_path and "" or name_prefix
   local scan_dir = expand_path_dir(dir_prefix)
-  local fs = vim.loop.fs_scandir(scan_dir)
-
-  if not fs then
-    return {}
-  end
+  local workspace_root = vim.fs.normalize(vim.fn.getcwd())
+  local recursive = vim.fs.relpath(workspace_root, vim.fs.normalize(scan_dir)) ~= nil
 
   local items = {}
   local include_hidden = candidate_prefix:sub(1, 1) == "."
-  local lower_prefix = candidate_prefix:lower()
-  local text_edit_range = graphics_text_edit_range(params, path_prefix, path_suffix)
+  local text_edit_range = workspace_path_text_edit_range(params, path_prefix, path_suffix)
 
-  while true do
-    local name, fs_type = vim.loop.fs_scandir_next(fs)
+  for _, entry in ipairs(scan_workspace_entries(scan_dir, include_hidden, recursive)) do
+    local name = entry.name
+    local fs_type = entry.fs_type
 
-    if not name then
-      break
-    end
-
-    local prefix_matches = candidate_prefix == "" or vim.startswith(name:lower(), lower_prefix)
-
-    if (include_hidden or name:sub(1, 1) ~= ".") and prefix_matches and is_graphics_candidate(name, fs_type) then
+    if is_workspace_file_candidate(name, fs_type, allowed_extensions)
+      and candidate_matches_prefix(name, candidate_prefix)
+    then
       local is_directory = fs_type == "directory"
       local filter_text = dir_prefix .. name .. (is_directory and "/" or "")
 
@@ -305,8 +386,32 @@ local function graphics_path_prefix(line)
     or line:match("\\includegraphics%{([^{}]*)$")
 end
 
-local function graphics_path_suffix(line)
+local function workspace_path_suffix(line)
   return line:match("^([^{}]*)%}") or ""
+end
+
+local function workspace_file_path_prefix(line)
+  local graphics_prefix = graphics_path_prefix(line)
+  if graphics_prefix ~= nil then
+    return graphics_prefix, graphics_extensions
+  end
+
+  local patterns = {
+    "\\([%a]+)%*?%s*%{([^{}]*)$",
+    "\\([%a]+)%*?%s*%b[]%s*%{([^{}]*)$",
+    "\\([%a]+)%*?%s*%b[]%s*%b[]%s*%{([^{}]*)$",
+  }
+
+  for _, pattern in ipairs(patterns) do
+    local command, path_prefix = line:match(pattern)
+    local allowed_extensions = command and workspace_file_commands[command]
+
+    if allowed_extensions then
+      return path_prefix, allowed_extensions
+    end
+  end
+
+  return nil, nil
 end
 
 local function math_rm_item()
@@ -969,11 +1074,14 @@ function source:complete(params, callback)
     return
   end
 
-  local path_prefix = graphics_path_prefix(line)
+  local path_prefix, allowed_extensions = workspace_file_path_prefix(line)
 
   if path_prefix ~= nil then
-    local path_suffix = graphics_path_suffix(params.context.cursor_after_line or "")
-    callback({ items = complete_graphics_paths(params, path_prefix, path_suffix), isIncomplete = false })
+    local path_suffix = workspace_path_suffix(params.context.cursor_after_line or "")
+    callback({
+      items = complete_workspace_paths(params, path_prefix, path_suffix, allowed_extensions),
+      isIncomplete = false,
+    })
     return
   end
 
@@ -1015,7 +1123,9 @@ function M.register()
 end
 
 function M.is_reference_context(line)
-  return reference_argument_prefix(line) ~= nil or citation_argument_prefix(line) ~= nil
+  return reference_argument_prefix(line) ~= nil
+    or citation_argument_prefix(line) ~= nil
+    or workspace_file_path_prefix(line) ~= nil
 end
 
 function M.should_complete_after_pair(line_before_cursor, line_after_cursor)
@@ -1025,7 +1135,7 @@ function M.should_complete_after_pair(line_before_cursor, line_after_cursor)
 
   return reference_argument_prefix(line_before_cursor) ~= nil
     or citation_argument_prefix(line_before_cursor) ~= nil
-    or graphics_path_prefix(line_before_cursor) ~= nil
+    or workspace_file_path_prefix(line_before_cursor) ~= nil
 end
 
 return M
