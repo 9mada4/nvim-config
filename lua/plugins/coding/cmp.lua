@@ -89,6 +89,33 @@ return {
           }),
         })
       end
+
+      local tex_pair_group = vim.api.nvim_create_augroup("cmp-tex-pair-completion", { clear = true })
+      vim.api.nvim_create_autocmd("CursorMovedI", {
+        group = tex_pair_group,
+        desc = "Open TeX argument completion after an automatic closing brace",
+        callback = function(args)
+          local filetype = vim.bo[args.buf].filetype
+          if filetype ~= "tex" and filetype ~= "plaintex" and filetype ~= "latex" then
+            return
+          end
+
+          local line = vim.api.nvim_get_current_line()
+          local column = vim.api.nvim_win_get_cursor(0)[2]
+          local line_before_cursor = line:sub(1, column)
+          local line_after_cursor = line:sub(column + 1)
+
+          if not cmp.visible() and tex_commands.should_complete_after_pair(line_before_cursor, line_after_cursor) then
+            cmp.complete({
+              config = {
+                sources = {
+                  { name = "tex_commands", keyword_length = 0 },
+                },
+              },
+            })
+          end
+        end,
+      })
     end,
   },
 }

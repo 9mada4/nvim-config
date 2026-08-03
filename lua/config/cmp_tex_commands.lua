@@ -278,7 +278,8 @@ local function complete_graphics_paths(params, path_prefix, path_suffix)
     local prefix_matches = candidate_prefix == "" or vim.startswith(name:lower(), lower_prefix)
 
     if (include_hidden or name:sub(1, 1) ~= ".") and prefix_matches and is_graphics_candidate(name, fs_type) then
-      local filter_text = name
+      local is_directory = fs_type == "directory"
+      local filter_text = dir_prefix .. name .. (is_directory and "/" or "")
 
       if replacing_existing_path and path_prefix ~= "" then
         filter_text = path_prefix
@@ -1015,6 +1016,16 @@ end
 
 function M.is_reference_context(line)
   return reference_argument_prefix(line) ~= nil or citation_argument_prefix(line) ~= nil
+end
+
+function M.should_complete_after_pair(line_before_cursor, line_after_cursor)
+  if line_before_cursor:sub(-1) ~= "{" or line_after_cursor:sub(1, 1) ~= "}" then
+    return false
+  end
+
+  return reference_argument_prefix(line_before_cursor) ~= nil
+    or citation_argument_prefix(line_before_cursor) ~= nil
+    or graphics_path_prefix(line_before_cursor) ~= nil
 end
 
 return M
