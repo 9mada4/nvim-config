@@ -4,6 +4,7 @@ return {
   event = "VeryLazy",
   dependencies = {
     "StefanBartl/lib.nvim",
+    "StefanBartl/ui.nvim",
     "nvim-lua/plenary.nvim",
     "nvim-telescope/telescope.nvim",
   },
