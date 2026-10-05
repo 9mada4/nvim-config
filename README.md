@@ -14,15 +14,7 @@
 - [Folder structure](#folder-structure)
 
 ## todo
-- [x] Windowsセットアップ手順追記
-- [x] IME自動切り替え実装
-  - [x] luaから.ps1ファイルを呼び出せるようにしたらいけそう。
-  - [x] 通知をオフ
-  - [ ] ｊｊが入力されたらback２回にescを送信したら、.ps1も呼び出されていけそう。
-- [ ] macOSもターミナル上でキー送信で対応か？
-- [x] Lazy.gitの動作確認
-  - [x] swapファイルが残る
-  - [x] Windowsのセットアップ手順を簡略化
+- [ ] shift + mvのmdプレビューでtexもレンダリングできるようにしたい
 
 https://youtu.be/80zZQLe0NNg?si=i35CENhmjsgItoPy <br>
 zz, zb, zt
