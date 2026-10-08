@@ -15,7 +15,8 @@
             + mv  md外部プレビュー
             + mf  TeX PDFを開く
             + mc  TeX途中生成物を削除
-       CSV   Tab/Shift-Tab/Enter  セル移動
+       CSV   Spc + cv  表表示ON/OFF（初期はOFF）
+             Tab/Shift-Tab/Enter  セル移動（表表示ON時）
 
 [Codex] Spc + cc  Codex開閉
             + cf  Codexへ移動

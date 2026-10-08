@@ -3,6 +3,9 @@ return {
     "hat0uma/csvview.nvim",
     ft = { "csv", "tsv" },
     cmd = { "CsvViewEnable", "CsvViewDisable", "CsvViewToggle" },
+    keys = {
+      { "<leader>cv", "<cmd>CsvViewToggle<CR>", desc = "CSV: Toggle table view" },
+    },
     opts = {
       view = {
         display_mode = "border",
@@ -15,13 +18,5 @@ return {
         jump_next_row = { "<CR>", mode = { "n", "v" } },
       },
     },
-    init = function()
-      vim.api.nvim_create_autocmd("FileType", {
-        pattern = { "csv", "tsv" },
-        callback = function()
-          vim.cmd("CsvViewEnable")
-        end,
-      })
-    end,
   },
 }
