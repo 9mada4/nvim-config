@@ -74,6 +74,7 @@ local commands = {
   { name = "include", insert = "include{${1:file}}", detail = "include file" },
   { name = "includegraphics", insert = "includegraphics[${1:width=0.8\\\\linewidth}]{${2:file}}", detail = "insert image" },
   { name = "caption", insert = "caption{${1:caption}}", detail = "caption" },
+  { name = "multicolumn", insert = "multicolumn{${1:2}}{${2:c}}{${3:text}}", detail = "table cell spanning multiple columns" },
   { name = "label", insert = "label{${1:key}}", detail = "label" },
   { name = "ref", insert = "ref{${1:key}}", detail = "reference" },
   { name = "pageref", insert = "pageref{${1:key}}", detail = "page reference" },
