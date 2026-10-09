@@ -77,6 +77,7 @@ local commands = {
   { name = "multicolumn", insert = "multicolumn{${1:2}}{${2:c}}{${3:text}}", detail = "table cell spanning multiple columns" },
   { name = "label", insert = "label{${1:key}}", detail = "label" },
   { name = "ref", insert = "ref{${1:key}}", detail = "reference" },
+  { name = "eqref", insert = "eqref{${1:key}}", detail = "equation reference" },
   { name = "pageref", insert = "pageref{${1:key}}", detail = "page reference" },
   { name = "cite", insert = "cite{${1:key}}", detail = "citation" },
   { name = "footnote", insert = "footnote{${1:text}}", detail = "footnote" },
@@ -1047,6 +1048,11 @@ end
 
 function source:get_debug_name()
   return "tex_commands"
+end
+
+function source:get_position_encoding_kind()
+  -- Completion ranges use Neovim byte columns, including after Japanese text.
+  return "utf-8"
 end
 
 function source:get_trigger_characters()
