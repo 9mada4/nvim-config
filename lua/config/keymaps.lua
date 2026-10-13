@@ -5,6 +5,11 @@ vim.keymap.set("i", "jj", "<Esc>", { noremap = true, silent = true })
 vim.keymap.set("v", "K", ":m '<-2<CR>gv=gv")
 vim.keymap.set("v", "J", ":m '>+1<CR>gv=gv")
 
+-- 検索ハイライトをON/OFF
+vim.keymap.set("n", "<leader>h", function()
+  vim.opt.hlsearch = not vim.opt.hlsearch:get()
+end, { desc = "Search: toggle highlight" })
+
 -- 最後に検索した語を使って，カーソル位置以降を確認しながら置換する
 -- 例: /status で検索したあと <leader>sr
 vim.keymap.set("n", "<leader>sr", function()
