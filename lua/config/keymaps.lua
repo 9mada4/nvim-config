@@ -48,9 +48,9 @@ vim.keymap.set("n", "<leader>mv", function()
     return
   end
 
-  local ok = require("config.markdown_preview").toggle()
+  local ok, error_message = require("config.markdown_preview").toggle()
   if not ok then
-    vim.notify("markdown-preview.nvim is not ready. Run :Lazy sync", vim.log.levels.WARN)
+    vim.notify("Markdown preview: " .. tostring(error_message), vim.log.levels.ERROR)
   end
 end, { desc = "Markdown: browser preview toggle" })
 
