@@ -11,6 +11,7 @@ vim.opt.smartindent = true
 vim.opt.ignorecase = true
 vim.opt.smartcase = true
 vim.opt.incsearch = true
+vim.opt.hlsearch = true
 
 -- クリップボード連携（利用可能な環境のみ）
 if vim.fn.has("clipboard") == 1 then
