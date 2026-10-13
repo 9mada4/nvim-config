@@ -26,6 +26,20 @@ return {
     },
     config = function()
       ensure_lazygit_color_env()
+
+      -- The global terminal <Esc><Esc> mapping delays/intercepts Esc before it
+      -- reaches lazygit (and the Neovim editor launched inside it).
+      vim.api.nvim_create_autocmd("FileType", {
+        pattern = "lazygit",
+        callback = function(args)
+          vim.keymap.set("t", "<Esc>", "<Esc>", {
+            buffer = args.buf,
+            nowait = true,
+            silent = true,
+            desc = "LazyGit: pass Esc to the running application",
+          })
+        end,
+      })
     end,
   },
 }
