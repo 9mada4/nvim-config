@@ -35,7 +35,7 @@
 Spc sr  単語置換   / 下に検索   N ←→ n 選択
 Spc sR  作業ディレクトリ全体の検索・置換
          Normal Enter  全アクション選択（下分割）
-:noh    検索Highlight
+Spc h   検索Highlight ON/OFF   :noh 一時解除
 [Git] p  pull   Spc gg  Open LazyGit   G  auto comit msg  
       P  push   Spc gd  git diff       R  pull --rebase   
 [VimCmd]    :q  quit    :q!  force
