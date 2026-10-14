@@ -301,6 +301,16 @@ function M.summarize(files)
     "-f", prompt_path,
   }
   local run_ok, result = pcall(run, argv, { text = true, timeout = timeout_ms })
+  if use_metal and (not run_ok or not result) then
+    for index, value in ipairs(argv) do
+      if value == "-ngl" then
+        argv[index + 1] = "0"
+        break
+      end
+    end
+    vim.list_extend(argv, { "--device", "none" })
+    run_ok, result = pcall(run, argv, { text = true, timeout = timeout_ms })
+  end
   pcall(uv.fs_unlink, prompt_path)
   if not run_ok or not result then
     return {}

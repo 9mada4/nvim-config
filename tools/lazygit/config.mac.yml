@@ -10,7 +10,11 @@ customCommands:
 
   - key: "G"
     context: "files"
-    description: "Open commit editor and generate message in background"
+    description: "Open editor with rule-based message; generate LLM summary in background"
     output: terminal
     command: |
-      NVIM_GENERATE_COMMIT_MSG=1 git -c core.editor=nvim commit
+      MSG="$(NVIM_COMMIT_MSG_MODE=rule nvim --clean --headless +'lua dofile(vim.fn.stdpath("config") .. "/scripts/generate-commit-msg.lua")' +qa 2>/dev/null)"
+      STATUS=$?
+      [ "$STATUS" -eq 0 ] || { echo "failed to generate commit message"; exit 1; }
+      [ -n "$MSG" ] || { echo "failed to generate commit message"; exit 1; }
+      NVIM_GENERATE_COMMIT_MSG=1 git -c core.editor=nvim commit -e -m "$MSG"

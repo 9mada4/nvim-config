@@ -560,6 +560,14 @@ else
 end
 
 local msg = prefix .. scope .. ": " .. subject
+local output_mode = vim.env.NVIM_COMMIT_MSG_MODE or "full"
+if output_mode == "rule" then
+  local output = { msg }
+  vim.list_extend(output, body)
+  io.stdout:write(table.concat(output, "\n") .. "\n")
+  return
+end
+
 local llm_summaries = {}
 local selected_items
 if count == 1 then
@@ -614,9 +622,10 @@ if #llm_inputs > 0 then
   end
 end
 
-if count == 1 and llm_summaries.F1 then
-  msg = msg .. " — " .. llm_summaries.F1
-elseif count > 1 then
+local llm_text
+if count == 1 then
+  llm_text = llm_summaries.F1
+else
   local extra = {}
   for index, item in ipairs(llm_inputs) do
     local summary = llm_summaries["F" .. tostring(index)]
@@ -625,8 +634,25 @@ elseif count > 1 then
     end
   end
   if #extra > 0 then
+    llm_text = "変更の補足: " .. table.concat(extra, "、")
+  end
+end
+
+if output_mode == "llm" then
+  if not llm_text then
+    io.stderr:write("LLMの補足文を生成できませんでした\n")
+    os.exit(2)
+  end
+  io.stdout:write(llm_text .. "\n")
+  return
+end
+
+if llm_text then
+  if count == 1 then
+    msg = msg .. " — " .. llm_text
+  else
     table.insert(body, "")
-    table.insert(body, "変更の補足: " .. table.concat(extra, "、"))
+    table.insert(body, llm_text)
   end
 end
 
