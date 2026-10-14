@@ -115,16 +115,76 @@ local function parse_num(value)
   return tonumber(value) or 0
 end
 
+local function split_nul(output)
+  if output == "" then
+    return {}
+  end
+  return vim.split(output, "\0", { plain = true, trimempty = true })
+end
+
+local function git_name_status(use_cached)
+  local cmd = { "git", "diff", "--name-status", "-z" }
+  if use_cached then
+    cmd = { "git", "diff", "--cached", "--name-status", "-z" }
+  end
+  local output = vim.fn.system(cmd)
+  if vim.v.shell_error ~= 0 then
+    return nil
+  end
+
+  local values = split_nul(output)
+  local items = {}
+  local index = 1
+  while index <= #values do
+    local status = values[index]
+    index = index + 1
+    if status:match("^[RC]") then
+      local old_path = values[index]
+      local new_path = values[index + 1]
+      if not old_path or not new_path then
+        return nil
+      end
+      items[#items + 1] = { status = status, old_path = old_path, path = new_path }
+      index = index + 2
+    else
+      local path = values[index]
+      if not path then
+        return nil
+      end
+      items[#items + 1] = { status = status, old_path = path, path = path }
+      index = index + 1
+    end
+  end
+  return items
+end
+
+local function git_name_only(use_cached)
+  local cmd = { "git", "diff", "--name-only", "-z" }
+  if use_cached then
+    cmd = { "git", "diff", "--cached", "--name-only", "-z" }
+  end
+  local output = vim.fn.system(cmd)
+  if vim.v.shell_error ~= 0 then
+    return nil
+  end
+  return split_nul(output)
+end
+
 local function get_numstat(use_cached)
   local cmd = { "git", "diff", "--numstat" }
   if use_cached then
     cmd = { "git", "diff", "--cached", "--numstat" }
   end
 
-  local lines = vim.fn.systemlist(cmd)
+  table.insert(cmd, "-z")
+  local output = vim.fn.system(cmd)
+  if vim.v.shell_error ~= 0 then
+    return {}
+  end
+
   local stats = {}
-  for _, line in ipairs(lines) do
-    local added, deleted, path = line:match("^([^\t]+)\t([^\t]+)\t(.+)$")
+  for _, line in ipairs(split_nul(output)) do
+    local added, deleted, path = line:match("^([^\t]+)\t([^\t]+)\t(.*)$")
     if added and deleted and path then
       stats[normalize_numstat_path(path)] = parse_num(added) + parse_num(deleted)
     end
@@ -229,17 +289,22 @@ end
 local changes
 local files
 if use_staged then
-  changes = vim.fn.systemlist({ "git", "diff", "--cached", "--name-status" })
-  files = vim.fn.systemlist({ "git", "diff", "--cached", "--name-only" })
+  changes = git_name_status(true)
+  files = git_name_only(true)
 else
   vim.fn.system({ "git", "diff", "--quiet" })
   if vim.v.shell_error ~= 0 then
-    changes = vim.fn.systemlist({ "git", "diff", "--name-status" })
-    files = vim.fn.systemlist({ "git", "diff", "--name-only" })
+    changes = git_name_status(false)
+    files = git_name_only(false)
   else
     print("変更がありません")
     os.exit(0)
   end
+end
+
+if not changes or not files then
+  io.stderr:write("変更ファイルを読み込めませんでした\n")
+  os.exit(1)
 end
 
 if is_empty(changes) or is_empty(files) then
@@ -279,15 +344,10 @@ local op_counts = {
   renamed = 0,
 }
 
-for _, line in ipairs(changes) do
-  if line ~= "" then
-    local status, path1, path2 = line:match("^([^\t]+)\t([^\t]+)\t([^\t]+)$")
-    if not status then
-      status, path1 = line:match("^([^\t]+)\t([^\t]+)$")
-    end
-    status = status or ""
-    path1 = path1 or ""
-    path2 = path2 or ""
+for _, change in ipairs(changes) do
+  local status = change.status or ""
+  local path1 = change.old_path or ""
+  local path2 = change.path ~= path1 and change.path or ""
 
     local target = path1
     local op = "modified"
@@ -317,9 +377,8 @@ for _, line in ipairs(changes) do
       status = status,
     })
 
-    if first_target == "" then
-      first_target = target
-    end
+  if first_target == "" then
+    first_target = target
   end
 end
 
@@ -492,6 +551,76 @@ else
 end
 
 local msg = prefix .. scope .. ": " .. subject
+local llm_summaries = {}
+local selected_items
+if count == 1 then
+  selected_items = { changed_items[1] }
+else
+  local selected_paths = pick_main_paths(changed_items, 3, stats)
+  local selected = {}
+  for _, path in ipairs(selected_paths) do
+    selected[path] = true
+  end
+  selected_items = {}
+  for _, item in ipairs(changed_items) do
+    if selected[item.path] then
+      selected_items[#selected_items + 1] = item
+    end
+  end
+end
+
+local llm_inputs = {}
+for _, item in ipairs(selected_items) do
+  if item.op ~= "deleted" and item.op ~= "renamed" and item.op ~= "copied" then
+    local cmd = { "git", "diff", "--no-ext-diff", "--no-textconv", "--unified=2" }
+    if use_staged then
+      table.insert(cmd, 3, "--cached")
+    end
+    vim.list_extend(cmd, { "--", item.path })
+    local diff = vim.fn.system(cmd)
+    if vim.v.shell_error == 0
+      and #diff > 0
+      and #diff <= 4096
+      and not diff:find("\0", 1, true)
+      and not diff:find("GIT binary patch", 1, true)
+      and not diff:find("Binary files ", 1, true)
+    then
+      llm_inputs[#llm_inputs + 1] = {
+        path = item.path,
+        operation = item.op,
+        diff = diff,
+      }
+    end
+  end
+end
+
+if #llm_inputs > 0 then
+  local helper_path = vim.fn.stdpath("config") .. "/scripts/commit-msg-llm.lua"
+  local ok, helper = pcall(dofile, helper_path)
+  if ok and type(helper) == "table" and type(helper.summarize) == "function" then
+    local summarize_ok, summaries = pcall(helper.summarize, llm_inputs)
+    if summarize_ok and type(summaries) == "table" then
+      llm_summaries = summaries
+    end
+  end
+end
+
+if count == 1 and llm_summaries.F1 then
+  msg = msg .. " — " .. llm_summaries.F1
+elseif count > 1 then
+  local extra = {}
+  for index, item in ipairs(llm_inputs) do
+    local summary = llm_summaries["F" .. tostring(index)]
+    if summary then
+      extra[#extra + 1] = basename(item.path) .. ": " .. summary
+    end
+  end
+  if #extra > 0 then
+    table.insert(body, "")
+    table.insert(body, "変更の補足: " .. table.concat(extra, "、"))
+  end
+end
+
 local output = { msg }
 for _, line in ipairs(body) do
   table.insert(output, line)

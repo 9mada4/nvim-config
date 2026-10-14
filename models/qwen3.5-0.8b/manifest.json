@@ -1,0 +1,71 @@
+{
+  "model": "Qwen3.5-0.8B Q4_K_M",
+  "source": "https://huggingface.co/bartowski/Qwen_Qwen3.5-0.8B-GGUF",
+  "source_revision": "f36b1ea49a332ede8fe5f389bbf5b3575ef71f48",
+  "file": "Qwen_Qwen3.5-0.8B-Q4_K_M.gguf",
+  "bytes": 579615840,
+  "sha256": "fb044e93939a70469c905781334f5de1e6c8b608ced6cbc8c9249bd4127d9526",
+  "max_part_bytes": 50331648,
+  "parts": [
+    {
+      "name": "model.part.000",
+      "bytes": 50331648,
+      "sha256": "ba050ed868b61280ba508868690d01068e1085458c9bd0936b1039826d701bdc"
+    },
+    {
+      "name": "model.part.001",
+      "bytes": 50331648,
+      "sha256": "d842dcbf8f039694da10ab4dbe38c4de5106e293a1524ad41a1029adb0dd28ee"
+    },
+    {
+      "name": "model.part.002",
+      "bytes": 50331648,
+      "sha256": "0f3a39c7bcb00ecc6fe5285e1aa379593c6788fc0e046519e0ec3ca3de3e2f84"
+    },
+    {
+      "name": "model.part.003",
+      "bytes": 50331648,
+      "sha256": "2546d5268b40aea3d49bba7ccaf8f35c403c88c74171a79e5e04b9b54770f881"
+    },
+    {
+      "name": "model.part.004",
+      "bytes": 50331648,
+      "sha256": "873511b314692b753bc983049ce6035f435d17729a36a60cc326690af2e79fc5"
+    },
+    {
+      "name": "model.part.005",
+      "bytes": 50331648,
+      "sha256": "195877b10c35b3ff00224357d8ef4518bf8510bc4fc7dee03ecdf9c9920b0911"
+    },
+    {
+      "name": "model.part.006",
+      "bytes": 50331648,
+      "sha256": "1aee1985bd8c2b98df62a0868d4f2a6b3ae0ae9620ea1a5a2ce584aaf989984f"
+    },
+    {
+      "name": "model.part.007",
+      "bytes": 50331648,
+      "sha256": "ae148eb608e81d0119de234c4a92c1478c066b868030a2a6647f687f01bdc0e0"
+    },
+    {
+      "name": "model.part.008",
+      "bytes": 50331648,
+      "sha256": "02affd76f321b27ab53618c33e671b56716ca3c25b3206c8270bc8b6cf4f4225"
+    },
+    {
+      "name": "model.part.009",
+      "bytes": 50331648,
+      "sha256": "684296d805eafba0f6cb55e648ac855d9159c1d451ae02023c47e88a940f2a13"
+    },
+    {
+      "name": "model.part.010",
+      "bytes": 50331648,
+      "sha256": "55a69cfde7483b76969206228c9ce29a6b77827679433906aaccdc178a4f1b75"
+    },
+    {
+      "name": "model.part.011",
+      "bytes": 25967712,
+      "sha256": "1fb539a9a72fc0f8a8c30af90d662d84822f4d1888b8e3d27823ed6abc89cb46"
+    }
+  ]
+}

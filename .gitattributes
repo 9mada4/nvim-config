@@ -1,0 +1,5 @@
+*.gguf -text
+*.part.* -text
+*.dylib -text
+*.exe -text
+*.dll -text
