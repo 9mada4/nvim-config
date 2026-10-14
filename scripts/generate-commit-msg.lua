@@ -9,6 +9,15 @@ local function systemlist(cmd)
   return out, code
 end
 
+-- vim.fn.system() replaces NUL bytes with SOH, so use vim.system() for Git's -z output.
+local function system_raw(cmd)
+  local result = vim.system(cmd, { text = false }):wait()
+  if result.code ~= 0 or result.signal ~= 0 then
+    return nil
+  end
+  return result.stdout or ""
+end
+
 local function run_in_repo_root()
   local root_out, root_code = systemlist({ "git", "rev-parse", "--show-toplevel" })
   if root_code ~= 0 or not root_out[1] or root_out[1] == "" then
@@ -127,8 +136,8 @@ local function git_name_status(use_cached)
   if use_cached then
     cmd = { "git", "diff", "--cached", "--name-status", "-z" }
   end
-  local output = vim.fn.system(cmd)
-  if vim.v.shell_error ~= 0 then
+  local output = system_raw(cmd)
+  if not output then
     return nil
   end
 
@@ -163,8 +172,8 @@ local function git_name_only(use_cached)
   if use_cached then
     cmd = { "git", "diff", "--cached", "--name-only", "-z" }
   end
-  local output = vim.fn.system(cmd)
-  if vim.v.shell_error ~= 0 then
+  local output = system_raw(cmd)
+  if not output then
     return nil
   end
   return split_nul(output)
@@ -177,8 +186,8 @@ local function get_numstat(use_cached)
   end
 
   table.insert(cmd, "-z")
-  local output = vim.fn.system(cmd)
-  if vim.v.shell_error ~= 0 then
+  local output = system_raw(cmd)
+  if not output then
     return {}
   end
 
