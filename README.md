@@ -202,35 +202,26 @@ powershell -NoProfile -NonInteractive -ExecutionPolicy Bypass -File .\tools\wind
 <h2 id="custom-lazygit"></h2>
 
 ## 7. Custom LazyGit
-(optional: LazyGit users)
-1. create a symlink to the repo-managed config
+LazyGit を使う場合は、このリポジトリの設定を適用します。
 
-- macOS:
-```
+### macOS
+`tools/lazygit/config.mac.yml` を LazyGit の設定にリンクします。
+
+```sh
 cd ~/.config/nvim
 mkdir -p "$(lazygit --print-config-dir)"
 ln -sfn "$PWD/tools/lazygit/config.mac.yml" "$(lazygit --print-config-dir)/config.yml"
 ```
 
-- Windows:
+以後は `git pull` で設定も更新されます。Neovim の外で色が出ない場合は、シェルの `NO_COLOR` 設定を確認してください。
+
+### Windows（PowerShell）
+リポジトリ内の設定と補助スクリプトを LazyGit の設定ディレクトリへコピーします。
+
 ```powershell
 $LG = (lazygit --print-config-dir).Trim()
 New-Item -ItemType Directory -Force -Path $LG | Out-Null
-```
-
-2. apply repo-managed files
-
-`macOS`:
-- repo-managed config: [`tools/lazygit/config.mac.yml`](tools/lazygit/config.mac.yml)
-- after the first symlink, `git pull` updates the LazyGit config automatically
-- if colors still look disabled outside Neovim, check whether `NO_COLOR` is set in your shell startup files
-- `G` opens the commit-message editor with `nvim`, so the `gitcommit` buffer uses your Neovim colorscheme
-
-`Windows (repo-managed files)`:
-```powershell
 cd $env:LOCALAPPDATA\nvim
-```
-```powershell
 Copy-Item .\tools\lazygit\commit-with-generated-msg.cmd "$LG\commit-with-generated-msg.cmd" -Force
 
 $CFG = Get-Content .\tools\lazygit\config.windows.yml -Raw
@@ -238,12 +229,14 @@ $CFG = $CFG.Replace('__LAZYGIT_DIR__', $LG)
 Set-Content "$LG\config.yml" -Value $CFG -Encoding utf8
 ```
 
-3. usage
-- `<leader>gg` opens LazyGit in Neovim
-- `G` opens the commit-message editor with the rule-based Conventional Commit message already inserted, then generates the LLM summary in the background. In the `gitcommit` buffer, press `<Space>gm` to preview the LLM summary, then press Enter to insert it at the cursor or `q`/Esc to cancel. Your existing text is preserved. If inference fails, the rule-based message remains in the editor and the preview reports the failure. The model and prebuilt llama.cpp runtimes are included in the clone; no Ollama or Python install is needed. The clone is about 650 MB larger, and first use assembles a verified model cache of about 580 MB. Windows summarization uses the Visual C++ runtime. macOS requires Apple Silicon and macOS 14 or later; Windows requires x64.
-- The bundled Qwen model is Apache-2.0 licensed; llama.cpp is MIT licensed, and the Windows OpenMP runtime includes its LLVM license. See the included license files and manifests for pinned sources and checksums.
-- In LazyGit, press `R` or `G` after applying the matching setup above
-- check config dir: `lazygit --print-config-dir`
+更新後はこのコピー手順を再実行してください。設定先は `lazygit --print-config-dir` で確認できます。
+
+### 使い方
+- Neovim の `<leader>gg` で LazyGit を開きます。
+- LazyGit の `R` で `git pull --rebase`、`G` でコミットメッセージの編集画面を開きます。
+- `G` では規則に基づく Conventional Commit 文が先に入り、LLM の補足文が裏で生成されます。編集画面で `<Space>gm` を押すと補足文を確認でき、Enter で挿入、`q` / Esc で閉じられます。生成に失敗しても先に入った文は残ります。
+
+モデルと実行ファイルは同梱されており、Ollama と Python は不要です。対応環境は macOS 14 以降の Apple Silicon、または Windows x64（Visual C++ ランタイムが必要）です。クローンは約 650 MB 増え、初回利用時に約 580 MB のキャッシュを作成します。ライセンスと入手元・チェックサムは同梱のライセンスファイルとマニフェストを参照してください。
 
 <h2 id="first-setup-checklist"></h2>
 
