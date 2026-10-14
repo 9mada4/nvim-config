@@ -17,11 +17,11 @@ function M.preview(buf)
     return
   end
   if state.status == "running" then
-    vim.notify("コミットメッセージを生成中です", vim.log.levels.INFO)
+    vim.notify("LLM補足文を生成中です", vim.log.levels.INFO)
     return
   end
   if state.status ~= "ready" then
-    vim.notify("コミットメッセージを生成できませんでした", vim.log.levels.WARN)
+    vim.notify("LLM補足文を生成できませんでした", vim.log.levels.WARN)
     return
   end
 
@@ -51,7 +51,7 @@ function M.preview(buf)
     height = height,
     border = "rounded",
     style = "minimal",
-    title = " 生成したコミットメッセージ ",
+    title = " LLM補足文 ",
     title_pos = "center",
     footer = " Enter: カーソル位置に挿入  /  q・Esc: 閉じる ",
     footer_pos = "center",
@@ -100,7 +100,7 @@ local function start(buf)
     vim.v.progpath,
     "--clean",
     "--headless",
-    "+lua dofile(vim.fn.stdpath('config') .. '/scripts/generate-commit-msg.lua')",
+    "+lua vim.env.NVIM_COMMIT_MSG_MODE = 'llm'; dofile(vim.fn.stdpath('config') .. '/scripts/generate-commit-msg.lua')",
     "+qa",
   }, { cwd = vim.fn.getcwd(), text = true }, function(result)
     vim.schedule(function()
@@ -110,12 +110,13 @@ local function start(buf)
       local message = (result.stdout or ""):gsub("\r\n", "\n"):gsub("\n+$", "")
       if result.code ~= 0 or result.signal ~= 0 or message == "" or message == "変更がありません" then
         state.status = "failed"
-        vim.notify("コミットメッセージを生成できませんでした", vim.log.levels.WARN)
+        local detail = (result.stderr or ""):match("[^\r\n]+")
+        vim.notify("LLM補足文を生成できませんでした" .. (detail and ": " .. detail or ""), vim.log.levels.WARN)
         return
       end
       state.lines = vim.split(message, "\n", { plain = true })
       state.status = "ready"
-      vim.notify("生成候補ができました。<Space>gm で確認できます", vim.log.levels.INFO)
+      vim.notify("LLM補足文ができました。<Space>gm で確認できます", vim.log.levels.INFO)
     end)
   end)
 end
