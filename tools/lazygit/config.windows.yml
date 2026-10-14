@@ -6,6 +6,6 @@
     output: log
   - key: "G"
     context: "files"
-    description: "Generate commit message and open editor"
+    description: "Open commit editor and generate message in background"
     output: terminal
     command: '__LAZYGIT_DIR__\commit-with-generated-msg.cmd'
