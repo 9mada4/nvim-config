@@ -52,6 +52,7 @@ brew install glow
 brew install ripgrep
 brew install codex
 ```
+- lazygit: Github管理用, pngpaste: 画像コピペ用, gh: github, glow: md preview用, ripgrep: テキスト検索用
 
 <h2 id="set-font"></h2>
 
