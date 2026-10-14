@@ -34,6 +34,11 @@ return {
                 hl.LineNrAbove = { fg = line_nr_fg, bg = "NONE" }
                 hl.LineNrBelow = { fg = line_nr_fg, bg = "NONE" }
                 hl.CursorLineNr = { fg = cursor_line_nr_fg, bg = "NONE", bold = true }
+                for level = 1, 6 do
+                    hl["@markup.heading." .. level .. ".html"] = {
+                        link = "@markup.heading." .. level .. ".markdown",
+                    }
+                end
             end,
         })
 
