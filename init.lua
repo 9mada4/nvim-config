@@ -21,6 +21,7 @@ require("lazy").setup(require("plugins.pluginlist"))
 
 require("config.options")
 require("config.keymaps")
+require("config.commit_message").setup()
 require("config.ime")
 require("config.cursorword_highlight")
 require("config.latex")
