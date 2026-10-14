@@ -176,7 +176,7 @@ Codex CLI に直接打つコマンド:
 
 <h2 id="ime-setting"></h2>
 
-## 6. IME setting
+## 6. IME setting (不完全，改修中)
 (optional)
 Windows terminal Neovim では、InsertLeave 時に PowerShell で「無変換」キーを送信して IME OFF を行います。
 
