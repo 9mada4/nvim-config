@@ -238,6 +238,8 @@ Set-Content "$LG\config.yml" -Value $CFG -Encoding utf8
 
 モデルと実行ファイルは同梱されており、Ollama と Python は不要です。対応環境は macOS 14 以降の Apple Silicon、または Windows x64（Visual C++ ランタイムが必要）です。クローンは約 650 MB 増え、初回利用時に約 580 MB のキャッシュを作成します。ライセンスと入手元・チェックサムは同梱のライセンスファイルとマニフェストを参照してください。
 
+プロンプトは `scripts/commit-msg-llm.lua` 冒頭の `system_prompt` で調整できます。変更前後の内容を1ファイルずつ渡し、最大3ファイルの要約を生成します。モデルには要約文だけを求め、ファイルとの対応はコード側で管理します。40文字の上限をなくし、160字を超える出力や生成途中の文は候補から除外します。生成文には変更の誤読や単位の誤推測が残るため、プレビューで内容を確認してから挿入してください。
+
 <h2 id="first-setup-checklist"></h2>
 
 ## 8. First setup checklist
