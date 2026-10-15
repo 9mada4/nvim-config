@@ -234,7 +234,7 @@ Set-Content "$LG\config.yml" -Value $CFG -Encoding utf8
 ### 使い方
 - Neovim の `<leader>gg` で LazyGit を開きます。
 - LazyGit の `R` で `git pull --rebase`、`G` でコミットメッセージの編集画面を開きます。
-- `G` では規則に基づく Conventional Commit 文が先に入り、LLM の補足文が裏で生成されます。編集画面で `<Space>gm` を押すと補足文を確認でき、Enter で挿入、`q` / Esc で閉じられます。生成に失敗しても先に入った文は残ります。
+- `G` では規則に基づく Conventional Commit 文の末尾に半角スペースが入り、その直後にカーソルが置かれます。LLM の補足文は裏で生成され、編集画面で `<Space>gm` を押すと確認できます。Enter でカーソル位置に挿入、`q` / Esc で閉じられます。生成に失敗しても先に入った文は残ります。
 
 モデルと実行ファイルは同梱されており、Ollama と Python は不要です。対応環境は macOS 14 以降の Apple Silicon、または Windows x64（Visual C++ ランタイムが必要）です。クローンは約 650 MB 増え、初回利用時に約 580 MB のキャッシュを作成します。ライセンスと入手元・チェックサムは同梱のライセンスファイルとマニフェストを参照してください。
 

@@ -81,6 +81,20 @@ local function start(buf)
   end
   local state = { status = "running" }
   states[buf] = state
+
+  local subject = vim.api.nvim_buf_get_lines(buf, 0, 1, false)[1]
+  if subject and subject ~= "" then
+    subject = subject:gsub("%s+$", "") .. " "
+    vim.api.nvim_buf_set_lines(buf, 0, 1, false, { subject })
+    local win = vim.api.nvim_get_current_win()
+    vim.wo[win].virtualedit = "onemore"
+    vim.schedule(function()
+      if vim.api.nvim_win_is_valid(win) and vim.api.nvim_win_get_buf(win) == buf then
+        vim.api.nvim_win_set_cursor(win, { 1, #subject })
+      end
+    end)
+  end
+
   vim.keymap.set("n", "<leader>gm", function()
     M.preview(buf)
   end, { buffer = buf, desc = "Commit: preview generated message" })
