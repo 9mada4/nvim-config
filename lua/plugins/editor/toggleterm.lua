@@ -37,7 +37,7 @@ return {
         end,
       })
 
-      vim.keymap.set({ "n", "t" }, "<leader>tt", function()
+      vim.keymap.set("n", "<leader>tt", function()
         popup_terminal:toggle()
       end, { desc = "Terminal: toggle popup" })
     end,
