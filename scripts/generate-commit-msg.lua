@@ -569,42 +569,51 @@ if output_mode == "rule" then
 end
 
 local llm_summaries = {}
-local selected_items
-if count == 1 then
-  selected_items = { changed_items[1] }
-else
-  local selected_paths = pick_main_paths(changed_items, 3, stats)
-  local selected = {}
-  for _, path in ipairs(selected_paths) do
-    selected[path] = true
+local function git_content(revision, path)
+  return system_raw({ "git", "show", revision .. ":" .. path })
+end
+
+local function worktree_content(path)
+  local file = io.open(path, "rb")
+  if not file then
+    return nil
   end
-  selected_items = {}
-  for _, item in ipairs(changed_items) do
-    if selected[item.path] then
-      selected_items[#selected_items + 1] = item
-    end
-  end
+  local text = file:read("*a")
+  file:close()
+  return text
 end
 
 local llm_inputs = {}
-for _, item in ipairs(selected_items) do
-  if item.op ~= "deleted" and item.op ~= "renamed" and item.op ~= "copied" then
-    local cmd = { "git", "diff", "--no-ext-diff", "--no-textconv", "--unified=2" }
-    if use_staged then
-      table.insert(cmd, 3, "--cached")
+for _, item in ipairs(changed_items) do
+  local cmd = { "git", "--literal-pathspecs", "diff", "--no-ext-diff", "--no-textconv", "--unified=2" }
+  if use_staged then
+    cmd[#cmd + 1] = "--cached"
+  end
+  vim.list_extend(cmd, { "--", item.path })
+  if item.old_path ~= item.path then
+    cmd[#cmd + 1] = item.old_path
+  end
+  local diff = system_raw(cmd)
+  if diff and #diff > 0
+    and not diff:find("\0", 1, true)
+    and not diff:find("GIT binary patch", 1, true)
+    and not diff:find("Binary files ", 1, true)
+  then
+    local before = item.op == "added" and "" or git_content(use_staged and "HEAD" or "", item.old_path)
+    local after
+    if item.op == "deleted" then
+      after = ""
+    elseif use_staged then
+      after = git_content("", item.path)
+    else
+      after = worktree_content(item.path)
     end
-    vim.list_extend(cmd, { "--", item.path })
-    local diff = vim.fn.system(cmd)
-    if vim.v.shell_error == 0
-      and #diff > 0
-      and #diff <= 4096
-      and not diff:find("\0", 1, true)
-      and not diff:find("GIT binary patch", 1, true)
-      and not diff:find("Binary files ", 1, true)
-    then
+    if before and after and not before:find("\0", 1, true) and not after:find("\0", 1, true) then
       llm_inputs[#llm_inputs + 1] = {
         path = item.path,
-        operation = item.op,
+        old_path = item.old_path,
+        before = before,
+        after = after,
         diff = diff,
       }
     end
@@ -623,19 +632,16 @@ if #llm_inputs > 0 then
 end
 
 local llm_text
-if count == 1 then
-  llm_text = llm_summaries.F1
-else
-  local extra = {}
-  for index, item in ipairs(llm_inputs) do
-    local summary = llm_summaries["F" .. tostring(index)]
-    if summary then
-      extra[#extra + 1] = basename(item.path) .. ": " .. summary
-    end
+local extra = {}
+for index, item in ipairs(llm_inputs) do
+  local summary = llm_summaries["F" .. tostring(index)]
+  if summary then
+    local path = item.path:gsub("%c", " ")
+    extra[#extra + 1] = path .. ":\n" .. summary
   end
-  if #extra > 0 then
-    llm_text = "変更の補足: " .. table.concat(extra, "、")
-  end
+end
+if #extra > 0 then
+  llm_text = table.concat(extra, "\n\n")
 end
 
 if output_mode == "llm" then
@@ -648,12 +654,8 @@ if output_mode == "llm" then
 end
 
 if llm_text then
-  if count == 1 then
-    msg = msg .. " — " .. llm_text
-  else
-    table.insert(body, "")
-    table.insert(body, llm_text)
-  end
+  table.insert(body, "")
+  table.insert(body, llm_text)
 end
 
 local output = { msg }
