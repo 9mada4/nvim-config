@@ -14,7 +14,7 @@ return {
           vim.opt_local.softtabstop = 2
           vim.opt_local.numberwidth = 2
           vim.opt_local.foldcolumn = "0"
-          vim.opt_local.signcolumn = "number"
+          vim.opt_local.signcolumn = "yes"
 
           local opts = { buffer = args.buf, silent = true }
           vim.keymap.set("i", "<CR>", "<CR><Cmd>AutolistNewBullet<CR>", opts)
