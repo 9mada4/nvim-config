@@ -15,7 +15,6 @@ return {
     init = function()
       vim.g.mkdp_auto_start = 0
       vim.g.mkdp_auto_close = 0
-      vim.g.mkdp_refresh_slow = 0
       vim.g.mkdp_open_to_the_world = 0
       vim.g.mkdp_open_ip = "127.0.0.1"
       vim.g.mkdp_echo_preview_url = 1
@@ -24,6 +23,10 @@ return {
         sync_scroll_type = "middle",
         disable_filename = 1,
       }
+    end,
+    config = function()
+      -- Override the plugin's refresh events while keeping its preview lifecycle.
+      vim.cmd.source(vim.fn.stdpath("config") .. "/autoload/mkdp/autocmd.vim")
     end,
   },
   {
