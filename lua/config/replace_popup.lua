@@ -75,14 +75,14 @@ local function render(s)
   local lines = {
     string.format("  %d 件一致  ·  現在のバッファ  ·  文字列として検索", #s.matches),
     "  j/k 選択   y/Enter 置換   n スキップ   a 残り全部",
-    "  l 置換して終了   u 元に戻す   e/E 入力に戻る   q 閉じる",
+    "  l 置換して終了   u 元に戻す   s 新規検索   e/E 入力編集   q 閉じる",
     "",
   }
   local highlights = {}
   if search == "" then
     lines[#lines + 1] = "  上の検索欄に置換前の文字を入力してください。"
   elseif #s.matches == 0 then
-    lines[#lines + 1] = "  一致なし"
+    lines[#lines + 1] = "  一致なし。s で次の検索・置換を開始できます。"
   else
     for index, match in ipairs(s.matches) do
       local marker = index == s.selected and "▶" or " "
@@ -125,6 +125,14 @@ local function edit(s, field)
   local win = field == "search" and s.search_win or s.replace_win
   vim.api.nvim_set_current_win(win)
   vim.cmd("startinsert!")
+end
+
+local function new_search(s)
+  vim.api.nvim_buf_set_lines(s.search_buf, 0, -1, false, { "" })
+  vim.api.nvim_buf_set_lines(s.replace_buf, 0, -1, false, { "" })
+  s.selected = 1
+  render(s)
+  edit(s, "search")
 end
 
 local function undo_boundary(s)
@@ -369,6 +377,7 @@ function M.open()
   vim.keymap.set("n", "<Esc>", close, { buffer = preview_buf, nowait = true })
   vim.keymap.set("n", "e", function() edit(s, "search") end, { buffer = preview_buf, nowait = true })
   vim.keymap.set("n", "E", function() edit(s, "replace") end, { buffer = preview_buf, nowait = true })
+  vim.keymap.set("n", "s", function() new_search(s) end, { buffer = preview_buf, nowait = true })
   vim.keymap.set("n", "j", function()
     s.selected = math.min(s.selected + 1, #s.matches)
     render(s)

@@ -14,7 +14,6 @@
 - [Folder structure](#folder-structure)
 
 ## todo
-- [ ] shift + mvのmdプレビューでtexもレンダリングできるようにしたい
 
 https://youtu.be/80zZQLe0NNg?si=i35CENhmjsgItoPy <br>
 zz, zb, zt
@@ -24,7 +23,7 @@ zz, zb, zt
 ## 1. Install Neovim (include `Font`, `Lazygit`)
 
 ### Windows
-Windows 11（PowerShell）での初回導入を想定した前提ツール（詳細インストール手順は省略）:
+Windows 11(PowerShell)での初回導入を想定した前提ツール(詳細インストール手順は省略):
 
 
 ```powershell
@@ -69,7 +68,7 @@ brew install codex
   2. 設定 > フォント > `UDEV Gothic NFLG Regular`をインストール
   3. Windows Terminal を開く
   2. `設定` (`Ctrl + ,`) を開く
-  3. 対象プロファイル（例: PowerShell）を選択
+  3. 対象プロファイル(例: PowerShell)を選択
   4. `外観` > `フォント フェイス` を `UDEV Gothic NFLG Regular`に変更
   5. `保存` を押して新しいタブを開き直す
 
@@ -92,11 +91,11 @@ fi
 `Windows 11 (PowerShell)`:
 - 設定ディレクトリの設定->確認
 ```powershell
-# 1. 設定ディレクトリのパスを設定（環境変数を使うのが一番確実！）
+# 1. 設定ディレクトリのパスを設定(環境変数を使うのが一番確実！)
 $NVIM_CONFIG_DIR = "$env:LOCALAPPDATA\nvim"
 Write-Host "Config Directory: $NVIM_CONFIG_DIR"
 
-# 2. フォルダの作成（すでにあってもエラーになりません）
+# 2. フォルダの作成(すでにあってもエラーになりません)
 New-Item -ItemType Directory -Force -Path $NVIM_CONFIG_DIR | Out-Null
 
 # 3. クローンまたは更新の判定
@@ -131,7 +130,7 @@ nvim
 <h2 id="codex-image-shortcut"></h2>
 
 ## 5. Codex image shortcut
-macOS の Shortcuts.app（ショートカット.app）で、クリップボードの画像を特定のパスへ同じファイル名で上書き保存できるようにしておきます。Shortcuts.app 側の詳細設定は割愛します。
+macOS の Shortcuts.app(ショートカット.app)で、クリップボードの画像を特定のパスへ同じファイル名で上書き保存できるようにしておきます。Shortcuts.app 側の詳細設定は割愛します。
 
 この設定では、保存先を次のファイルとして扱います。
 
@@ -182,7 +181,7 @@ Windows terminal Neovim では、InsertLeave 時に PowerShell で「無変換�
 
 - Script: `tools/windows/send-nonconvert.ps1`
 - Trigger: `InsertLeave` only
-- Scope: Windows only（macOS/Linux では何もしない）
+- Scope: Windows only(macOS/Linux では何もしない)
 - Dependencies: PowerShell が必要
 - Not required: Python / `pynvim` / remote plugin / custom exe
 
@@ -197,7 +196,7 @@ Windows terminal Neovim では、InsertLeave 時に PowerShell で「無変換�
 powershell -NoProfile -NonInteractive -ExecutionPolicy Bypass -File .\tools\windows\send-nonconvert.ps1
 ```
 
-- 既存の Hammerspoon 方式（legacy）はこちらを参照してください: [docs/hammerspoon-ime-terminal.md](docs/hammerspoon-ime-terminal.md)
+- 既存の Hammerspoon 方式(legacy)はこちらを参照してください: [docs/hammerspoon-ime-terminal.md](docs/hammerspoon-ime-terminal.md)
 
 <h2 id="custom-lazygit"></h2>
 
@@ -215,7 +214,7 @@ ln -sfn "$PWD/tools/lazygit/config.mac.yml" "$(lazygit --print-config-dir)/confi
 
 以後は `git pull` で設定も更新されます。Neovim の外で色が出ない場合は、シェルの `NO_COLOR` 設定を確認してください。
 
-### Windows（PowerShell）
+### Windows(PowerShell)
 リポジトリ内の設定と補助スクリプトを LazyGit の設定ディレクトリへコピーします。
 
 ```powershell
@@ -236,9 +235,9 @@ Set-Content "$LG\config.yml" -Value $CFG -Encoding utf8
 - LazyGit の `R` で `git pull --rebase`、`G` でコミットメッセージの編集画面を開きます。
 - `G` では規則に基づく Conventional Commit 文の末尾に半角スペースが入り、その直後にカーソルが置かれます。LLM の補足文は裏で生成され、編集画面で `<Space>gm` を押すと確認できます。Enter でカーソル位置に挿入、`q` / Esc で閉じられます。生成に失敗しても先に入った文は残ります。
 
-モデルと実行ファイルは同梱されており、Ollama と Python は不要です。対応環境は macOS 14 以降の Apple Silicon、または Windows x64（Visual C++ ランタイムが必要）です。クローンは約 650 MB 増え、初回利用時に約 580 MB のキャッシュを作成します。ライセンスと入手元・チェックサムは同梱のライセンスファイルとマニフェストを参照してください。
+モデルと実行ファイルは同梱されており、Ollama と Python は不要です。対応環境は macOS 14 以降の Apple Silicon、または Windows x64(Visual C++ ランタイムが必要)です。クローンは約 650 MB 増え、初回利用時に約 580 MB のキャッシュを作成します。ライセンスと入手元・チェックサムは同梱のライセンスファイルとマニフェストを参照してください。
 
-プロンプトは `scripts/commit-msg-llm.lua` 冒頭の `system_prompt` で調整できます。ファイルごとに差分の各変更箇所（ハンク）を取り出し、Tree-sitterで変更前後の関数・設定ブロック・見出しセクションを切り出して、差分と一緒に渡します。ステージ済みの変更はHEADとインデックス、未ステージの変更はインデックスと作業ファイルを参照します。パーサーがない場合やブロックが大きすぎる場合は周辺行を使います。参考情報は変更前後それぞれ最大2,048バイトに収め、差分自体は省略しません。
+プロンプトは `scripts/commit-msg-llm.lua` 冒頭の `system_prompt` で調整できます。ファイルごとに差分の各変更箇所(ハンク)を取り出し、Tree-sitterで変更前後の関数・設定ブロック・見出しセクションを切り出して、差分と一緒に渡します。ステージ済みの変更はHEADとインデックス、未ステージの変更はインデックスと作業ファイルを参照します。パーサーがない場合やブロックが大きすぎる場合は周辺行を使います。参考情報は変更前後それぞれ最大2,048バイトに収め、差分自体は省略しません。
 
 モデルは変更箇所ごとに日本語の一文を生成し、コード側でファイル名を付けて改行で結合します。変更ファイルは3件に制限せず、削除されたコードも対象にします。160字を超える文・生成途中の文・8,192バイトのプロンプト上限を超える変更箇所がある場合、そのファイルの要約は候補から除外します。変更箇所の数に応じて生成時間が増えます。生成文には変更の誤読や単位の誤推測が残るため、プレビューで内容を確認してから挿入してください。
 
@@ -249,7 +248,7 @@ Set-Content "$LG\config.yml" -Value $CFG -Encoding utf8
 - Step 3 実行後に `nvim` で起動できる
 - 初回起動で lazy.nvim / plugins の自動セットアップが完了する
 - `:checkhealth` を実行し，致命的エラーがない
-- （任意）`rg --version`, `lazygit --version`, `glow --version` が必要に応じて通る
+- (任意)`rg --version`, `lazygit --version`, `glow --version` が必要に応じて通る
 
 ## How to update
 Finder > `⌘ + Shift + .` > drag `$NVIM_CONFIG_DIR/lua` to upload file this repo
