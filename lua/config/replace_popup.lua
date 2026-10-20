@@ -74,7 +74,8 @@ local function render(s)
 
   local lines = {
     string.format("  %d 件一致  ·  現在のバッファ  ·  文字列として検索", #s.matches),
-    "  j/k: 選択  y/Enter: 置換  n: スキップ  a: 残り全部  l: 置換して終了  e/E: 編集  q: 閉じる",
+    "  j/k 選択   y/Enter 置換   n スキップ   a 残り全部",
+    "  l 置換して終了   u 元に戻す   e/E 入力に戻る   q 閉じる",
     "",
   }
   local highlights = {}
@@ -115,7 +116,7 @@ local function render(s)
     })
   end
   if vim.api.nvim_win_is_valid(s.preview_win) then
-    local target = #s.matches > 0 and s.selected > 0 and (4 + (s.selected - 1) * 2) or 1
+    local target = #s.matches > 0 and s.selected > 0 and (5 + (s.selected - 1) * 2) or 1
     vim.api.nvim_win_set_cursor(s.preview_win, { target, 0 })
   end
 end
@@ -124,6 +125,55 @@ local function edit(s, field)
   local win = field == "search" and s.search_win or s.replace_win
   vim.api.nvim_set_current_win(win)
   vim.cmd("startinsert!")
+end
+
+local function undo_boundary(s)
+  vim.api.nvim_buf_call(s.source_buf, function()
+    vim.cmd("let &undolevels = &undolevels")
+  end)
+end
+
+local function begin_change(s)
+  local previous = s.undo_history[#s.undo_history]
+  if previous and previous.tick ~= vim.api.nvim_buf_get_changedtick(s.source_buf) then
+    s.undo_history = {}
+  end
+  undo_boundary(s)
+end
+
+local function finish_change(s, selected)
+  undo_boundary(s)
+  s.undo_history[#s.undo_history + 1] = {
+    tick = vim.api.nvim_buf_get_changedtick(s.source_buf),
+    selected = selected,
+  }
+end
+
+local function undo_change(s)
+  local last = s.undo_history[#s.undo_history]
+  if not last then
+    vim.notify("このポップアップで戻せる置換はありません", vim.log.levels.INFO)
+    return
+  end
+  if last.tick ~= vim.api.nvim_buf_get_changedtick(s.source_buf) then
+    s.undo_history = {}
+    vim.notify("元のバッファが別途変更されたため、ポップアップからは戻せません", vim.log.levels.WARN)
+    return
+  end
+  local ok, err = pcall(vim.api.nvim_buf_call, s.source_buf, function()
+    vim.cmd("undo")
+  end)
+  if not ok then
+    vim.notify("置換を戻せませんでした: " .. tostring(err), vim.log.levels.ERROR)
+    return
+  end
+  table.remove(s.undo_history)
+  local previous = s.undo_history[#s.undo_history]
+  if previous then
+    previous.tick = vim.api.nvim_buf_get_changedtick(s.source_buf)
+  end
+  s.selected = last.selected
+  render(s)
 end
 
 local function replace_one(s)
@@ -142,7 +192,10 @@ local function replace_one(s)
     return false
   end
 
+  local selected = s.selected
+  begin_change(s)
   vim.api.nvim_buf_set_text(s.source_buf, match.row, match.first, match.row, match.last, { replacement })
+  finish_change(s, selected)
   render(s)
   -- The replacement itself may contain the search text. Move past it.
   local next_byte = match.first + #replacement
@@ -181,12 +234,15 @@ local function replace_all(s)
     return
   end
 
-  local count = #s.matches - s.selected + 1
+  local selected = s.selected
+  local count = #s.matches - selected + 1
+  begin_change(s)
   -- Work backwards so earlier byte columns remain valid, even on the same line.
-  for index = #s.matches, s.selected, -1 do
+  for index = #s.matches, selected, -1 do
     local match = s.matches[index]
     vim.api.nvim_buf_set_text(s.source_buf, match.row, match.first, match.row, match.last, { replacement })
   end
+  finish_change(s, selected)
   s.selected = 1
   render(s)
   vim.notify(string.format("%d 件置換しました", count))
@@ -249,6 +305,7 @@ function M.open()
     windows = { search_win, replace_win, preview_win },
     selected = 1,
     matches = {},
+    undo_history = {},
   }
   session = s
 
@@ -324,6 +381,7 @@ function M.open()
   vim.keymap.set("n", "<CR>", function() replace_one(s) end, { buffer = preview_buf, nowait = true })
   vim.keymap.set("n", "n", function() skip_one(s) end, { buffer = preview_buf, nowait = true })
   vim.keymap.set("n", "a", function() replace_all(s) end, { buffer = preview_buf, nowait = true })
+  vim.keymap.set("n", "u", function() undo_change(s) end, { buffer = preview_buf, nowait = true })
   vim.keymap.set("n", "l", function()
     if replace_one(s) then
       close()
