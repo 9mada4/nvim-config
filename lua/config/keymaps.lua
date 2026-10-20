@@ -10,32 +10,10 @@ vim.keymap.set("n", "<leader>h", function()
   vim.opt.hlsearch = not vim.opt.hlsearch:get()
 end, { desc = "Search: toggle highlight" })
 
--- 最後に検索した語を使って，カーソル位置以降を確認しながら置換する
--- 例: /status で検索したあと <leader>sr
 vim.keymap.set("n", "<leader>sr", function()
-  local last_search = vim.fn.getreg("/")
-  if last_search == "" then
-    vim.notify("No previous search pattern", vim.log.levels.WARN)
-    return ""
-  end
-
-  local lnum = vim.fn.line(".")
-  local col = vim.fn.col(".")
-
-  -- current line starts at current column; later lines start from column 1
-  local tail = "/gc|nohlsearch"
-  return string.format(
-    ":.,$s/\\%%(\\%%>%dl\\|\\%%%dl\\%%>%dc\\)\\zs<C-r>/%s%s",
-    lnum,
-    lnum,
-    col - 1,
-    tail,
-    string.rep("<Left>", #tail)
-  )
+  require("config.replace_popup").open()
 end, {
-  noremap = true,
-  expr = true,
-  desc = "Replace last search with confirm",
+  desc = "Replace in current buffer with preview",
 })
 
 -- Markdownプレビューを外部ブラウザで表示（VSCode風リッチ表示）

@@ -32,7 +32,10 @@
  編集   vc     cc   vwc    C       
  カット vd     dd   vwd    D       
 [Search]           ? 上に検索   * カーソル単語検索
-Spc sr  単語置換   / 下に検索   N ←→ n 選択
+Spc sr  現在のバッファをポップアップで置換（検索語→Tab→置換語→Enter）
+        プレビュー: j/k 選択  y/Enter 1件置換  n スキップ  a 残り全部置換
+                    l 1件置換して終了  e/E 入力へ戻る  q 閉じる
+        / 下に検索   N ←→ n 選択
 Spc sR  作業ディレクトリ全体の検索・置換
          Normal Enter  全アクション選択（下分割）
 Spc h   検索Highlight ON/OFF   :noh 一時解除
