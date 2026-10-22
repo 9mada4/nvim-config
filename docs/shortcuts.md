@@ -1,3 +1,4 @@
+[Help]   Spc + ?  ヒント表示（j/kでスクロール、qで閉じる）
 [Move]    h j k l     Ctrl + w : move window
           ← ↓ ↑ →
      gg       next   ↱w  → w → w     画面表示

@@ -204,9 +204,9 @@ vim.keymap.set("n", "<leader>gd", function()
   vim.keymap.set("n", "<C-[>", "<cmd>close<CR>", { buffer = buf, silent = true })
 end, { desc = "Git diff popup" })
 
--- ショートカットをポップアップ Spc + ?
+-- ショートカットをポップアップ Spc + ?（q で閉じる）
 vim.keymap.set("n", "<leader>?", function()
-  local sep = package.config:sub(1, 1)                        
+  local sep = package.config:sub(1, 1)
   local path = vim.fn.stdpath("config") .. sep .. "docs" .. sep .. "shortcuts.md"
 
   if vim.fn.filereadable(path) ~= 1 then
@@ -217,11 +217,36 @@ vim.keymap.set("n", "<leader>?", function()
   end
 
   local lines = vim.fn.readfile(path)
-  local content = table.concat(lines, "\n")
+  local buf = vim.api.nvim_create_buf(false, true)
+  vim.api.nvim_buf_set_lines(buf, 0, -1, false, lines)
+  vim.bo[buf].bufhidden = "wipe"
+  vim.bo[buf].swapfile = false
+  vim.bo[buf].modifiable = false
 
-  vim.notify(content, vim.log.levels.INFO, {
-    title = "Shortcut Memo",
-    timeout = 10000,
+  local content_width = 40
+  for _, line in ipairs(lines) do
+    content_width = math.max(content_width, vim.fn.strdisplaywidth(line))
+  end
+  local width = math.max(1, math.min(content_width + 2, vim.o.columns - 4))
+  local height = math.max(1, math.min(#lines, vim.o.lines - vim.o.cmdheight - 4))
+  local win = vim.api.nvim_open_win(buf, true, {
+    relative = "editor",
+    width = width,
+    height = height,
+    row = math.max(0, math.floor((vim.o.lines - vim.o.cmdheight - height) / 2) - 1),
+    col = math.max(0, math.floor((vim.o.columns - width) / 2) - 1),
+    style = "minimal",
+    border = "rounded",
+    title = " Shortcut Memo (q: close) ",
+    title_pos = "center",
+  })
+  vim.wo[win].wrap = false
+  vim.wo[win].foldenable = false
+  vim.keymap.set("n", "q", "<cmd>close<CR>", {
+    buffer = buf,
+    silent = true,
+    nowait = true,
+    desc = "Close shortcut memo",
   })
 end, { desc = "Show memo popup" })
 
