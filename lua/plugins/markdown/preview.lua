@@ -11,6 +11,16 @@ return {
       if result.code ~= 0 then
         error("Failed to install markdown-preview.nvim: " .. (result.stderr or "unknown error"))
       end
+
+      local mermaid_asset = plugin.dir .. "/app/_static/mermaid.min.js"
+      local update = vim.system({
+        "node",
+        vim.fn.stdpath("config") .. "/scripts/install-markdown-preview-mermaid.cjs",
+        mermaid_asset,
+      }, { text = true }):wait()
+      if update.code ~= 0 then
+        error("Failed to install Mermaid 11 for markdown-preview.nvim: " .. (update.stderr or "unknown error"))
+      end
     end,
     init = function()
       vim.g.mkdp_auto_start = 0
