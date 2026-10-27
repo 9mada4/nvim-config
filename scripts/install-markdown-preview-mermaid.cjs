@@ -27,6 +27,7 @@ async function main() {
   const absolutePath = path.resolve(assetPath)
   const temporaryPath = `${absolutePath}.${process.pid}.tmp`
   const currentMode = await fs.stat(absolutePath).then((stat) => stat.mode & 0o777).catch(() => 0o644)
+  await fs.mkdir(path.dirname(absolutePath), { recursive: true })
   await fs.writeFile(temporaryPath, contents, { mode: currentMode })
   await fs.rename(temporaryPath, absolutePath)
   console.log(`Installed Mermaid ${version} in ${absolutePath}`)

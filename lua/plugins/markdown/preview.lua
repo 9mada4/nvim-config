@@ -4,7 +4,10 @@ return {
     ft = { "markdown" },
     cmd = { "MarkdownPreview", "MarkdownPreviewStop", "MarkdownPreviewToggle" },
     build = function(plugin)
-      local result = vim.system({ "yarn", "install", "--frozen-lockfile" }, {
+      local yarn = vim.fn.executable("yarn") == 1
+          and { "yarn", "install", "--frozen-lockfile" }
+        or { "npm", "exec", "--yes", "--package=yarn@1.22.22", "--", "yarn", "install", "--frozen-lockfile" }
+      local result = vim.system(yarn, {
         cwd = plugin.dir .. "/app",
         text = true,
       }):wait()
@@ -12,7 +15,7 @@ return {
         error("Failed to install markdown-preview.nvim: " .. (result.stderr or "unknown error"))
       end
 
-      local mermaid_asset = plugin.dir .. "/app/_static/mermaid.min.js"
+      local mermaid_asset = vim.fn.stdpath("data") .. "/markdown-preview/mermaid.min.js"
       local update = vim.system({
         "node",
         vim.fn.stdpath("config") .. "/scripts/install-markdown-preview-mermaid.cjs",
@@ -37,6 +40,7 @@ return {
     config = function()
       -- Override the plugin's refresh events while keeping its preview lifecycle.
       vim.cmd.source(vim.fn.stdpath("config") .. "/autoload/mkdp/autocmd.vim")
+      require("config.markdown_preview").setup_commands()
     end,
   },
   {
