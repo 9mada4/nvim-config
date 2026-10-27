@@ -54,10 +54,10 @@ return {
       })
 
       require("scrollbar").setup({
-        scrollbar = {
-          set_highlights = true,
-          excluded_buftypes = { "terminal" },
-          excluded_filetypes = {
+        set_highlights = true,
+        exclude = {
+          buftypes = { "terminal" },
+          filetypes = {
             "NvimTree",
             "TelescopePrompt",
             "cmp_docs",
@@ -70,56 +70,58 @@ return {
             "prompt",
             "reposcope",
           },
-          marks = {
-            Cursor = {
-              text = "•",
-              highlight = { fg = colors.fg_gutter },
-            },
-            Search = {
-              highlight = { fg = colors.orange },
-            },
-            Error = {
-              highlight = { fg = colors.error },
-            },
-            Warn = {
-              highlight = { fg = colors.warning },
-            },
-            Info = {
-              highlight = { fg = colors.info },
-            },
-            Hint = {
-              highlight = { fg = colors.hint },
-            },
-            Misc = {
-              text = { "•", "•" },
-              highlight = { fg = "#5a678f" },
-            },
-            GitAdd = {
-              highlight = { fg = colors.green },
-            },
-            GitChange = {
-              highlight = { fg = colors.yellow },
-            },
-            GitDelete = {
-              highlight = { fg = colors.red },
-            },
+        },
+        marks = {
+          Cursor = {
+            text = "•",
+            highlight = { fg = colors.fg_gutter },
           },
-          providers = {
-            cursor = true,
-            diagnostic = true,
-            gitsigns = true,
-            search = false,
-            marks = false,
-            ale = false,
+          Search = {
+            highlight = { fg = colors.orange },
           },
+          Error = {
+            highlight = { fg = colors.error },
+          },
+          Warn = {
+            highlight = { fg = colors.warning },
+          },
+          Info = {
+            highlight = { fg = colors.info },
+          },
+          Hint = {
+            highlight = { fg = colors.hint },
+          },
+          Misc = {
+            text = { "•", "•" },
+            highlight = { fg = "#5a678f" },
+          },
+          GitAdd = {
+            highlight = { fg = colors.green },
+          },
+          GitChange = {
+            highlight = { fg = colors.yellow },
+          },
+          GitDelete = {
+            highlight = { fg = colors.red },
+          },
+        },
+        providers = {
+          cursor = true,
+          diagnostic = true,
+          gitsigns = true,
+          search = false,
+          marks = false,
+          ale = false,
+        },
+        scrollbar = {
           show = true,
           visibility = "active",
-          render = { geometry = "screen" },
+          unit = "screenline",
           max_lines = false,
           hide_if_all_visible = false,
-          float = { hide_on_cursor = false },
-          mouse = { enabled = false },
-          update = { interval_ms = 80 },
+          hide_on_cursor = false,
+          mouse = false,
+          throttle_ms = 80,
           layout = {
             columns = { { "thumb", "marks" } },
           },
