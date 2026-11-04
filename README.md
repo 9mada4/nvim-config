@@ -127,6 +127,8 @@ nvim
 ```
 `:Lazy`->`shift+s`(S)で読み込み
 
+Markdown のブラウザプレビューで `mermaid version 10.2.3` のエラーが出る場合は、`:Lazy build markdown-preview.nvim` で Mermaid 11 を導入し、Neovim を再起動してください。プラグイン本体に更新がない場合、`Sync` だけでは再ビルドされません。
+
 <h2 id="codex-image-shortcut"></h2>
 
 ## 5. Codex image shortcut
