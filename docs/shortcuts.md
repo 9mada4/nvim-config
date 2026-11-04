@@ -16,6 +16,9 @@
             + mv  md外部プレビュー
             + mf  TeX PDFを開く
             + mc  TeX途中生成物を削除
+       macOS Insert: ⌘Z undo / ⌘⇧Z redo（Insertを継続）
+       macOS ⌘V: ターミナル標準の貼り付け
+       ※ ⌘Z/⌘⇧Zはターミナル側からNeovimへキーを送信する設定が必要
        CSV   Spc + cv  表表示ON/OFF（初期はOFF）
              Tab/Shift-Tab/Enter  セル移動（表表示ON時）
 

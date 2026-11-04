@@ -1,6 +1,13 @@
 -- Insertモードで jj → Normalへ戻る
 vim.keymap.set("i", "jj", "<Esc>", { noremap = true, silent = true })
 
+-- ⌘V はターミナル標準の貼り付けを使う（Neovim側では割り当てない）。
+-- Undoを区切り、1コマンド実行した後はInsertモードに戻る。
+if require("config.os").is_macos then
+  vim.keymap.set("i", "<D-z>", "<C-g>u<C-o>u", { silent = true, desc = "Undo (Insert)" })
+  vim.keymap.set("i", "<D-S-z>", "<C-g>u<C-o><C-r>", { silent = true, desc = "Redo (Insert)" })
+end
+
 -- Visual modeで，K/J により選択中の行を上下に移動して再選択する
 vim.keymap.set("v", "K", ":m '<-2<CR>gv=gv")
 vim.keymap.set("v", "J", ":m '>+1<CR>gv=gv")
