@@ -35,6 +35,7 @@ winget install -e --id JesseDuffield.lazygit
 winget install -e --id charmbracelet.glow    # markdownプレビュー用
 winget install -e --id GitHub.cli    # octo.nvim用
 winget install -e --id OpenJS.NodeJS.LTS
+winget install --source winget --exact --id tree-sitter.tree-sitter-cli
 ```
 - Nodejsは管理者必要かも
 
