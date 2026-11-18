@@ -200,7 +200,6 @@ local function build_tex(root_file)
     "-e",
     "$dvipdf=q/dvipdfmx %O -o %D %S/",
     "-norc",
-    "-gg",
     "-pdfdvi",
     root_name,
   }
@@ -220,7 +219,6 @@ local function build_tex(root_file)
 
     if result.code == 0 then
       vim.schedule(function()
-        clean_aux_files(root_file)
         vim.fn.setqflist({}, "r")
         open_pdf_for_root(root_file, { notify_missing = false })
         vim.notify("updated " .. pdf_path_for_root(root_file), vim.log.levels.INFO, {
