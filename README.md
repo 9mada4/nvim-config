@@ -177,7 +177,7 @@ Codex CLI に直接打つコマンド:
 
 <h2 id="ime-setting"></h2>
 
-## 6. IME setting (不完全，改修中)
+## 6. IME setting
 (optional)
 
 ### macOS
@@ -203,6 +203,23 @@ im-select com.apple.keylayout.ABC
 ```
 
 Neovim を再起動し、日本語入力に切り替えてから別アプリへ移動し、戻ったときに英数になることを確認してください。
+
+#### Google日本語入力中の `jj` で Normal モードへ戻る
+
+日本語入力中は `j` がIMEの未確定文字になり、Neovim の `jj` マッピングに届きません。そこで Google日本語入力のローマ字テーブルで `jj` を ESC 文字（U+001B）に変換し、`DirectInput` 属性で即確定させます。Neovim は ESC を受け取って Normal モードへ戻り、上記の `InsertLeave` で英数に切り替わります。キー監視の常駐プロセスは不要です。
+
+```zsh
+python3 ~/.config/nvim/tools/macos/google-japanese-input/jj-esc.py            # 設定（自動バックアップ）
+python3 ~/.config/nvim/tools/macos/google-japanese-input/jj-esc.py --status   # 確認
+python3 ~/.config/nvim/tools/macos/google-japanese-input/jj-esc.py --remove   # 元の「っ」+ j に戻す
+```
+
+- 設定ファイル `~/Library/Application Support/Google/JapaneseInput/config1.db` を書き換え、変換エンジンを再起動します。バックアップは同じ場所に `config1.db.bak-日時` で作られます。
+- 未確定文字がない状態の `jj` は即座に Esc になります。`かjj` のように未確定文字がある場合は Enter で確定すると、「か」が入力されてから Normal に戻ります。
+- Google日本語入力全体の設定なので、他のアプリで `jj` を打つと制御文字が入ります。`っj` が必要な語（例: バッジ）は `xtu` などで入力してください。
+- 設定画面でローマ字テーブルを編集・保存すると `DirectInput` 属性が消えるため、その後はスクリプトを再実行してください。
+- macOS のターミナル上の Neovim で動作を確認済みです。
+- 同梱の `romanji-hiragana.tsv` は Mozc の標準ローマ字テーブルです（`LICENSE.mozc`）。
 
 ### Windows
 
