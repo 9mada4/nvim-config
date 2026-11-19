@@ -15,9 +15,6 @@
 
 ## todo
 
-https://youtu.be/80zZQLe0NNg?si=i35CENhmjsgItoPy <br>
-zz, zb, zt
-
 <h2 id="install-neovim"></h2>
 
 ## 1. Install Neovim (include `Font`, `Lazygit`)
@@ -51,8 +48,10 @@ brew install pngpaste
 brew install glow
 brew install ripgrep
 brew install codex
+brew install daipeihust/tap/im-select
 ```
 - lazygit: Github管理用, pngpaste: 画像コピペ用, gh: github, glow: md preview用, ripgrep: テキスト検索用
+- im-select: Neovim 起動時・フォーカス復帰時・挿入モード終了時の英数切り替え用
 
 <h2 id="set-font"></h2>
 
@@ -180,11 +179,38 @@ Codex CLI に直接打つコマンド:
 
 ## 6. IME setting (不完全，改修中)
 (optional)
+
+### macOS
+
+`im-select` をインストールすると、`lua/config/ime.lua` が次のタイミングで入力ソースを ABC（英数）へ切り替えます。
+
+- Neovim 起動時（`VimEnter`）
+- Neovim にフォーカスが戻ったとき（`FocusGained`、挿入モード中も対象）
+- 挿入モード終了時（`InsertLeave`）
+
+切り替え時だけコマンドを実行するため、常駐プロセスやキー入力の監視は不要です。日本語は手動で切り替えて入力でき、挿入モードに入る際の日本語入力の自動復元は行いません。
+
+前提と対象範囲:
+
+- macOS の入力ソースに「ABC」を登録してください。
+- ターミナルがフォーカス通知を Neovim に送る必要があります。標準ターミナル.appとChatGPT.app内のCodexでは確認済みです。
+- `im-select` が未インストールなら何もしません。PATH にない場合は Homebrew の標準パスも検索します。
+
+手動確認:
+
+```zsh
+im-select com.apple.keylayout.ABC
+```
+
+Neovim を再起動し、日本語入力に切り替えてから別アプリへ移動し、戻ったときに英数になることを確認してください。
+
+### Windows
+
 Windows terminal Neovim では、InsertLeave 時に PowerShell で「無変換」キーを送信して IME OFF を行います。
 
 - Script: `tools/windows/send-nonconvert.ps1`
 - Trigger: `InsertLeave` only
-- Scope: Windows only(macOS/Linux では何もしない)
+- Scope: Windows only（Linux では何もしない）
 - Dependencies: PowerShell が必要
 - Not required: Python / `pynvim` / remote plugin / custom exe
 
