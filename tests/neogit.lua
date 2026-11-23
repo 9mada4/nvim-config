@@ -74,6 +74,8 @@ local ok, failure = xpcall(function()
   write("unstaged.lua", "return 1")
   git({ "add", "." })
   git({ "commit", "-qm", "fixture" })
+  -- Untracked files make the status buffer taller than the window.
+  for i = 1, 60 do write(string.format("scroll%02d.txt", i), "x") end
   vim.fn.chdir(temporary)
   local spec = dofile(root .. "/lua/plugins/editor/neogit.lua")
   spec.opts.kind = "replace"
@@ -145,6 +147,14 @@ local ok, failure = xpcall(function()
   check(hints()[1] == "Tab Diff | s Stage | u Unstage | c Commit | x Discard", "first hint matches keys: " .. vim.inspect(hints()))
   check(hints()[2] == "p Pull | P Push | Z Stash | ? Help | q Close", "second hint matches keys")
   check(vim.fn.winsaveview().topfill == 2, "both virtual hint rows are visible above the first buffer row")
+  wait(function() return vim.api.nvim_buf_line_count(status_buf) > vim.api.nvim_win_get_height(0) end,
+    "status lists enough files to scroll")
+  vim.cmd("normal! G")
+  vim.api.nvim_exec_autocmds("WinScrolled", {})
+  check(vim.fn.winsaveview().topline > 1, "status scrolls past the hints")
+  vim.cmd("normal! gg")
+  vim.api.nvim_exec_autocmds({ "WinScrolled", "CursorMoved" }, { buffer = status_buf })
+  check(vim.fn.winsaveview().topfill == 2, "hints return after scrolling back to top")
   if #vim.api.nvim_list_uis() > 0 then
     vim.cmd.redraw()
     local screen = {}

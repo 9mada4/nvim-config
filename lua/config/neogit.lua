@@ -1,6 +1,7 @@
 local M = {}
 local active_commits = {}
 local hint_namespace = vim.api.nvim_create_namespace("nvim-config-neogit-hints")
+M.hint_rows = 2
 
 -- Popup actions already run in Neogit's async context. Reject index changes
 -- during generation, and always ask Git to open Neogit's normal editor (-e).
@@ -134,6 +135,22 @@ function M.setup_hints()
         vim.schedule(function()
           M.update_hints(args.buf)
         end)
+      end
+    end,
+  })
+  -- Filler rows above line 1 are only shown while topfill > 0. Cursor motions
+  -- such as k/gg reset it to 0, so restore it whenever line 1 is at the top.
+  vim.api.nvim_create_autocmd({ "WinScrolled", "CursorMoved" }, {
+    group = group,
+    callback = function()
+      local buf = vim.api.nvim_get_current_buf()
+      if vim.bo[buf].filetype ~= "NeogitStatus" then
+        return
+      end
+      local view = vim.fn.winsaveview()
+      if view.topline == 1 and view.topfill < M.hint_rows then
+        view.topfill = M.hint_rows
+        vim.fn.winrestview(view)
       end
     end,
   })
