@@ -22,5 +22,6 @@ return {
   config = function(_, opts)
     require("neogit").setup(opts)
     require("config.neogit").setup_hints()
+    require("config.neogit_popup").setup()
   end,
 }

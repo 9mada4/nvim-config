@@ -263,6 +263,15 @@ powershell -NoProfile -NonInteractive -ExecutionPolicy Bypass -File .\tools\wind
 
 Commitメニューの拡張には[公式のPopup Builder](https://github.com/NeogitOrg/neogit/blob/master/doc/neogit.txt#L2230)を使います。上部ヒントには項目追加の標準APIがないため、`disable_hint` とNeovimの仮想行APIを組み合わせています。キーはNeogitの設定から取得し、Status表示・再表示・更新時に描画します。Neogit本体は変更せず、バッファの行番号や選択範囲にも影響しません。狭いウィンドウでは右端が省略されます。検証は `nvim --clean --headless -i NONE -l tests/neogit.lua`（インストール済みNeogit/plenary、一時リポジトリ、LLM応答のみスタブ）と `nvim --clean --headless -l tests/commit-msg.lua` で実行できます。
 
+### Neogitポップアップの選択と日本語説明
+
+- 各ポップアップ（`?` のヘルプを含む）でカーソルを動かすと、カーソル下の操作・スイッチが強調表示されます。
+- `Enter` / `Space` で選択中の項目を実行します。キーを直接押した場合と同じ動作です。
+- `?` で選択中の項目の日本語説明（何が起きるか・注意・相当するgitコマンド）を表示し、`q` / `Esc` で閉じます。説明がない状態で `q` を押すとポップアップを閉じます。
+- 説明文は `lua/config/neogit_help_ja.lua` に追加できます。未登録の項目は英語の説明と「説明未登録」を表示します。
+- ステータス画面で下へスクロールした後に `k` / `gg` で先頭へ戻ると、上部ヒントが再表示されます。
+- 検証: `nvim --clean --headless -i NONE -l tests/neogit-popup.lua`
+
 <h2 id="first-setup-checklist"></h2>
 
 ## 8. First setup checklist
