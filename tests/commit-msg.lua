@@ -97,13 +97,14 @@ local function write(path, text)
   vim.fn.writefile(vim.split(text, "\n", { plain = true }), temporary .. "/" .. path, "b")
 end
 
-local function generate(mode, inspect)
+local function generate(mode, inspect, fail_llm)
   local output = {}
   vim.env.NVIM_COMMIT_MSG_MODE = mode
   dofile = function(path)
     if path:match("/scripts/commit%-msg%-llm%.lua$") then
       return { summarize = function(files)
         inspect(files)
+        if fail_llm then return {} end
         local summaries = {}
         for index in ipairs(files) do
           summaries["F" .. index] = "処理の条件を変更した。\n設定値を変更した。"
@@ -154,6 +155,9 @@ local ok, failure = xpcall(function()
   check(has(output, "a.lua:\n処理の条件を変更した。\n設定値を変更した。\n\n") and has(output, "\n\nb.lua:\n"),
     "prefix each file and join sentences and files with newlines")
   local full = generate("full", function() end)
+  local rule = generate("rule", function() error("rule mode must never call LLM") end)
+  check(full:sub(1, #rule - 1) == rule:sub(1, -2), "full mode preserves the complete rule subject and body")
+  check(generate("full", function() end, true) == rule, "full mode keeps the rule message on LLM failure")
   check(not has(full:match("^[^\n]+"), "処理の条件"), "keep generated paragraphs out of the commit subject")
   check(has(full, "\n\na.lua:\n"), "full mode puts summaries in the body")
   git({ "reset", "--hard", "-q", "HEAD" })
@@ -162,6 +166,19 @@ local ok, failure = xpcall(function()
     check(#files == 1 and files[1].before == "return 1\n", "unstaged before must come from the index")
     check(files[1].after == "return 5\n", "unstaged after must come from the worktree")
   end)
+  local function staged_only()
+    return vim.system({ vim.v.progpath, "--clean", "--headless",
+      "+lua dofile(" .. string.format("%q", root .. "/scripts/generate-commit-msg.lua") .. ")", "+qa" }, {
+      cwd = temporary, text = true,
+      env = { NVIM_COMMIT_MSG_MODE = "rule", NVIM_COMMIT_MSG_STAGED_ONLY = "1" },
+    }):wait()
+  end
+  local response = staged_only()
+  check(response.code == 0 and vim.trim(response.stdout) == "変更がありません",
+    "staged-only mode excludes unstaged changes and writes its result to stdout")
+  git({ "restore", "." })
+  response = staged_only()
+  check(response.code == 0 and vim.trim(response.stdout) == "変更がありません", "clean repository is handled")
 end, debug.traceback)
 
 dofile = real_dofile

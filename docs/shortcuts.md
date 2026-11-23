@@ -45,8 +45,20 @@ Spc sr  現在のバッファをポップアップで置換（検索語→Tab→
 Spc sR  作業ディレクトリ全体の検索・置換
          Normal Enter  全アクション選択（下分割）
 Spc h   検索Highlight ON/OFF   :noh 一時解除
-[Git] p  pull   Spc gg  Open Neogit   G  コミットメッセージ生成
-      P  push   Spc gd  git diff      R  pull --rebase
-                Spc gm  LLM補足文プレビュー（コミット編集画面）
+[Git] Spc gg  Open Neogit   Spc gd  git diff
+      Status: Tab Diff | s Stage | u Unstage | c Commit | x Discard
+              p Pull  | P Push  | Z Stash   | ? Help   | q Close
+      c → c  通常のコミット編集
+      c → g  Generate (Rule): ルールのみ（LLMなし）
+      c → G  Generate (Rule + LLM): 件名はルール、本文にLLM補足
+      p → -r → p/u  Pull --rebase（Pullメニューで-rをON、取得元を選択）
+      生成はステージ済みの変更のみ。先にsでステージする。
+      生成操作はCommit Popupのフラグを使わない（-aも適用しない）。
+      LLM生成は非同期。完了後に編集画面が開き、失敗時はルール文を保持する。
+      編集して :wq / Ctrl-c Ctrl-c で確定、Ctrl-c Ctrl-k で中止。
+      Spc gm  生成済みLLM補足文をプレビュー（c → Gの編集画面、再生成なし）
+              本文に挿入済み。Enter/q/Escでプレビューを閉じる。
+      上部2行は設定済みキーを使う仮想行。狭いウィンドウでは右端が省略される。
+      Statusの独自R/Gは廃止。標準キーは維持（RはNeogit標準のRename）。
 [VimCmd]    :q  quit    :q!  force
             :w  save    :e   open

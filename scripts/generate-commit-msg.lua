@@ -300,13 +300,16 @@ local files
 if use_staged then
   changes = git_name_status(true)
   files = git_name_only(true)
+elseif vim.env.NVIM_COMMIT_MSG_STAGED_ONLY == "1" then
+  io.stdout:write("変更がありません\n")
+  os.exit(0)
 else
   vim.fn.system({ "git", "diff", "--quiet" })
   if vim.v.shell_error ~= 0 then
     changes = git_name_status(false)
     files = git_name_only(false)
   else
-    print("変更がありません")
+    io.stdout:write("変更がありません\n")
     os.exit(0)
   end
 end
@@ -317,7 +320,7 @@ if not changes or not files then
 end
 
 if is_empty(changes) or is_empty(files) then
-  print("変更がありません")
+  io.stdout:write("変更がありません\n")
   os.exit(0)
 end
 
