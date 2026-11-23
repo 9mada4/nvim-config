@@ -194,6 +194,13 @@ local ok, failure = xpcall(function()
     local contents = table.concat(vim.api.nvim_buf_get_lines(popup, 0, -1, false), "\n")
     check(contents:find("Generate (Rule)", 1, true) and contents:find("Generate (Rule + LLM)", 1, true),
       "both generation modes are visible in commit popup")
+    for _, line in ipairs(vim.api.nvim_buf_get_lines(popup, 0, -1, false)) do
+      local col = line:find("G Generate (Rule + LLM)", 1, true)
+      if col then
+        local finish = vim.fn.strdisplaywidth(line:sub(1, col - 1)) + #"G Generate (Rule + LLM)"
+        check(finish <= 50, "generation column sits next to Create so narrow windows show it: ends at " .. finish)
+      end
+    end
     if stage_all then key(popup, "-a") end
     key(popup, lhs)
     return { done = function() return action_done end }

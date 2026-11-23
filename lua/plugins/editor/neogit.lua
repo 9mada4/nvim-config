@@ -16,6 +16,11 @@ return {
           :action("G", "Generate (Rule + LLM)", function()
             require("config.neogit").commit("full")
           end)
+        -- Groups render as columns without wrapping; the commit popup is
+        -- ~100 columns wide, so a last column is cut off in narrow windows.
+        -- Place Generate right after Create.
+        local groups = builder.state.actions
+        table.insert(groups, 2, table.remove(groups))
       end,
     },
   },
