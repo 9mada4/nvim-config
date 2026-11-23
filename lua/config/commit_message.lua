@@ -191,7 +191,54 @@ function M.start(buf, cwd)
   end)
 end
 
+-- Git treats everything before the first blank line as the subject.
+-- Insert that blank line when line 2 holds body text (comments are ignored).
+function M.ensure_subject_separator(buf)
+  local lines = vim.api.nvim_buf_get_lines(buf, 0, 2, false)
+  local subject, second = lines[1], lines[2]
+  if not subject or not second or vim.trim(subject) == "" or subject:match("^#") then
+    return false
+  end
+  if vim.trim(second) == "" or second:match("^#") then
+    return false
+  end
+  vim.api.nvim_buf_set_lines(buf, 1, 1, false, { "" })
+  return true
+end
+
+-- :w/:wq/:x/ZZ and Neogit's submit all write the buffer, so BufWritePre covers them.
+-- A plain :q on an unchanged buffer commits the file as-is, so fix and save it in QuitPre.
+function M.setup_subject_separator()
+  local group = vim.api.nvim_create_augroup("NvimConfigCommitSubject", { clear = true })
+  vim.api.nvim_create_autocmd("FileType", {
+    group = group,
+    pattern = "gitcommit",
+    callback = function(args)
+      vim.api.nvim_clear_autocmds({ group = group, buffer = args.buf })
+      vim.api.nvim_create_autocmd("BufWritePre", {
+        group = group,
+        buffer = args.buf,
+        callback = function()
+          M.ensure_subject_separator(args.buf)
+        end,
+      })
+      vim.api.nvim_create_autocmd("QuitPre", {
+        group = group,
+        buffer = args.buf,
+        callback = function()
+          if not vim.bo[args.buf].modified and M.ensure_subject_separator(args.buf) then
+            vim.api.nvim_buf_call(args.buf, function()
+              vim.cmd("silent noautocmd write")
+            end)
+          end
+        end,
+      })
+    end,
+  })
+end
+
 function M.setup()
+  M.setup_subject_separator()
   if vim.env.NVIM_GENERATE_COMMIT_MSG ~= "1" then
     return
   end

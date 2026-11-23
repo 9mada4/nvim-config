@@ -220,9 +220,10 @@ local ok, failure = xpcall(function()
   check(git({ "rev-parse", "HEAD" }) == head, "generation alone never commits")
   check(vim.api.nvim_buf_get_lines(buf, 0, 1, false)[1]:find("staged.lua", 1, true), "rule fills editor")
   check(not table.concat(vim.api.nvim_buf_get_lines(buf, 0, -1, false), "\n"):find("戻り値", 1, true), "rule has no LLM body")
-  vim.api.nvim_buf_set_lines(buf, 0, 1, false, { "test: 手動で確認・編集" })
+  vim.api.nvim_buf_set_lines(buf, 0, 1, false, { "test: 手動で確認・編集", "本文を2行目に書いた" })
   finish(task, buf, true)
   check(git({ "log", "-1", "--format=%s" }) == "test: 手動で確認・編集", "manual edits are committed")
+  check(git({ "log", "-1", "--format=%b" }):find("^本文を2行目に書いた"), "blank line is inserted after the subject on submit")
   check(git({ "show", "HEAD:unstaged.lua" }) == "return 1", "generated commit ignores -a and excludes unstaged contents")
 
   fixture()
@@ -264,11 +265,17 @@ local ok, failure = xpcall(function()
   change_index = false
 
   -- Standard c c remains the original action and still opens an editable buffer.
+  commit_message.setup_subject_separator()
   task = commit("c")
   buf = editor(task)
-  vim.api.nvim_buf_set_lines(buf, 0, 1, false, { "test: 通常のコミット" })
-  finish(task, buf, true)
+  vim.api.nvim_buf_set_lines(buf, 0, 1, false, { "test: 通常のコミット", "qで閉じた本文" })
+  -- Save without the hook, then :q in the real Neogit editor window.
+  vim.api.nvim_buf_call(buf, function() vim.cmd("silent noautocmd write") end)
+  vim.api.nvim_set_current_win(vim.fn.bufwinid(buf))
+  vim.cmd("quit")
+  wait(function() return task:done() end, ":q completes the commit")
   check(git({ "log", "-1", "--format=%s" }) == "test: 通常のコミット", "standard c c unchanged")
+  check(git({ "log", "-1", "--format=%b" }):find("^qで閉じた本文"), ":q in Neogit editor separates subject and body")
   for _, clean in ipairs({ false, true }) do
     if clean then git({ "restore", "." }) end
     local calls_before = llm_calls
@@ -301,6 +308,24 @@ local ok, failure = xpcall(function()
   check(table.concat(vim.api.nvim_buf_get_lines(legacy, 0, -1, false), "\n"):find("戻り値を変更した。", 1, true),
     "legacy preview Enter still inserts at the cursor")
   vim.api.nvim_buf_delete(legacy, { force = true })
+  -- :q on an unchanged commit buffer still separates subject and body on disk.
+  commit_message.setup_subject_separator()
+  local quit_path = temporary .. "/QUIT_EDITMSG"
+  vim.fn.writefile({ "test: 件名", "本文", "# comment" }, quit_path)
+  vim.cmd.edit(vim.fn.fnameescape(quit_path))
+  local quit_buf = vim.api.nvim_get_current_buf()
+  vim.bo[quit_buf].filetype = "gitcommit"
+  vim.api.nvim_exec_autocmds("QuitPre", { buffer = quit_buf })
+  check(vim.deep_equal(vim.fn.readfile(quit_path), { "test: 件名", "", "本文", "# comment" }),
+    ":q writes the blank line after the subject")
+  check(not vim.bo[quit_buf].modified, ":q leaves the buffer saved")
+  vim.api.nvim_exec_autocmds("QuitPre", { buffer = quit_buf })
+  check(#vim.fn.readfile(quit_path) == 4, "separator is inserted only once")
+  vim.api.nvim_buf_set_lines(quit_buf, 0, -1, false, { "test: 件名", "# comment only" })
+  vim.cmd("silent write")
+  check(vim.deep_equal(vim.fn.readfile(quit_path), { "test: 件名", "# comment only" }),
+    "comment on line 2 is left untouched")
+  vim.api.nvim_buf_delete(quit_buf, { force = true })
   wait(function()
     local refresh = require("neogit.lib.git").repo._refresh_task
     return not refresh or refresh:done()
