@@ -177,6 +177,11 @@ local ok, failure = xpcall(function()
   key(helpbuf, "<CR>")
   wait(function() return buffer("NeogitPullPopup") end, "<CR> on Pull in help opens pull popup")
   key(buffer("NeogitPullPopup"), "q")
+  wait(function()
+    local refresh = require("neogit.lib.git").repo._refresh_task
+    return not refresh or refresh:done()
+  end, "final repository refresh finishes before fixture removal")
+  vim.api.nvim_buf_delete(status_buf, { force = true })
 end, debug.traceback)
 
 vim.fn.chdir(original_cwd)
