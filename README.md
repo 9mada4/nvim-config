@@ -1,13 +1,13 @@
 # Neovim setup
 ## 目次
 - [todo](#todo)
-- [1. Install Neovim (include `Font`, `lazygit`)](#install-neovim)
+- [1. Install Neovim (include `Font`)](#install-neovim)
 - [2. Set Font](#set-font)
 - [3. Clone config](#clone-config)
 - [4. Open Neovim](#open-neovim)
 - [5. Codex image shortcut](#codex-image-shortcut)
 - [6. IME setting (optional)](#ime-setting)
-- [7. Custom LazyGit (optional: LazyGit users)](#custom-lazygit)
+- [7. Neogit](#neogit)
 - [8. First setup checklist](#first-setup-checklist)
 - [How to update](#how-to-update)
 - [If you require SSH](#if-you-require-ssh)
@@ -17,7 +17,7 @@
 
 <h2 id="install-neovim"></h2>
 
-## 1. Install Neovim (include `Font`, `Lazygit`)
+## 1. Install Neovim (include `Font`)
 
 ### Windows
 Windows 11(PowerShell)での初回導入を想定した前提ツール(詳細インストール手順は省略):
@@ -28,7 +28,6 @@ winget install -e --id Neovim.Neovim
 winget install -e --id Git.Git
 winget install -e --id DEVCOM.JetBrainsMonoNerdFont
 winget install BurntSushi.ripgrep.MSVC
-winget install -e --id JesseDuffield.lazygit
 winget install -e --id charmbracelet.glow    # markdownプレビュー用
 winget install -e --id GitHub.cli    # octo.nvim用
 winget install -e --id OpenJS.NodeJS.LTS
@@ -42,7 +41,6 @@ winget install --source winget --exact --id tree-sitter.tree-sitter-cli
 brew install nvim
 brew install --cask font-fira-code-nerd-font
 brew install --cask font-udev-gothic-nf
-brew install lazygit
 brew install gh
 brew install pngpaste
 brew install glow
@@ -50,7 +48,7 @@ brew install ripgrep
 brew install codex
 brew install daipeihust/tap/im-select
 ```
-- lazygit: Github管理用, pngpaste: 画像コピペ用, gh: github, glow: md preview用, ripgrep: テキスト検索用
+- pngpaste: 画像コピペ用, gh: github, glow: md preview用, ripgrep: テキスト検索用
 - im-select: Neovim 起動時・フォーカス復帰時・挿入モード終了時の英数切り替え用
 
 <h2 id="set-font"></h2>
@@ -244,42 +242,15 @@ powershell -NoProfile -NonInteractive -ExecutionPolicy Bypass -File .\tools\wind
 
 - 既存の Hammerspoon 方式(legacy)はこちらを参照してください: [docs/hammerspoon-ime-terminal.md](docs/hammerspoon-ime-terminal.md)
 
-<h2 id="custom-lazygit"></h2>
+<h2 id="neogit"></h2>
 
-## 7. Custom LazyGit
-LazyGit を使う場合は、このリポジトリの設定を適用します。
-
-### macOS
-`tools/lazygit/config.mac.yml` を LazyGit の設定にリンクします。
-
-```sh
-cd ~/.config/nvim
-mkdir -p "$(lazygit --print-config-dir)"
-ln -sfn "$PWD/tools/lazygit/config.mac.yml" "$(lazygit --print-config-dir)/config.yml"
-```
-
-以後は `git pull` で設定も更新されます。Neovim の外で色が出ない場合は、シェルの `NO_COLOR` 設定を確認してください。
-
-### Windows(PowerShell)
-リポジトリ内の設定と補助スクリプトを LazyGit の設定ディレクトリへコピーします。
-
-```powershell
-$LG = (lazygit --print-config-dir).Trim()
-New-Item -ItemType Directory -Force -Path $LG | Out-Null
-cd $env:LOCALAPPDATA\nvim
-Copy-Item .\tools\lazygit\commit-with-generated-msg.cmd "$LG\commit-with-generated-msg.cmd" -Force
-
-$CFG = Get-Content .\tools\lazygit\config.windows.yml -Raw
-$CFG = $CFG.Replace('__LAZYGIT_DIR__', $LG)
-Set-Content "$LG\config.yml" -Value $CFG -Encoding utf8
-```
-
-更新後はこのコピー手順を再実行してください。設定先は `lazygit --print-config-dir` で確認できます。
+## 7. Neogit
 
 ### 使い方
-- Neovim の `<leader>gg` で LazyGit を開きます。
-- LazyGit の `R` で `git pull --rebase`、`G` でコミットメッセージの編集画面を開きます。
+- Neovim の `<Space>gg` で Neogit を開きます。
+- Neogit のステータス画面で `R` を押すと `git pull --rebase` を実行します。変更をステージして `G` を押すと、コミットメッセージの編集画面が開きます。
 - `G` では規則に基づく Conventional Commit 文の末尾に半角スペースが入り、その直後にカーソルが置かれます。LLM の補足文は裏で生成され、編集画面で `<Space>gm` を押すと確認できます。Enter でカーソル位置に挿入、`q` / Esc で閉じられます。生成に失敗しても先に入った文は残ります。
+- 編集画面で `:wq` または `Ctrl-c Ctrl-c` でコミットを確定し、`Ctrl-c Ctrl-k` で中止します。
 
 モデルと実行ファイルは同梱されており、Ollama と Python は不要です。対応環境は macOS 14 以降の Apple Silicon、または Windows x64(Visual C++ ランタイムが必要)です。クローンは約 650 MB 増え、初回利用時に約 580 MB のキャッシュを作成します。ライセンスと入手元・チェックサムは同梱のライセンスファイルとマニフェストを参照してください。
 
@@ -294,7 +265,7 @@ Set-Content "$LG\config.yml" -Value $CFG -Encoding utf8
 - Step 3 実行後に `nvim` で起動できる
 - 初回起動で lazy.nvim / plugins の自動セットアップが完了する
 - `:checkhealth` を実行し，致命的エラーがない
-- (任意)`rg --version`, `lazygit --version`, `glow --version` が必要に応じて通る
+- (任意)`rg --version`, `glow --version` が必要に応じて通る
 
 ## How to update
 Finder > `⌘ + Shift + .` > drag `$NVIM_CONFIG_DIR/lua` to upload file this repo

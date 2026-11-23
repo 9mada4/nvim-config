@@ -13,7 +13,7 @@ return {
   require("plugins.editor.gitsigns"),
   require("plugins.editor.grug-far"),
   require("plugins.editor.img-clip"),
-  require("plugins.editor.lazygit"),
+  require("plugins.editor.neogit"),
   require("plugins.editor.noice"),
   require("plugins.editor.octo"),
   require("plugins.editor.reposcope"),

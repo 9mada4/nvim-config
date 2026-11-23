@@ -75,7 +75,17 @@ function M.preview(buf)
   vim.keymap.set("n", "<Esc>", cancel, { buffer = preview, nowait = true, silent = true })
 end
 
-local function start(buf)
+function M.generate(mode, cwd, callback)
+  return vim.system({
+    vim.v.progpath,
+    "--clean",
+    "--headless",
+    "+lua dofile(vim.fn.stdpath('config') .. '/scripts/generate-commit-msg.lua')",
+    "+qa",
+  }, { cwd = cwd, env = { NVIM_COMMIT_MSG_MODE = mode }, text = true }, callback)
+end
+
+function M.start(buf, cwd)
   if states[buf] then
     return
   end
@@ -110,13 +120,7 @@ local function start(buf)
     end,
   })
 
-  state.process = vim.system({
-    vim.v.progpath,
-    "--clean",
-    "--headless",
-    "+lua vim.env.NVIM_COMMIT_MSG_MODE = 'llm'; dofile(vim.fn.stdpath('config') .. '/scripts/generate-commit-msg.lua')",
-    "+qa",
-  }, { cwd = vim.fn.getcwd(), text = true }, function(result)
+  state.process = M.generate("llm", cwd, function(result)
     vim.schedule(function()
       if states[buf] ~= state or not vim.api.nvim_buf_is_valid(buf) then
         return
@@ -143,7 +147,7 @@ function M.setup()
     pattern = "gitcommit",
     callback = function(args)
       if vim.bo[args.buf].buftype == "" then
-        start(args.buf)
+        M.start(args.buf, vim.fn.getcwd())
       end
     end,
   })

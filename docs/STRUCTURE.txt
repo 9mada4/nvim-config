@@ -25,7 +25,7 @@ Generated: 2026-04-15 16:26:34
 │       │   ├── comment.lua
 │       │   ├── gitsigns.lua
 │       │   ├── img-clip.lua
-│       │   ├── lazygit.lua
+│       │   ├── neogit.lua
 │       │   ├── noice.lua
 │       │   ├── octo.lua
 │       │   ├── reposcope.lua

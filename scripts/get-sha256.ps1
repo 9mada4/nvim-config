@@ -4,5 +4,15 @@ param(
 )
 
 $ErrorActionPreference = 'Stop'
-$hash = Get-FileHash -LiteralPath $LiteralPath -Algorithm SHA256
-[Console]::Out.WriteLine($hash.Hash.ToLowerInvariant())
+$sha256 = [System.Security.Cryptography.SHA256]::Create()
+try {
+  $stream = [System.IO.File]::OpenRead($LiteralPath)
+  try {
+    $hash = $sha256.ComputeHash($stream)
+    [Console]::Out.WriteLine([BitConverter]::ToString($hash).Replace('-', '').ToLowerInvariant())
+  } finally {
+    $stream.Dispose()
+  }
+} finally {
+  $sha256.Dispose()
+}

@@ -45,7 +45,8 @@ Spc sr  現在のバッファをポップアップで置換（検索語→Tab→
 Spc sR  作業ディレクトリ全体の検索・置換
          Normal Enter  全アクション選択（下分割）
 Spc h   検索Highlight ON/OFF   :noh 一時解除
-[Git] p  pull   Spc gg  Open LazyGit   G  auto comit msg  
-      P  push   Spc gd  git diff       R  pull --rebase   
+[Git] p  pull   Spc gg  Open Neogit   G  コミットメッセージ生成
+      P  push   Spc gd  git diff      R  pull --rebase
+                Spc gm  LLM補足文プレビュー（コミット編集画面）
 [VimCmd]    :q  quit    :q!  force
             :w  save    :e   open
