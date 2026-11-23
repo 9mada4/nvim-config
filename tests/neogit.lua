@@ -192,15 +192,18 @@ local ok, failure = xpcall(function()
     wait(function() return buffer("NeogitCommitPopup") end, "c opens commit popup")
     local popup = buffer("NeogitCommitPopup")
     local contents = table.concat(vim.api.nvim_buf_get_lines(popup, 0, -1, false), "\n")
-    check(contents:find("Generate (Rule)", 1, true) and contents:find("Generate (Rule + LLM)", 1, true),
-      "both generation modes are visible in commit popup")
-    for _, line in ipairs(vim.api.nvim_buf_get_lines(popup, 0, -1, false)) do
-      local col = line:find("G Generate (Rule + LLM)", 1, true)
-      if col then
-        local finish = vim.fn.strdisplaywidth(line:sub(1, col - 1)) + #"G Generate (Rule + LLM)"
-        check(finish <= 50, "generation column sits next to Create so narrow windows show it: ends at " .. finish)
+    local lines = vim.api.nvim_buf_get_lines(popup, 0, -1, false)
+    local create_col
+    for row, line in ipairs(lines) do
+      if line:find("Create", 1, true) then
+        create_col = line:find("Create", 1, true)
+        check(not line:find("Generate", 1, true), "no separate Generate column")
+        check(lines[row + 1]:find("c Commit", 1, true) == create_col, "Commit stays first in Create")
+        check(lines[row + 2]:find("g Gen-Rule", 1, true) == create_col, "g sits under Create")
+        check(lines[row + 3]:find("G Gen-Rule+LLM", 1, true) == create_col, "G sits under Create")
       end
     end
+    check(create_col, "Create column found")
     if stage_all then key(popup, "-a") end
     key(popup, lhs)
     return { done = function() return action_done end }
