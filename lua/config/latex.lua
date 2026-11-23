@@ -5,6 +5,7 @@ local os = require("config.os")
 
 local running = {}
 local pending = {}
+local pending_open_pdf = {}
 
 local function read_first_lines(bufnr, count)
   local line_count = vim.api.nvim_buf_line_count(bufnr)
@@ -162,7 +163,10 @@ local function open_pdf_for_root(root_file, opts)
   return true
 end
 
-local function build_tex(root_file)
+local function build_tex(root_file, opts)
+  opts = opts or {}
+  local open_pdf = opts.open_pdf ~= false
+
   if not root_file or vim.fn.filereadable(root_file) ~= 1 then
     return
   end
@@ -173,6 +177,7 @@ local function build_tex(root_file)
 
   if running[key] then
     pending[key] = true
+    pending_open_pdf[key] = pending_open_pdf[key] or open_pdf
     return
   end
 
@@ -186,6 +191,7 @@ local function build_tex(root_file)
 
   running[key] = true
   pending[key] = false
+  pending_open_pdf[key] = false
 
   local cmd = {
     "latexmk",
@@ -220,7 +226,9 @@ local function build_tex(root_file)
     if result.code == 0 then
       vim.schedule(function()
         vim.fn.setqflist({}, "r")
-        open_pdf_for_root(root_file, { notify_missing = false })
+        if open_pdf then
+          open_pdf_for_root(root_file, { notify_missing = false })
+        end
         vim.notify("updated " .. pdf_path_for_root(root_file), vim.log.levels.INFO, {
           title = "LaTeX",
         })
@@ -237,8 +245,10 @@ local function build_tex(root_file)
 
     if pending[key] then
       pending[key] = false
+      local next_open_pdf = pending_open_pdf[key]
+      pending_open_pdf[key] = false
       vim.schedule(function()
-        build_tex(root_file)
+        build_tex(root_file, { open_pdf = next_open_pdf })
       end)
     end
   end)
@@ -281,7 +291,7 @@ vim.api.nvim_create_autocmd("BufWritePost", {
   callback = function(args)
     local root_file = find_tex_root(args.buf)
     if root_file then
-      build_tex(root_file)
+      build_tex(root_file, { open_pdf = false })
     end
   end,
 })
@@ -294,6 +304,15 @@ vim.api.nvim_create_user_command("TexBuild", function()
   end
   build_tex(root_file)
 end, { desc = "Build the current LaTeX project" })
+
+vim.api.nvim_create_user_command("TexBuildNoOpen", function()
+  local root_file = find_tex_root(0)
+  if not root_file then
+    vim.notify("TeX root file was not found", vim.log.levels.WARN, { title = "LaTeX" })
+    return
+  end
+  build_tex(root_file, { open_pdf = false })
+end, { desc = "Build the current LaTeX project without opening its PDF" })
 
 vim.api.nvim_create_user_command("TexClean", function()
   local root_file = find_tex_root(0)
