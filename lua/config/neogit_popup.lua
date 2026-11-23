@@ -2,6 +2,27 @@
 -- Neogit popups. Neogit's own keys keep working; these only add bindings.
 local M = {}
 M.namespace = vim.api.nvim_create_namespace("nvim-config-neogit-popup")
+M.hint_namespace = vim.api.nvim_create_namespace("nvim-config-neogit-popup-hint")
+local hint = {
+  { "Enter/Space", "NeogitPopupActionKey" },
+  { " 実行", "NeogitSubtleText" },
+  { " | ", "NeogitSubtleText" },
+  { "?", "NeogitPopupActionKey" },
+  { " 日本語で説明", "NeogitSubtleText" },
+  { " | ", "NeogitSubtleText" },
+  { "q", "NeogitPopupActionKey" },
+  { " 閉じる", "NeogitSubtleText" },
+}
+
+-- Neogit sizes popups to line count + 1, so one virtual line below the last
+-- row fits without resizing. Re-placed whenever Neogit re-renders the popup.
+local function place_hint(buf)
+  if not vim.api.nvim_buf_is_valid(buf) then
+    return
+  end
+  local last = vim.api.nvim_buf_line_count(buf) - 1
+  vim.api.nvim_buf_set_extmark(buf, M.hint_namespace, last, 0, { id = 1, virt_lines = { hint } })
+end
 local explain_win = {}
 
 local function instance(buf)
@@ -92,7 +113,9 @@ function M.run(buf)
   local wanted = vim.keycode(item.keys)
   for _, mapping in ipairs(vim.api.nvim_buf_get_keymap(buf, "n")) do
     if mapping.callback and vim.keycode(mapping.lhs) == wanted then
-      return mapping.callback()
+      mapping.callback()
+      place_hint(buf)
+      return
     end
   end
   vim.api.nvim_feedkeys(wanted, "m", false)
@@ -134,6 +157,7 @@ end
 
 local function highlight(buf)
   vim.api.nvim_buf_clear_namespace(buf, M.namespace, 0, -1)
+  place_hint(buf)
   local item = M.item_under_cursor(buf)
   if not item then
     return

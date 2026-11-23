@@ -101,6 +101,19 @@ local ok, failure = xpcall(function()
     return vim.fn.maparg("<CR>", "n", false, true).buffer == 1
   end, "popup gets buffer-local <CR>")
   local instance = require("neogit.lib.popup").instance
+  local function bottom_hint(buf)
+    local marks = vim.api.nvim_buf_get_extmarks(buf, popup_ui.hint_namespace, 0, -1, { details = true })
+    if #marks ~= 1 then return nil end
+    local text = {}
+    for _, chunk in ipairs(marks[1][4].virt_lines[1]) do text[#text + 1] = chunk[1] end
+    return table.concat(text), marks[1][2], marks[1][4].virt_lines_above
+  end
+  local hint, hint_row, above = bottom_hint(push)
+  check(hint == "Enter/Space 実行 | ? 日本語で説明 | q 閉じる", "bottom hint text: " .. tostring(hint))
+  check(hint_row == vim.api.nvim_buf_line_count(push) - 1 and not above, "hint sits below the last line")
+  wait(function()
+    return vim.api.nvim_win_get_height(vim.fn.bufwinid(push)) >= vim.api.nvim_buf_line_count(push) + 1
+  end, "popup window has room for the hint row")
 
   -- Actions in the right-hand column share a row with the left-hand column.
   goto_text(push, "C Set variables")
@@ -138,6 +151,8 @@ local ok, failure = xpcall(function()
   goto_text(push, "--force-with-lease")
   key(push, " ")
   wait(function() return not switch("force-with-lease").enabled end, "<Space> toggles the switch back")
+  hint, hint_row = bottom_hint(push)
+  check(hint and hint_row == vim.api.nvim_buf_line_count(push) - 1, "hint stays at the bottom after re-render")
 
   -- ? opens a Japanese explanation; q closes only the float.
   goto_text(push, "--force-with-lease")
