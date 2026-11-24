@@ -48,18 +48,14 @@ Spc h   検索Highlight ON/OFF   :noh 一時解除
 [Git] Spc gg  Open Neogit   Spc gd  git diff
       Status: Tab Diff | s Stage | u Unstage | c Commit | x Discard
               p Pull  | P Push  | Z Stash   | ? Help   | q Close
-      c → c  通常のコミット編集
-      c → g  Generate (Rule): ルールのみ（LLMなし）
-      c → G  Generate (Rule + LLM): 件名はルール、本文にLLM補足
-      p → -r → p/u  Pull --rebase（Pullメニューで-rをON、取得元を選択）
-      生成はステージ済みの変更のみ。先にsでステージする。
-      生成操作はCommit Popupのフラグを使わない（-aも適用しない）。
-      LLM生成は非同期。完了後に編集画面が開き、失敗時はルール文を保持する。
-      編集して :wq / Ctrl-c Ctrl-c で確定、Ctrl-c Ctrl-k で中止。
-      保存時・:q時に、2行目に本文があれば件名の後へ空行を自動挿入。
-      Spc gm  生成済みLLM補足文をプレビュー（c → Gの編集画面、再生成なし）
-              本文に挿入済み。Enter/q/Escでプレビューを閉じる。
-      上部2行は設定済みキーを使う仮想行。狭いウィンドウでは右端が省略される。
-      Statusの独自R/Gは廃止。標準キーは維持（RはNeogit標準のRename）。
+      メニュー: Enter/Spc 実行   ? 日本語で説明   q/Esc 閉じる
+      p → -r → p/u  Pull --rebase（-rをONにして取得元を選ぶ）
+      c → c  自分で書く
+      c → g  Gen-Rule: ルールで自動生成（LLMなし）
+      c → G  Gen-Rule+LLM: gの内容にLLMの補足文を加える
+              g/Gはステージ済みの変更だけが対象（-aなどは無視）
+      編集画面: :wq / Ctrl-c Ctrl-c  コミット   Ctrl-c Ctrl-k  中止
+                Spc gm  LLMの補足文をもう一度見る（Gのとき、q/Escで閉じる）
+                件名の次の行に本文を書くと、保存時や:q時に空行が入る
 [VimCmd]    :q  quit    :q!  force
             :w  save    :e   open
